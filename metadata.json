@@ -1,0 +1,5 @@
+{
+  "name": "Portal de Gestão do Conhecimento",
+  "description": "Uma aplicação web para o Programa de Gestão do Conhecimento do INPI, com módulos interativos para sistematizar e utilizar os conhecimentos institucionais.",
+  "requestFramePermissions": []
+}
