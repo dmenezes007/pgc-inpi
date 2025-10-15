@@ -155,7 +155,7 @@ const Identidade: React.FC = () => {
                 </h1>
                 <div className="bg-slate-800 p-6 rounded-lg shadow-lg border border-slate-700">
                     <p className="text-lg leading-relaxed text-gray-300">
-                        A identidade institucional é o alicerce que orienta todas as nossas ações. Este módulo apresenta os pilares estratégicos do INPI — <span className="text-orange-400 font-serif-highlight">Missão, Visão, Valores e Objetivos</span> — e destaca a importância de alinhar o Programa de Gestão do Conhecimento a esses propósitos, garantindo que a criação, o compartilhamento e o uso do conhecimento contribuam diretamente para a <span className="text-orange-400 font-serif-highlight">realização da nossa estratégia</span> organizacional.
+                        A identidade institucional é o alicerce que orienta todas as nossas ações. Este módulo apresenta os pilares estratégicos do INPI — <span className="text-orange-400 font-serif-highlight">Missão, Visão, Valores e Objetivos</span> — e destaca a importância de alinhar o Processo de Gestão do Conhecimento a esses propósitos, garantindo que a criação, o compartilhamento e o uso do conhecimento contribuam diretamente para a <span className="text-orange-400 font-serif-highlight">realização da nossa estratégia</span> organizacional.
                     </p>
                 </div>
             </div>
