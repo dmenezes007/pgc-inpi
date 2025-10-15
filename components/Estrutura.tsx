@@ -75,33 +75,45 @@ const Estrutura: React.FC = () => {
                     aria-label="Buscar na estrutura organizacional"
                     // Estilização para combinar com o layout original
                     styles={{
-                        control: (base) => ({
+                        control: (base, state) => ({
                             ...base,
-                            backgroundColor: '#334155', // bg-slate-700
-                            borderColor: '#475569', // border-slate-600
-                            color: 'white',
+                            backgroundColor: '#1e293b',
+                            borderColor: state.isFocused ? '#f97316' : '#334155',
+                            boxShadow: state.isFocused ? '0 0 0 1px #f97316' : 'none',
+                            borderRadius: '0.5rem',
+                            minHeight: '48px',
+                            '&:hover': {
+                                borderColor: '#f97316'
+                            },
+                            transition: 'border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
                         }),
-                        singleValue: (base) => ({
-                            ...base,
-                            color: 'white',
-                        }),
-                        input: (base) => ({
-                            ...base,
-                            color: 'white',
-                        }),
+                        singleValue: (base) => ({ ...base, color: '#f1f5f9' }),
+                        input: (base) => ({ ...base, color: '#f1f5f9' }),
                         menu: (base) => ({
                             ...base,
-                            backgroundColor: '#1e293b', // bg-slate-800
+                            backgroundColor: '#1e293b',
+                            borderRadius: '0.5rem',
+                            border: '1px solid #334155',
                         }),
                         option: (base, { isFocused, isSelected }) => ({
                             ...base,
-                            backgroundColor: isSelected ? '#ea580c' : isFocused ? '#334155' : '#1e293b',
-                            color: 'white',
+                            backgroundColor: isSelected ? '#ea580c' : isFocused ? 'rgba(249, 115, 22, 0.2)' : 'transparent',
+                            color: isSelected ? 'white' : '#f1f5f9',
+                            borderRadius: '0.375rem',
+                            '&:active': { backgroundColor: '#c2410c' },
                         }),
-                        placeholder: (base) => ({
+                        placeholder: (base) => ({ ...base, color: '#64748b' }),
+                        clearIndicator: (base) => ({
                             ...base,
-                            color: '#9ca3af', // placeholder-gray-400
+                            color: '#64748b',
+                            '&:hover': { color: '#94a3b8' },
                         }),
+                        dropdownIndicator: (base) => ({
+                            ...base,
+                            color: '#64748b',
+                            '&:hover': { color: '#94a3b8' },
+                        }),
+                        indicatorSeparator: () => ({ display: 'none' }),
                     }}
                 />
 
