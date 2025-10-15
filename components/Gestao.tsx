@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import Papa from 'papaparse';
+import Papa from "papaparse";
 
 // --- Interfaces para Tipagem dos Dados ---
 interface MegData {

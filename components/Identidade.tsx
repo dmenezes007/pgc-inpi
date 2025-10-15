@@ -11,7 +11,7 @@ const identityData = {
         "A conformidade (qualidade) do exame de PI dever ser uma prioridade e um diferencial estratégico do INPI.",
         "Propor a revisão da LPI com foco na otimização do processamento dos pedidos de direitos de PI.",
         "Terceirizar a busca de patentes.",
-        "Otimizar e modernizar a automação dos processos de exame de pedidos de PI, em primeira e segunda instâncias.",
+        "Otimizar e modernizar a automação   dos processos de exame de pedidos de PI, em primeira e segunda instâncias.",
         "Aprimorar a harmonização de procedimentos de primeira e segunda instâncias em busca de maior previsibilidade e segurança jurídica.",
         "Aceitar novas modalidades de marcas não tradicionais, tais como sonoras e olfativas.",
         "Estabelecer de maneira sistemática e contínua processos de interação com as partes interessadas e de avaliação da qualidade dos serviços pelos usuários."
