@@ -71,7 +71,7 @@ Gestão de Crises;Reconhecer as principais normas, regulamentos e métodos relat
 Gestão de Crises;Reconhecer diferentes níveis de abordagem e condutas apropriadas para situações de crise.
 Gestão de Crises;Dispor de saberes e domínio sobre ferramentas e estratégias passíveis de serem tempestivamente mobilizadas em situações de crise.
 Autoconhecimento e Desenvolvimento Pessoal;Identificar seu propósito e o que lhe impulsiona e motiva na carreira pública.
-Autoconhecimento e Desenvolvimento Pessoal;Compreender quais são as competências fundamentais para o exercício da liderança.
+Autoconhecento e Desenvolvimento Pessoal;Compreender quais são as competências fundamentais para o exercício da liderança.
 Autoconhecimento e Desenvolvimento Pessoal;Reconhecer as características e qualidades dos diferentes estilos de liderança.
 Autoconhecimento e Desenvolvimento Pessoal;Identificar dimensões da inteligência emocional e comportamental para a autoliderança, assim como para interações interpessoais e em grupos.
 Autoconhecimento e Desenvolvimento Pessoal;Demonstrar conhecimento acerca de técnicas de gestão do tempo e produtividade.
@@ -87,6 +87,22 @@ Coordenação e Colaboração em Rede;Identificar tendências e desafios para a 
 Coordenação e Colaboração em Rede;Compreender as relações federativas e o papel de cada ente federado e de cada poder para a consecução de objetivos públicos.
 Coordenação e Colaboração em Rede;Compreender a interface entre as esferas política e técnica e suas implicações para a área de atuação.
 Coordenação e Colaboração em Rede;Identificar os diversos atores no contexto em que opera, seus objetivos e potenciais oportunidades de parcerias e de benefício mútuo.`;
+
+// --- Icon Definitions ---
+const defaultIcon = <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>;
+
+const conhecimentoIcons: { [key: string]: React.ReactNode } = {
+    'Visão de Futuro': <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>,
+    'Inovação e Mudança': <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>,
+    'Comunicação Estratégica': <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-2.236 9.168-5.518" /></svg>,
+    'Geração de Valor para o Usuário': <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.196-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.783-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>,
+    'Gestão para Resultados': <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>,
+    'Gestão de Crises': <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 20.917l9 2.083 9-2.083c-1.482-4.696-4.236-8.405-8.618-11.046z" /></svg>,
+    'Autoconhecimento e Desenvolvimento Pessoal': defaultIcon,
+    'Engajamento de Pessoas e Equipes': <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>,
+    'Coordenação e Colaboração em Rede': <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12s-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" /></svg>,
+};
+
 
 // --- Main Lideranca Component ---
 const Lideranca: React.FC = () => {
@@ -115,13 +131,6 @@ const Lideranca: React.FC = () => {
         setOpenAccordion(openAccordion === id ? null : id);
     };
 
-    // Generic icon for "Conhecimento", themed with orange.
-    const conhecimentoIcon = (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-        </svg>
-    );
-
     return (
         <div>
             <h1 className="text-4xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-orange-400">
@@ -140,7 +149,7 @@ const Lideranca: React.FC = () => {
                         title={conhecimento}
                         isOpen={openAccordion === conhecimento}
                         onClick={() => handleAccordionToggle(conhecimento)}
-                        icon={conhecimentoIcon}
+                        icon={conhecimentoIcons[conhecimento] || defaultIcon}
                     >
                         {accordionData.get(conhecimento)?.map((especificacao, index) => (
                             // --- Style adapted from Identidade.tsx ---
