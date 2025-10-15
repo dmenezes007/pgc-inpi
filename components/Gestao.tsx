@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import Papa from 'paparse';
+import Papa from 'papaparse';
 
 // --- Interfaces para Tipagem dos Dados ---
 interface MegData {
@@ -16,7 +16,7 @@ interface IesgoData {
   Tema_Niv_4: string;
 }
 
-// --- Componente Reutilizável para Itens de Seleção (Inspirado no 'Identidade') ---
+// --- Componente Reutilizável para Itens de Seleção ---
 const SelectionItem: React.FC<{
     label: string;
     isSelected: boolean;
@@ -45,6 +45,7 @@ const MegCorrelationSystem: React.FC = () => {
     const [selectedTema, setSelectedTema] = useState<string | null>(null);
 
     useEffect(() => {
+        // Busca e processa os dados do CSV para o MEG
         Papa.parse<MegData>("https://dmenezes007.github.io/pgc-inpi/src/files/docs/meg.csv", {
             download: true, header: true, delimiter: ";", skipEmptyLines: true,
             complete: (results) => setData(results.data),
@@ -107,6 +108,7 @@ const IesgoCorrelationSystem: React.FC = () => {
     const [niv3, setNiv3] = useState<string | null>(null);
 
     useEffect(() => {
+        // Busca e processa os dados do CSV para o iESGo
         Papa.parse<IesgoData>("https://dmenezes007.github.io/pgc-inpi/src/files/docs/iesgo.csv", {
             download: true, header: true, delimiter: ";", skipEmptyLines: true,
             complete: (results) => setData(results.data),
@@ -173,14 +175,14 @@ const Gestao: React.FC = () => {
                     {activeTab === 'meg' && (
                         <div className="space-y-4">
                              <h3 className="text-xl font-semibold text-gray-200">MEG - FNQ</h3>
-                             <p className="text-gray-300">O <span className="font-semibold text-white">Modelo de Excelência da Gestão® (MEG)</span> da Fundação Nacional da Qualidade (FNQ) serve como um referencial para a maturidade da gestão...</p>
+                             <p className="text-gray-300">O <span className="font-semibold text-white">Modelo de Excelência da Gestão® (MEG)</span> da Fundação Nacional da Qualidade (FNQ) serve como um referencial para a maturidade da gestão. No contexto do conhecimento, ele nos orienta a estruturar processos que abrangem desde a <span className="text-orange-400 font-serif-highlight">gestão do conhecimento e da informação</span> até a <span className="text-orange-400 font-serif-highlight">gestão da inovação</span>, garantindo que o aprendizado organizacional seja contínuo e gere valor para a sociedade.</p>
                              <MegCorrelationSystem />
                         </div>
                     )}
                     {activeTab === 'iesgo' && (
                         <div className="space-y-4">
                             <h3 className="text-xl font-semibold text-gray-200">iESGo - TCU</h3>
-                            <p className="text-gray-300">O <span className="font-semibold text-white">Levantamento de Governança, Sustentabilidade e Gestão (iESGo)</span>, do Tribunal de Contas da União (TCU), avalia a capacidade das organizações públicas em gerar resultados...</p>
+                            <p className="text-gray-300">O <span className="font-semibold text-white">Levantamento de Governança, Sustentabilidade e Gestão (iESGo)</span>, do Tribunal de Contas da União (TCU), avalia a capacidade das organizações públicas em gerar resultados. A gestão do conhecimento é um pilar essencial neste modelo, pois impacta diretamente a <span className="text-orange-400 font-serif-highlight">capacidade de planejamento</span>, a <span className="text-orange-400 font-serif-highlight">tomada de decisão baseada em evidências</span> e a <span className="text-orange-400 font-serif-highlight">transparência</span> das nossas ações, fortalecendo a governança e a entrega de valor público.</p>
                             <IesgoCorrelationSystem />
                         </div>
                     )}
