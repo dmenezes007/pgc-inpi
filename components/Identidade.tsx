@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 
 const identityData = {
-  mission: "Impulsionar a inovação por meio da Propriedade Industrial.",
-  vision: "Consolidar-se como escritório de Propriedade Industrial de classe mundial.",
+  mission: "Impulsionar a inovação por meio da Propriedade Industrial (PI).",
+  vision: "Consolidar-se como escritório de PI de classe mundial.",
   strategicObjectives: [
     {
       id: 1,
