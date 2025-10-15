@@ -37,7 +37,7 @@ export interface Project {
 }
 
 
-const CORRECT_PASSWORD = 'PGI_INPI_2025';
+const CORRECT_PASSWORD = 'PGC_INPI_2025';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
