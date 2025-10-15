@@ -95,7 +95,7 @@ const Estrutura: React.FC = () => {
                         }),
                         option: (base, { isFocused, isSelected }) => ({
                             ...base,
-                            backgroundColor: isSelected ? '#4f46e5' : isFocused ? '#334155' : '#1e293b',
+                            backgroundColor: isSelected ? '#ea580c' : isFocused ? '#334155' : '#1e293b',
                             color: 'white',
                         }),
                         placeholder: (base) => ({
