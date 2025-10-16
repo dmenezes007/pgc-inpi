@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import Papa from 'papaparse';
 import Select, { SingleValue } from 'react-select';
-import { RadialBarChart, RadialBar, Legend, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Legend, Tooltip, ResponsiveContainer } from 'recharts';
 
 // --- Interfaces ---
 interface RastreamentoData {
     Unidade: string;
+    Sigla: string;
     Conhecimento_Sugerido: string;
     'Relevancia (Score)': string;
     Ordem: string;
@@ -49,8 +50,18 @@ const VisaoPorUnidade: React.FC<{ data: RastreamentoData[] }> = ({ data }) => {
     const [selectedUnidade, setSelectedUnidade] = useState<string>('');
 
     const unidadeOptions = useMemo((): SelectOption[] => {
-        const uniqueUnidades = [...new Set(data.map(item => item.Unidade))];
-        return uniqueUnidades.sort().map(option => ({ value: option, label: option }));
+        const unidadesMap = new Map<string, string>();
+        data.forEach(item => {
+            if (item.Unidade && item.Sigla && !unidadesMap.has(item.Unidade)) {
+                unidadesMap.set(item.Unidade, item.Sigla);
+            }
+        });
+        const uniqueUnidades = Array.from(unidadesMap.entries());
+        uniqueUnidades.sort((a, b) => a[0].localeCompare(b[0]));
+        return uniqueUnidades.map(([nome, sigla]) => ({
+            value: nome,
+            label: `${nome} - ${sigla}`
+        }));
     }, [data]);
 
     const handleUnidadeChange = (option: SingleValue<SelectOption>) => {
@@ -75,10 +86,10 @@ const VisaoPorUnidade: React.FC<{ data: RastreamentoData[] }> = ({ data }) => {
     return (
         <div className="space-y-6">
             <p className="text-gray-300">Dados do conhecimento Instalado em cada unidade, com a indicação da relevância, prioridade e grau de desenvolvimento.</p>
-            <div className="max-w-md">
+            <div className="max-w-lg">
                 <Select
                     instanceId="unidade-select"
-                    value={selectedUnidade ? { value: selectedUnidade, label: selectedUnidade } : null}
+                    value={unidadeOptions.find(option => option.value === selectedUnidade) || null}
                     onChange={handleUnidadeChange}
                     options={unidadeOptions}
                     styles={customSelectStyles}
@@ -113,7 +124,7 @@ const VisaoPorUnidade: React.FC<{ data: RastreamentoData[] }> = ({ data }) => {
     );
 };
 
-const VisaoRadialChart: React.FC<{ data: RastreamentoData[], type: 'Essencial' | 'Crítico' }> = ({ data, type }) => {
+const VisaoRadarChart: React.FC<{ data: RastreamentoData[], type: 'Essencial' | 'Crítico' }> = ({ data, type }) => {
     const introText = {
         'Essencial': 'Dados do conhecimento essencial ao INPI, fundamental ao seu funcionamento e necessário para as suas operações e execução de suas atividades básicas.',
         'Crítico': 'Dados do conhecimento crítico ao INPI, estratégico, diferenciado e necessário à realização de sua missão, visão e objetivos estratégicos.'
@@ -124,45 +135,37 @@ const VisaoRadialChart: React.FC<{ data: RastreamentoData[], type: 'Essencial' |
         const grouped = filtered.reduce((acc, item) => {
             const level = `Nível ${item.Grau_Conhecimento_Instalado}`;
             if (!acc[level]) {
-                acc[level] = 0;
+                acc[level] = { level: level, total: 0 };
             }
-            acc[level]++;
+            acc[level].total++;
             return acc;
-        }, {} as Record<string, number>);
+        }, {} as Record<string, { level: string, total: number }>);
 
-        return Object.entries(grouped).map(([name, value]) => ({ name, value }));
+        // Ensure all levels are present for a consistent radar shape
+        const levels = ['Nível 1', 'Nível 2', 'Nível 3'];
+        const finalData = levels.map(level => {
+            return grouped[level] || { level: level, total: 0 };
+        });
+
+        return finalData;
     }, [data, type]);
-    
-    const COLORS = ['#dc2626', '#f59e0b', '#22c55e'];
 
     return (
         <div className="space-y-6">
             <p className="text-gray-300">{introText[type]}</p>
             <div style={{ width: '100%', height: 400 }}>
                 <ResponsiveContainer>
-                    <RadialBarChart 
-                        innerRadius="20%" 
-                        outerRadius="80%" 
-                        data={chartData} 
-                        startAngle={180} 
-                        endAngle={0}
-                    >
-                        <RadialBar
-                            minAngle={15}
-                            label={{ position: 'insideStart', fill: '#fff' }}
-                            background
-                            dataKey='value'
-                        >
-                            {chartData.map((entry, index) => (
-                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                            ))}
-                        </RadialBar>
-                        <Legend iconSize={10} width={120} height={140} layout='vertical' verticalAlign='middle' align="right" />
+                    <RadarChart cx="50%" cy="50%" outerRadius="80%" data={chartData}>
+                        <PolarGrid stroke="#475569" />
+                        <PolarAngleAxis dataKey="level" stroke="#cbd5e1" />
+                        <PolarRadiusAxis angle={30} domain={[0, 'dataMax + 5']} stroke="#94a3b8" />
+                        <Radar name={type} dataKey="total" stroke="#fb923c" fill="#fb923c" fillOpacity={0.6} />
                         <Tooltip 
                             contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #475569' }}
                             labelStyle={{ color: '#cbd5e1' }}
                         />
-                    </RadialBarChart>
+                        <Legend wrapperStyle={{ color: '#cbd5e1' }} />
+                    </RadarChart>
                 </ResponsiveContainer>
             </div>
         </div>
@@ -188,7 +191,8 @@ const Rastreamento: React.FC = () => {
             delimiter: ';',
             skipEmptyLines: true,
             complete: (results) => {
-                setData(results.data);
+                const filteredData = results.data.filter(row => row.Unidade && row.Conhecimento_Sugerido);
+                setData(filteredData);
             },
         });
     }, []);
@@ -198,9 +202,9 @@ const Rastreamento: React.FC = () => {
             case 'unidade':
                 return <VisaoPorUnidade data={data} />;
             case 'essencial':
-                return <VisaoRadialChart data={data} type="Essencial" />;
+                return <VisaoRadarChart data={data} type="Essencial" />;
             case 'critico':
-                return <VisaoRadialChart data={data} type="Crítico" />;
+                return <VisaoRadarChart data={data} type="Crítico" />;
             default:
                 return null;
         }
@@ -211,11 +215,7 @@ const Rastreamento: React.FC = () => {
             <h1 className="text-4xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-orange-400">
                 Rastreamento
             </h1>
-            <div className="bg-slate-800 p-6 rounded-lg shadow-lg mb-10 border border-slate-700">
-                <p className="text-lg leading-relaxed text-gray-300">
-                    O rastreamento é o processo de <span className="text-orange-400 font-serif-highlight">levantamento geral</span> das diferentes naturezas e dimensões do conhecimento. Seu objetivo é <span className="text-orange-400 font-serif-highlight">mapear e identificar os conhecimentos essenciais e críticos</span>, bem como as <span className="text-orange-400 font-serif-highlight">lacunas de conhecimento</span> existentes na organização, servindo de base para o planejamento estratégico da gestão do conhecimento. Nesse sentido, foi adotada a <span className="text-orange-400 font-serif-highlight"></span>metodologia de análise hierárquica e contextual</span> no levantamento dos conhecimentos associados às diferentes instâncias organizacionais, com a sinalização de seu índice de relevância e das lacunas identificadas.
-                </p>
-            </div>
+            
             <div className="w-full">
                 <div className="border-b border-slate-700">
                     <nav className="-mb-px flex space-x-6" aria-label="Tabs">
