@@ -142,12 +142,85 @@ const IesgoCorrelationSystem: React.FC = () => {
     );
 };
 
-// --- Componente Principal 'Gestao' (Estrutura Intacta) ---
+// --- Subcomponente para a Política de Gestão de Pessoas do INPI ---
+const PoliticaGestaoPessoas: React.FC = () => {
+    const principios = [
+        "Meritocracia",
+        "Valorização das pessoas",
+        "Isonomia",
+        "Transparência",
+        "Qualidade de vida",
+        "Inclusão e diversidade",
+        "Atração e retenção de talentos",
+        "Relações de trabalho sustentáveis",
+    ];
+
+    const funcoes = [
+        "Política de recrutamento e seleção",
+        "Política de capacitação",
+        "Política de gestão de desempenho e reconhecimento",
+        "Política de gestão de benefícios",
+        "Política de gestão da qualidade de vida e promoção da saúde",
+    ];
+
+    const politicaCapacitacao = [
+        "Ações de desenvolvimento de liderança e gestão",
+        "Ações de desenvolvimento de competências transversais",
+        "Ações de desenvolvimento de competências técnicas",
+        "Ações educacionais para sucessores qualificados",
+        "Avaliação da efetividade das ações educacionais",
+        "Ações para incentivar a cultura de gestão do conhecimento",
+    ];
+
+    const renderListItem = (text: string, highlight: boolean = false) => (
+        <div key={text} className={`flex items-start text-gray-300 p-3 bg-slate-900/50 rounded-md ${highlight ? 'ring-2 ring-orange-500 shadow-lg' : ''}`}>
+            <svg className="w-4 h-4 mr-3 mt-0.5 flex-shrink-0 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+            <span className={highlight ? 'font-bold text-white' : ''}>{text}</span>
+        </div>
+    );
+
+    return (
+        <div className="space-y-4">
+            <h3 className="text-xl font-semibold text-gray-200">Política de Gestão de Pessoas do INPI</h3>
+            <p className="text-gray-300">
+                A Política de Gestão de Pessoas (PGP-INPI), instituída pela Portaria/INPI/Nº 19, de 05 de junho de 2023, estabelece os parâmetros de governança e gestão para orientar as atividades de gestão de pessoas, alinhando-as ao planejamento estratégico e aos resultados institucionais. Ela é fundamental para a Gestão do Conhecimento, pois promove um ambiente que valoriza, capacita e engaja os servidores, criando as bases para a inovação e o aprendizado contínuo.
+            </p>
+            <div className="mt-8 pt-6 border-t border-slate-700">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* Coluna Princípios */}
+                    <div className="space-y-4">
+                        <h4 className="font-semibold text-gray-200">Princípios</h4>
+                        <div className="space-y-2">
+                            {principios.map(p => renderListItem(p, p === "Atração e retenção de talentos"))}
+                        </div>
+                    </div>
+                    {/* Coluna Funções */}
+                    <div className="space-y-4">
+                        <h4 className="font-semibold text-gray-200">Funções</h4>
+                        <div className="space-y-2">
+                            {funcoes.map(f => renderListItem(f, f === "Política de capacitação"))}
+                        </div>
+                    </div>
+                    {/* Coluna Política de Capacitação */}
+                    <div className="space-y-4">
+                        <h4 className="font-semibold text-gray-200">Política de Capacitação</h4>
+                        <div className="space-y-2">
+                            {politicaCapacitacao.map(pc => renderListItem(pc, pc === "Ações para incentivar a cultura de gestão do conhecimento"))}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// --- Componente Principal 'Gestao' ---
 const Gestao: React.FC = () => {
     const [activeTab, setActiveTab] = useState('meg');
     const tabs = [
         { id: 'meg', title: 'Modelo de Excelência da Gestão (MEG/FNQ)' },
         { id: 'iesgo', title: 'Levantamento de Governança (iESGo/TCU)' },
+        { id: 'pgp', title: 'Política de Gestão de Pessoas do INPI' },
     ];
 
     return (
@@ -185,6 +258,9 @@ const Gestao: React.FC = () => {
                             <p className="text-gray-300">O <span className="font-semibold text-white">Levantamento de Governança, Sustentabilidade e Gestão (iESGo)</span>, do Tribunal de Contas da União (TCU), avalia a capacidade das organizações públicas em gerar resultados. A gestão do conhecimento é um pilar essencial neste modelo, pois impacta diretamente a <span className="text-orange-400 font-serif-highlight">capacidade de planejamento</span>, a <span className="text-orange-400 font-serif-highlight">tomada de decisão baseada em evidências</span> e a <span className="text-orange-400 font-serif-highlight">transparência</span> das nossas ações, fortalecendo a governança e a entrega de valor público.</p>
                             <IesgoCorrelationSystem />
                         </div>
+                    )}
+                    {activeTab === 'pgp' && (
+                        <PoliticaGestaoPessoas />
                     )}
                 </div>
             </div>
