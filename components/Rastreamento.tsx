@@ -46,7 +46,7 @@ const customSelectStyles = {
 
 // --- Subcomponentes para cada Aba ---
 
-const VisaoPorUnidade: React.FC<{ data: RastreamentoData[] }> = ({ data }) => {
+const VisaoGeral: React.FC<{ data: RastreamentoData[] }> = ({ data }) => {
     const [selectedUnidade, setSelectedUnidade] = useState<string>('');
 
     const unidadeOptions = useMemo((): SelectOption[] => {
@@ -124,23 +124,57 @@ const VisaoPorUnidade: React.FC<{ data: RastreamentoData[] }> = ({ data }) => {
 };
 
 const VisaoRadarChart: React.FC<{ data: RastreamentoData[], type: 'Essencial' | 'Crítico' }> = ({ data, type }) => {
+    const [selectedUnidade, setSelectedUnidade] = useState<string>('');
+
+    const unidadeOptions = useMemo((): SelectOption[] => {
+        const unidadesMap = new Map<string, string>();
+        data.forEach(item => {
+            if (item.Unidade && item.Sigla && !unidadesMap.has(item.Unidade)) {
+                unidadesMap.set(item.Unidade, item.Sigla);
+            }
+        });
+        const uniqueUnidades = Array.from(unidadesMap.entries());
+        return uniqueUnidades.map(([nome, sigla]) => ({
+            value: nome,
+            label: `${nome} - ${sigla}`
+        }));
+    }, [data]);
+
+    const handleUnidadeChange = (option: SingleValue<SelectOption>) => {
+        setSelectedUnidade(option ? option.value : '');
+    };
+
     const introText = {
         'Essencial': 'Dados do conhecimento essencial ao INPI, fundamental ao seu funcionamento e necessário para as suas operações e execução de suas atividades básicas.',
         'Crítico': 'Dados do conhecimento crítico ao INPI, estratégico, diferenciado e necessário à realização de sua missão, visão e objetivos estratégicos.'
     };
 
     const chartData = useMemo(() => {
-        const filtered = data.filter(item => item.Tipo_de_Conhecimento === type);
+        let filtered = data.filter(item => item.Tipo_de_Conhecimento === type);
+        if (selectedUnidade) {
+            filtered = filtered.filter(item => item.Unidade === selectedUnidade);
+        }
         return filtered.map(item => ({
             subject: `${item.Conhecimento_Sugerido} (${item.Sigla})`,
             value: parseInt(item.Grau_Conhecimento_Instalado, 10),
             fullMark: 3,
         }));
-    }, [data, type]);
+    }, [data, type, selectedUnidade]);
 
     return (
         <div className="space-y-6">
             <p className="text-gray-300">{introText[type]}</p>
+            <div className="max-w-lg">
+                <Select
+                    instanceId={`${type}-unidade-select`}
+                    value={unidadeOptions.find(option => option.value === selectedUnidade) || null}
+                    onChange={handleUnidadeChange}
+                    options={unidadeOptions}
+                    styles={customSelectStyles}
+                    placeholder="Filtrar por unidade..."
+                    isClearable
+                />
+            </div>
             <div style={{ width: '100%', height: 500 }}>
                 <ResponsiveContainer>
                     <RadarChart cx="50%" cy="50%" outerRadius="80%" data={chartData}>
@@ -150,7 +184,7 @@ const VisaoRadarChart: React.FC<{ data: RastreamentoData[], type: 'Essencial' | 
                             stroke="#cbd5e1" 
                             tick={{ fontSize: 12, fill: '#cbd5e1' }}
                         />
-                        <PolarRadiusAxis angle={30} domain={[0, 3]} stroke="#94a3b8" />
+                        <PolarRadiusAxis angle={30} domain={[0, 3]} ticks={[0, 1, 2, 3]} stroke="#94a3b8" />
                         <Radar name="Grau de Conhecimento" dataKey="value" stroke="#fb923c" fill="#fb923c" fillOpacity={0.6} />
                         <Tooltip 
                             contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #475569' }}
@@ -172,7 +206,7 @@ const Rastreamento: React.FC = () => {
     const [data, setData] = useState<RastreamentoData[]>([]);
 
     const tabs = [
-        { id: 'unidade', title: 'Visão por Unidade' },
+        { id: 'unidade', title: 'Visão Geral' },
         { id: 'essencial', title: 'Visão Essencial' },
         { id: 'critico', title: 'Visão Crítica' },
     ];
@@ -193,7 +227,7 @@ const Rastreamento: React.FC = () => {
     const renderContent = () => {
         switch (activeTab) {
             case 'unidade':
-                return <VisaoPorUnidade data={data} />;
+                return <VisaoGeral data={data} />;
             case 'essencial':
                 return <VisaoRadarChart data={data} type="Essencial" />;
             case 'critico':
