@@ -13,7 +13,7 @@ const Tecnica: React.FC = () => {
     const [selectedNivel2, setSelectedNivel2] = useState<string>('');
 
     useEffect(() => {
-        Papa.parse<TecnicaData>('/src/files/docs/tecnica.csv', {
+        Papa.parse<TecnicaData>('https://dmenezes007.github.io/pgc-inpi/src/files/docs/tecnica.csv', {
             download: true,
             header: true,
             delimiter: ';',
