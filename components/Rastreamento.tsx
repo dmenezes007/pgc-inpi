@@ -2,12 +2,13 @@ import React, { useState, useEffect, useMemo } from 'react';
 import Papa from 'papaparse';
 import Select, { SingleValue } from 'react-select';
 import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Tooltip, ResponsiveContainer } from 'recharts';
+import rastreamentoCsvUrl from '/src/files/docs/rastreamento.csv';
 
 // --- Interfaces ---
 interface RastreamentoData {
     Unidade: string;
     Sigla: string;
-    Conhecimento_Sugerido: string;
+    Conhecimento: string;
     'Relevancia (Score)': string;
     Ordem: string;
     Tipo_de_Conhecimento: 'Crítico' | 'Essencial' | 'Apoio';
@@ -121,7 +122,7 @@ const VisaoGeral: React.FC<{ data: RastreamentoData[] }> = ({ data }) => {
                         <div key={index} className="bg-slate-900/70 p-4 rounded-lg border border-slate-700 flex items-center space-x-4">
                             <span className="text-orange-400 font-bold text-lg w-6 text-center">{item.Ordem}.</span>
                             <div className="flex-grow">
-                                <p className="text-white font-medium">{item.Conhecimento_Sugerido}</p>
+                                <p className="text-white font-medium">{item.Conhecimento}</p>
                             </div>
                             <div className="flex items-center space-x-4">
                                 <div className="w-28 flex justify-center">
@@ -182,7 +183,7 @@ const VisaoRadarChart: React.FC<{ data: RastreamentoData[], type: 'Essencial' | 
         if (!selectedUnidade) return [];
         let filtered = data.filter(item => item.Tipo_de_Conhecimento === type && item.Unidade === selectedUnidade);
         return filtered.map(item => ({
-            subject: item.Conhecimento_Sugerido,
+            subject: item.Conhecimento,
             value: parseInt(item.Grau_Conhecimento_Instalado, 10) || 0,
             fullMark: 3,
         }));
@@ -270,13 +271,13 @@ const Rastreamento: React.FC = () => {
     ];
 
     useEffect(() => {
-        Papa.parse<RastreamentoData>('https://dmenezes007.github.io/pgc-inpi/src/files/docs/rastreamento.csv', {
+        Papa.parse<RastreamentoData>(rastreamentoCsvUrl, {
             download: true,
             header: true,
             delimiter: ';',
             skipEmptyLines: true,
             complete: (results) => {
-                const filteredData = results.data.filter(row => row.Unidade && row.Conhecimento_Sugerido);
+                const filteredData = results.data.filter(row => row.Unidade && row.Conhecimento);
                 setData(filteredData);
             },
         });
