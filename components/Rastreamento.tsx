@@ -123,12 +123,47 @@ const VisaoGeral: React.FC<{ data: RastreamentoData[] }> = ({ data }) => {
     );
 };
 
+const CustomAngleAxisTick = (props: any) => {
+    const { x, y, payload } = props;
+    const value = payload.value as string;
+    const maxChars = 20;
+
+    const words = value.split(' ');
+    const lines: string[] = [];
+    let currentLine = words[0] || '';
+
+    for (let i = 1; i < words.length; i++) {
+        const word = words[i];
+        if (currentLine.length + word.length + 1 <= maxChars) {
+            currentLine += ' ' + word;
+        } else {
+            lines.push(currentLine);
+            currentLine = word;
+        }
+    }
+    lines.push(currentLine);
+
+    return (
+        <g transform={`translate(${x},${y})`}>
+            <text textAnchor="middle" dominantBaseline="central" fill="#cbd5e1" fontSize={11}>
+                {lines.map((line, index) => (
+                    <tspan key={index} x={0} dy={index > 0 ? '1.2em' : 0}>
+                        {line}
+                    </tspan>
+                ))}
+            </text>
+        </g>
+    );
+};
+
 const VisaoRadarChart: React.FC<{ data: RastreamentoData[], type: 'Essencial' | 'Crítico' }> = ({ data, type }) => {
     const [selectedUnidade, setSelectedUnidade] = useState<string>('');
 
     const unidadeOptions = useMemo((): SelectOption[] => {
         const unidadesMap = new Map<string, string>();
-        data.forEach(item => {
+        const relevantData = data.filter(item => item.Tipo_de_Conhecimento === type);
+
+        relevantData.forEach(item => {
             if (item.Unidade && item.Sigla && !unidadesMap.has(item.Unidade)) {
                 unidadesMap.set(item.Unidade, item.Sigla);
             }
@@ -138,7 +173,7 @@ const VisaoRadarChart: React.FC<{ data: RastreamentoData[], type: 'Essencial' | 
             value: nome,
             label: `${nome} - ${sigla}`
         }));
-    }, [data]);
+    }, [data, type]);
 
     const handleUnidadeChange = (option: SingleValue<SelectOption>) => {
         setSelectedUnidade(option ? option.value : '');
@@ -150,12 +185,10 @@ const VisaoRadarChart: React.FC<{ data: RastreamentoData[], type: 'Essencial' | 
     };
 
     const chartData = useMemo(() => {
-        let filtered = data.filter(item => item.Tipo_de_Conhecimento === type);
-        if (selectedUnidade) {
-            filtered = filtered.filter(item => item.Unidade === selectedUnidade);
-        }
+        if (!selectedUnidade) return [];
+        let filtered = data.filter(item => item.Tipo_de_Conhecimento === type && item.Unidade === selectedUnidade);
         return filtered.map(item => ({
-            subject: `${item.Conhecimento_Sugerido} (${item.Sigla})`,
+            subject: item.Conhecimento_Sugerido,
             value: parseInt(item.Grau_Conhecimento_Instalado, 10),
             fullMark: 3,
         }));
@@ -175,26 +208,24 @@ const VisaoRadarChart: React.FC<{ data: RastreamentoData[], type: 'Essencial' | 
                     isClearable
                 />
             </div>
-            <div style={{ width: '100%', height: 500 }}>
-                <ResponsiveContainer>
-                    <RadarChart cx="50%" cy="50%" outerRadius="80%" data={chartData}>
-                        <PolarGrid stroke="#475569" />
-                        <PolarAngleAxis 
-                            dataKey="subject" 
-                            stroke="#cbd5e1" 
-                            tick={{ fontSize: 12, fill: '#cbd5e1' }}
-                        />
-                        <PolarRadiusAxis angle={30} domain={[0, 3]} ticks={[0, 1, 2, 3]} stroke="#94a3b8" />
-                        <Radar name="Grau de Conhecimento" dataKey="value" stroke="#fb923c" fill="#fb923c" fillOpacity={0.6} />
-                        <Tooltip 
-                            contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #475569' }}
-                            labelStyle={{ color: '#cbd5e1' }}
-                            formatter={(value: number) => [value, 'Grau de Conhecimento']}
-                        />
-                        <Legend wrapperStyle={{ color: '#cbd5e1' }} />
-                    </RadarChart>
-                </ResponsiveContainer>
-            </div>
+            {selectedUnidade && (
+                <div style={{ width: '100%', height: 500 }}>
+                    <ResponsiveContainer>
+                        <RadarChart cx="50%" cy="50%" outerRadius="70%" data={chartData}>
+                            <PolarGrid stroke="#475569" />
+                            <PolarAngleAxis dataKey="subject" tick={<CustomAngleAxisTick />} />
+                            <PolarRadiusAxis angle={30} domain={[0, 3]} ticks={[0, 1, 2, 3]} stroke="#94a3b8" />
+                            <Radar name="Grau de Conhecimento" dataKey="value" stroke="#fb923c" fill="#fb923c" fillOpacity={0.6} />
+                            <Tooltip 
+                                contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #475569' }}
+                                labelStyle={{ color: '#cbd5e1' }}
+                                formatter={(value: number) => [value, 'Grau de Conhecimento']}
+                            />
+                            <Legend wrapperStyle={{ color: '#cbd5e1' }} />
+                        </RadarChart>
+                    </ResponsiveContainer>
+                </div>
+            )}
         </div>
     );
 };
