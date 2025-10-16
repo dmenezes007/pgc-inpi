@@ -1,11 +1,59 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import Papa from 'papaparse';
+import Select, { SingleValue } from 'react-select';
 
 interface TecnicaData {
     Nivel1: string;
     Nivel2: string;
     Nivel3: string;
 }
+
+interface SelectOption {
+    value: string;
+    label: string;
+}
+
+const customStyles = {
+    control: (provided: any) => ({
+        ...provided,
+        backgroundColor: '#334155', // bg-slate-700
+        borderColor: '#475569', // border-slate-600
+        color: 'white',
+        borderRadius: '0.375rem', // rounded-md
+        padding: '0.2rem',
+        border: '1px solid #475569',
+        boxShadow: 'none',
+        '&:hover': {
+            borderColor: '#64748b', // border-slate-500
+        },
+    }),
+    singleValue: (provided: any) => ({
+        ...provided,
+        color: 'white',
+    }),
+    menu: (provided: any) => ({
+        ...provided,
+        backgroundColor: '#1e293b', // bg-slate-800
+        borderColor: '#475569', // border-slate-600
+    }),
+    option: (provided: any, state: { isFocused: any; isSelected: any; }) => ({
+        ...provided,
+        backgroundColor: state.isFocused ? '#475569' : state.isSelected ? '#f97316' : '#1e293b',
+        color: 'white',
+        '&:active': {
+            backgroundColor: '#f97316',
+        },
+    }),
+    input: (provided: any) => ({
+        ...provided,
+        color: 'white',
+    }),
+    placeholder: (provided: any) => ({
+        ...provided,
+        color: '#94a3b8', // text-gray-400
+    }),
+};
+
 
 const Tecnica: React.FC = () => {
     const [data, setData] = useState<TecnicaData[]>([]);
@@ -24,16 +72,16 @@ const Tecnica: React.FC = () => {
         });
     }, []);
 
-    const nivel1Options = useMemo(() => {
+    const nivel1Options = useMemo((): SelectOption[] => {
         const uniqueNivel1 = [...new Set(data.map(item => item.Nivel1))];
-        return uniqueNivel1.sort();
+        return uniqueNivel1.sort().map(option => ({ value: option, label: option }));
     }, [data]);
 
-    const nivel2Options = useMemo(() => {
+    const nivel2Options = useMemo((): SelectOption[] => {
         if (!selectedNivel1) return [];
         const filtered = data.filter(item => item.Nivel1 === selectedNivel1);
         const uniqueNivel2 = [...new Set(filtered.map(item => item.Nivel2))];
-        return uniqueNivel2.sort();
+        return uniqueNivel2.sort().map(option => ({ value: option, label: option }));
     }, [data, selectedNivel1]);
 
     const nivel3Options = useMemo(() => {
@@ -43,13 +91,13 @@ const Tecnica: React.FC = () => {
         return uniqueNivel3.sort();
     }, [data, selectedNivel1, selectedNivel2]);
 
-    const handleNivel1Change = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setSelectedNivel1(e.target.value);
+    const handleNivel1Change = (option: SingleValue<SelectOption>) => {
+        setSelectedNivel1(option ? option.value : '');
         setSelectedNivel2('');
     };
 
-    const handleNivel2Change = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setSelectedNivel2(e.target.value);
+    const handleNivel2Change = (option: SingleValue<SelectOption>) => {
+        setSelectedNivel2(option ? option.value : '');
     };
 
     return (
@@ -64,39 +112,36 @@ const Tecnica: React.FC = () => {
             </div>
 
             <div className="bg-slate-800 p-6 rounded-lg border border-slate-700">
-                <h2 className="text-xl font-bold text-gray-200 mb-4">Explore as Competências Técnicas</h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {/* Nível 1 Dropdown */}
                     <div className="space-y-2">
                         <label htmlFor="nivel1" className="block text-sm font-medium text-gray-300">Nível 1</label>
-                        <select
+                        <Select
                             id="nivel1"
-                            value={selectedNivel1}
+                            instanceId="nivel1-select"
+                            value={selectedNivel1 ? { value: selectedNivel1, label: selectedNivel1 } : null}
                             onChange={handleNivel1Change}
-                            className="w-full p-2.5 bg-slate-700 border border-slate-600 rounded-md text-white focus:ring-orange-500 focus:border-orange-500"
-                        >
-                            <option value="">Selecione o Nível 1</option>
-                            {nivel1Options.map(option => (
-                                <option key={option} value={option}>{option}</option>
-                            ))}
-                        </select>
+                            options={nivel1Options}
+                            styles={customStyles}
+                            placeholder="Selecione ou digite o Nível 1"
+                            isClearable
+                        />
                     </div>
 
                     {/* Nível 2 Dropdown */}
                     <div className="space-y-2">
                         <label htmlFor="nivel2" className="block text-sm font-medium text-gray-300">Nível 2</label>
-                        <select
+                        <Select
                             id="nivel2"
-                            value={selectedNivel2}
+                            instanceId="nivel2-select"
+                            value={selectedNivel2 ? { value: selectedNivel2, label: selectedNivel2 } : null}
                             onChange={handleNivel2Change}
-                            disabled={!selectedNivel1}
-                            className="w-full p-2.5 bg-slate-700 border border-slate-600 rounded-md text-white focus:ring-orange-500 focus:border-orange-500 disabled:opacity-50"
-                        >
-                            <option value="">Selecione o Nível 2</option>
-                            {nivel2Options.map(option => (
-                                <option key={option} value={option}>{option}</option>
-                            ))}
-                        </select>
+                            options={nivel2Options}
+                            styles={customStyles}
+                            isDisabled={!selectedNivel1}
+                            placeholder="Selecione ou digite o Nível 2"
+                            isClearable
+                        />
                     </div>
 
                     {/* Nível 3 Display */}
