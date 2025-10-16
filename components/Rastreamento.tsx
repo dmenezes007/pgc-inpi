@@ -82,6 +82,15 @@ const VisaoGeral: React.FC<{ data: RastreamentoData[] }> = ({ data }) => {
         );
     };
 
+    const getTypeColor = (type: string) => {
+        switch (type) {
+            case 'Crítico': return 'bg-red-500/20 text-red-400';
+            case 'Essencial': return 'bg-yellow-500/20 text-yellow-400';
+            case 'Apoio': return 'bg-sky-500/20 text-sky-400';
+            default: return 'bg-slate-500/20 text-slate-400';
+        }
+    };
+
     return (
         <div className="space-y-6">
             <p className="text-gray-300">Dados do conhecimento Instalado em cada unidade, com a indicação da relevância, prioridade e grau de desenvolvimento.</p>
@@ -99,20 +108,38 @@ const VisaoGeral: React.FC<{ data: RastreamentoData[] }> = ({ data }) => {
 
             {selectedUnidade && (
                 <div className="mt-6 space-y-3">
+                    {/* Cabeçalho */}
+                    <div className="flex items-center space-x-4 text-sm font-semibold text-gray-400 px-4 py-2 border-b border-slate-700">
+                        <div className="w-6 text-center">#</div>
+                        <div className="flex-grow">Conhecimento</div>
+                        <div className="w-28 text-center">Tipo</div>
+                        <div className="w-28 text-center">Relevância</div>
+                        <div className="w-32 text-center">Grau de Desenvolvimento</div>
+                    </div>
+
                     {filteredData.map((item, index) => (
                         <div key={index} className="bg-slate-900/70 p-4 rounded-lg border border-slate-700 flex items-center space-x-4">
-                            <span className="text-orange-400 font-bold text-lg w-6">{item.Ordem}.</span>
+                            <span className="text-orange-400 font-bold text-lg w-6 text-center">{item.Ordem}.</span>
                             <div className="flex-grow">
                                 <p className="text-white font-medium">{item.Conhecimento_Sugerido}</p>
                             </div>
                             <div className="flex items-center space-x-4">
-                                <div className="flex items-center justify-center w-12 h-12 bg-slate-800 rounded-full border border-slate-600" title={`Relevância: ${item['Relevancia (Score)']}`}>
-                                    <span className="text-sm font-bold text-white">{parseFloat(item['Relevancia (Score)']).toFixed(0)}%</span>
+                                <div className="w-28 flex justify-center">
+                                    <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getTypeColor(item.Tipo_de_Conhecimento)}`}>
+                                        {item.Tipo_de_Conhecimento}
+                                    </span>
                                 </div>
-                                <div className="flex space-x-1.5" title={`Grau de Desenvolvimento: ${item.Grau_Conhecimento_Instalado}`}>
-                                    <DevelopmentBar level={1} activeLevel={parseInt(item.Grau_Conhecimento_Instalado)} />
-                                    <DevelopmentBar level={2} activeLevel={parseInt(item.Grau_Conhecimento_Instalado)} />
-                                    <DevelopmentBar level={3} activeLevel={parseInt(item.Grau_Conhecimento_Instalado)} />
+                                <div className="w-28 flex justify-center" title={`Relevância: ${item['Relevancia (Score)']}`}>
+                                    <div className="flex items-center justify-center w-12 h-12 bg-slate-800 rounded-full border border-slate-600">
+                                        <span className="text-sm font-bold text-white">{parseFloat(item['Relevancia (Score)']).toFixed(0)}%</span>
+                                    </div>
+                                </div>
+                                <div className="w-32 flex justify-center" title={`Grau de Desenvolvimento: ${item.Grau_Conhecimento_Instalado}`}>
+                                    <div className="flex space-x-1.5">
+                                        <DevelopmentBar level={1} activeLevel={parseInt(item.Grau_Conhecimento_Instalado)} />
+                                        <DevelopmentBar level={2} activeLevel={parseInt(item.Grau_Conhecimento_Instalado)} />
+                                        <DevelopmentBar level={3} activeLevel={parseInt(item.Grau_Conhecimento_Instalado)} />
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -120,39 +147,6 @@ const VisaoGeral: React.FC<{ data: RastreamentoData[] }> = ({ data }) => {
                 </div>
             )}
         </div>
-    );
-};
-
-const CustomAngleAxisTick = (props: any) => {
-    const { x, y, payload } = props;
-    const value = payload.value as string;
-    const maxChars = 20;
-
-    const words = value.split(' ');
-    const lines: string[] = [];
-    let currentLine = words[0] || '';
-
-    for (let i = 1; i < words.length; i++) {
-        const word = words[i];
-        if (currentLine.length + word.length + 1 <= maxChars) {
-            currentLine += ' ' + word;
-        } else {
-            lines.push(currentLine);
-            currentLine = word;
-        }
-    }
-    lines.push(currentLine);
-
-    return (
-        <g transform={`translate(${x},${y})`}>
-            <text textAnchor="middle" dominantBaseline="central" fill="#cbd5e1" fontSize={11}>
-                {lines.map((line, index) => (
-                    <tspan key={index} x={0} dy={index > 0 ? '1.2em' : 0}>
-                        {line}
-                    </tspan>
-                ))}
-            </text>
-        </g>
     );
 };
 
@@ -194,6 +188,24 @@ const VisaoRadarChart: React.FC<{ data: RastreamentoData[], type: 'Essencial' | 
         }));
     }, [data, type, selectedUnidade]);
 
+    const renderRadarLabel = (props: any) => {
+        const { x, y, payload } = props;
+        return (
+            <text
+                x={x}
+                y={y}
+                dy={-10}
+                fill="#fb923c"
+                fontSize={14}
+                fontWeight="bold"
+                textAnchor="middle"
+                dominantBaseline="middle"
+            >
+                {payload.subject}
+            </text>
+        );
+    };
+
     return (
         <div className="space-y-6">
             <p className="text-gray-300">{introText[type]}</p>
@@ -213,15 +225,14 @@ const VisaoRadarChart: React.FC<{ data: RastreamentoData[], type: 'Essencial' | 
                     <ResponsiveContainer>
                         <RadarChart cx="50%" cy="50%" outerRadius="70%" data={chartData}>
                             <PolarGrid stroke="#475569" />
-                            <PolarAngleAxis dataKey="subject" tick={<CustomAngleAxisTick />} />
+                            <PolarAngleAxis tick={false} />
                             <PolarRadiusAxis angle={30} domain={[0, 3]} ticks={[0, 1, 2, 3]} stroke="#94a3b8" />
-                            <Radar name="Grau de Conhecimento" dataKey="value" stroke="#fb923c" fill="#fb923c" fillOpacity={0.6} />
+                            <Radar name="Grau de Conhecimento" dataKey="value" stroke="#fb923c" fill="#fb923c" fillOpacity={0.6} label={renderRadarLabel} />
                             <Tooltip 
                                 contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #475569' }}
                                 labelStyle={{ color: '#cbd5e1' }}
                                 formatter={(value: number) => [value, 'Grau de Conhecimento']}
                             />
-                            <Legend wrapperStyle={{ color: '#cbd5e1' }} />
                         </RadarChart>
                     </ResponsiveContainer>
                 </div>
