@@ -211,7 +211,11 @@ const Rastreamento: React.FC = () => {
             <h1 className="text-4xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-orange-400">
                 Rastreamento
             </h1>
-            
+            <div className="bg-slate-800 p-6 rounded-lg shadow-lg mb-10 border border-slate-700">
+                <p className="text-lg leading-relaxed text-gray-300">
+                    O rastreamento é o processo de <span className="text-orange-400 font-serif-highlight">levantamento geral</span> das diferentes naturezas e dimensões do conhecimento. Seu objetivo é <span className="text-orange-400 font-serif-highlight">mapear e identificar os conhecimentos essenciais e críticos</span>, bem como as <span className="text-orange-400 font-serif-highlight">lacunas de conhecimento</span> existentes na organização, servindo de base para o planejamento estratégico da gestão do conhecimento. Nesse sentido, foi adotada a <span className="text-orange-400 font-serif-highlight"></span>metodologia de análise hierárquica e contextual</span> no levantamento dos conhecimentos associados às diferentes instâncias organizacionais, com a sinalização de seu índice de relevância e das lacunas identificadas.
+                </p>
+            </div>
             <div className="w-full">
                 <div className="border-b border-slate-700">
                     <nav className="-mb-px flex space-x-6" aria-label="Tabs">
