@@ -115,7 +115,7 @@ const Tecnica: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {/* Nível 1 Dropdown */}
                     <div className="space-y-2">
-                        <label htmlFor="nivel1" className="block text-sm font-medium text-gray-300">Nível 1</label>
+                        <label htmlFor="nivel1" className="block text-sm font-medium text-gray-300">Nível 1 de Conhecimento</label>
                         <Select
                             id="nivel1"
                             instanceId="nivel1-select"
@@ -130,7 +130,7 @@ const Tecnica: React.FC = () => {
 
                     {/* Nível 2 Dropdown */}
                     <div className="space-y-2">
-                        <label htmlFor="nivel2" className="block text-sm font-medium text-gray-300">Nível 2</label>
+                        <label htmlFor="nivel2" className="block text-sm font-medium text-gray-300">Nível 2 de Conhecimento</label>
                         <Select
                             id="nivel2"
                             instanceId="nivel2-select"
@@ -157,7 +157,7 @@ const Tecnica: React.FC = () => {
                                 ))
                             ) : (
                                 <div className="text-gray-400 text-sm p-3 bg-slate-900/50 rounded-md">
-                                    {selectedNivel2 ? 'Nenhum item encontrado.' : 'Selecione Nível 1 e 2 para ver os itens.'}
+                                    {selectedNivel2 ? 'Nenhum item encontrado.' : 'Selecione os Níveis 1 e 2 de Conhecimento'}
                                 </div>
                             )}
                         </div>
