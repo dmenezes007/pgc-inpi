@@ -190,6 +190,7 @@ const VisaoRadarChart: React.FC<{ data: RastreamentoData[], type: 'Essencial' | 
 
     const renderRadarLabel = (props: any) => {
         const { x, y, payload } = props;
+        if (!payload) return null;
         return (
             <text
                 x={x}
