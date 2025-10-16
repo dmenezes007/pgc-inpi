@@ -123,7 +123,7 @@ const Tecnica: React.FC = () => {
                             onChange={handleNivel1Change}
                             options={nivel1Options}
                             styles={customStyles}
-                            placeholder="Selecione ou digite o Nível 1"
+                            placeholder="Busque pelo Nível 1 de Conhecimento"
                             isClearable
                         />
                     </div>
@@ -139,14 +139,14 @@ const Tecnica: React.FC = () => {
                             options={nivel2Options}
                             styles={customStyles}
                             isDisabled={!selectedNivel1}
-                            placeholder="Selecione ou digite o Nível 2"
+                            placeholder="Busque pelo Nível 2 de Conhecimento"
                             isClearable
                         />
                     </div>
 
                     {/* Nível 3 Display */}
                     <div className="space-y-2">
-                        <label className="block text-sm font-medium text-gray-300">Nível 3</label>
+                        <label className="block text-sm font-medium text-gray-300">Nível 3 de Conhecimento</label>
                         <div className="space-y-2 pt-2">
                             {nivel3Options.length > 0 ? (
                                 nivel3Options.map(item => (
