@@ -57,7 +57,6 @@ const VisaoPorUnidade: React.FC<{ data: RastreamentoData[] }> = ({ data }) => {
             }
         });
         const uniqueUnidades = Array.from(unidadesMap.entries());
-        uniqueUnidades.sort((a, b) => a[0].localeCompare(b[0]));
         return uniqueUnidades.map(([nome, sigla]) => ({
             value: nome,
             label: `${nome} - ${sigla}`
@@ -132,37 +131,31 @@ const VisaoRadarChart: React.FC<{ data: RastreamentoData[], type: 'Essencial' | 
 
     const chartData = useMemo(() => {
         const filtered = data.filter(item => item.Tipo_de_Conhecimento === type);
-        const grouped = filtered.reduce((acc, item) => {
-            const level = `Nível ${item.Grau_Conhecimento_Instalado}`;
-            if (!acc[level]) {
-                acc[level] = { level: level, total: 0 };
-            }
-            acc[level].total++;
-            return acc;
-        }, {} as Record<string, { level: string, total: number }>);
-
-        // Ensure all levels are present for a consistent radar shape
-        const levels = ['Nível 1', 'Nível 2', 'Nível 3'];
-        const finalData = levels.map(level => {
-            return grouped[level] || { level: level, total: 0 };
-        });
-
-        return finalData;
+        return filtered.map(item => ({
+            subject: `${item.Conhecimento_Sugerido} (${item.Sigla})`,
+            value: parseInt(item.Grau_Conhecimento_Instalado, 10),
+            fullMark: 3,
+        }));
     }, [data, type]);
 
     return (
         <div className="space-y-6">
             <p className="text-gray-300">{introText[type]}</p>
-            <div style={{ width: '100%', height: 400 }}>
+            <div style={{ width: '100%', height: 500 }}>
                 <ResponsiveContainer>
                     <RadarChart cx="50%" cy="50%" outerRadius="80%" data={chartData}>
                         <PolarGrid stroke="#475569" />
-                        <PolarAngleAxis dataKey="level" stroke="#cbd5e1" />
-                        <PolarRadiusAxis angle={30} domain={[0, 'dataMax + 5']} stroke="#94a3b8" />
-                        <Radar name={type} dataKey="total" stroke="#fb923c" fill="#fb923c" fillOpacity={0.6} />
+                        <PolarAngleAxis 
+                            dataKey="subject" 
+                            stroke="#cbd5e1" 
+                            tick={{ fontSize: 12, fill: '#cbd5e1' }}
+                        />
+                        <PolarRadiusAxis angle={30} domain={[0, 3]} stroke="#94a3b8" />
+                        <Radar name="Grau de Conhecimento" dataKey="value" stroke="#fb923c" fill="#fb923c" fillOpacity={0.6} />
                         <Tooltip 
                             contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #475569' }}
                             labelStyle={{ color: '#cbd5e1' }}
+                            formatter={(value: number) => [value, 'Grau de Conhecimento']}
                         />
                         <Legend wrapperStyle={{ color: '#cbd5e1' }} />
                     </RadarChart>
@@ -215,6 +208,12 @@ const Rastreamento: React.FC = () => {
             <h1 className="text-4xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-orange-400">
                 Rastreamento
             </h1>
+
+            <div className="bg-slate-800 p-6 rounded-lg shadow-lg mb-10 border border-slate-700">
+                <p className="text-lg leading-relaxed text-gray-300">
+                    O rastreamento é o processo de <span className="text-orange-400 font-serif-highlight">levantamento geral</span> das diferentes naturezas e dimensões do conhecimento. Seu objetivo é <span className="text-orange-400 font-serif-highlight">mapear e identificar os conhecimentos essenciais e críticos</span>, bem como as <span className="text-orange-400 font-serif-highlight">lacunas de conhecimento</span> existentes na organização, servindo de base para o planejamento estratégico da gestão do conhecimento. Nesse sentido, foi adotada a <span className="text-orange-400 font-serif-highlight"></span>metodologia de análise hierárquica e contextual</span> no levantamento dos conhecimentos associados às diferentes instâncias organizacionais, com a sinalização de seu índice de relevância e das lacunas identificadas.
+                </p>
+            </div>
             
             <div className="w-full">
                 <div className="border-b border-slate-700">
