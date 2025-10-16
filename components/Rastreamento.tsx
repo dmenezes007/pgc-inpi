@@ -226,7 +226,7 @@ const VisaoRadarChart: React.FC<{ data: RastreamentoData[], type: 'Essencial' | 
                         <ResponsiveContainer>
                             <RadarChart cx="50%" cy="50%" outerRadius="70%" data={chartData}>
                                 <PolarGrid stroke="#475569" />
-                                <PolarAngleAxis tick={false} />
+                                <PolarAngleAxis dataKey="subject" tick={false} />
                                 <PolarRadiusAxis angle={30} domain={[0, 3]} ticks={[0, 1, 2, 3]} stroke="#94a3b8" />
                                 <Radar name="Grau de Conhecimento" dataKey="value" stroke="#fb923c" fill="#fb923c" fillOpacity={0.6} label={renderRadarLabel} />
                                 <Tooltip 
