@@ -65,12 +65,9 @@ const MainContent: React.FC<MainContentProps> = ({ activeModule, onModuleSelect 
                         <h1 className="text-4xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-orange-400">
                             Créditos
                         </h1>
-                        <div className="bg-slate-800 p-8 rounded-lg shadow-lg border border-slate-700 space-y-4 text-center">
+                        <div className="bg-slate-800 p-8 rounded-lg shadow-lg border border-slate-700 space-y-4 text-left">
                             <p className="text-lg text-gray-300">
-                                Este programa reconhece e agradece o trabalho fundamental do <span className="font-semibold text-white">Centro de Educação Corporativa</span>, que subsidia o Instituto com atos, informações e elementos valiosos para a gestão do conhecimento.
-                            </p>
-                            <p className="text-gray-400">Agradecimentos especiais a todos que contribuem para o fortalecimento do nosso capital intelectual.</p>
-                             <p className="text-sm text-slate-500 pt-4">© 2025 INPI</p>
+                                Este programa reconhece e agradece o trabalho fundamental do <span className="font-semibold text-white">Centro de Educação Corporativa</span>, que subsidia o Instituto com atos, informações e elementos valiosos para a gestão do conhecimento. Agradecimentos especiais a todos que contribuem para o fortalecimento do nosso capital intelectual.</p>
                         </div>
                     </div>
                 );
