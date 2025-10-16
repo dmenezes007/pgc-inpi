@@ -231,7 +231,7 @@ const VisaoRadarChart: React.FC<{ data: RastreamentoData[], type: 'Essencial' | 
             </div>
             {selectedUnidade && (
                 <div style={{ width: '100%', height: 500 }} className="flex items-center justify-center">
-                    {chartData.length >= 3 ? (
+                    {chartData.length > 0 ? (
                         <ResponsiveContainer>
                             <RadarChart cx="50%" cy="50%" outerRadius="60%" data={chartData}>
                                 <PolarGrid stroke="#475569" />
@@ -248,9 +248,7 @@ const VisaoRadarChart: React.FC<{ data: RastreamentoData[], type: 'Essencial' | 
                         </ResponsiveContainer>
                     ) : (
                         <p className="text-gray-400">
-                            {chartData.length > 0
-                                ? "É necessário ter pelo menos 3 conhecimentos para exibir o gráfico."
-                                : "Nenhum dado de conhecimento encontrado para esta unidade."}
+                            Nenhum dado de conhecimento encontrado para esta unidade.
                         </p>
                     )}
                 </div>
