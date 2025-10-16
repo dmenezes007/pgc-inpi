@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import Papa from 'papaparse';
 import Select, { SingleValue } from 'react-select';
-import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Legend, Tooltip, ResponsiveContainer } from 'recharts';
+import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Tooltip, ResponsiveContainer } from 'recharts';
 
 // --- Interfaces ---
 interface RastreamentoData {
@@ -183,7 +183,7 @@ const VisaoRadarChart: React.FC<{ data: RastreamentoData[], type: 'Essencial' | 
         let filtered = data.filter(item => item.Tipo_de_Conhecimento === type && item.Unidade === selectedUnidade);
         return filtered.map(item => ({
             subject: item.Conhecimento_Sugerido,
-            value: parseInt(item.Grau_Conhecimento_Instalado, 10),
+            value: parseInt(item.Grau_Conhecimento_Instalado, 10) || 0,
             fullMark: 3,
         }));
     }, [data, type, selectedUnidade]);
@@ -221,20 +221,28 @@ const VisaoRadarChart: React.FC<{ data: RastreamentoData[], type: 'Essencial' | 
                 />
             </div>
             {selectedUnidade && (
-                <div style={{ width: '100%', height: 500 }}>
-                    <ResponsiveContainer>
-                        <RadarChart cx="50%" cy="50%" outerRadius="70%" data={chartData}>
-                            <PolarGrid stroke="#475569" />
-                            <PolarAngleAxis tick={false} />
-                            <PolarRadiusAxis angle={30} domain={[0, 3]} ticks={[0, 1, 2, 3]} stroke="#94a3b8" />
-                            <Radar name="Grau de Conhecimento" dataKey="value" stroke="#fb923c" fill="#fb923c" fillOpacity={0.6} label={renderRadarLabel} />
-                            <Tooltip 
-                                contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #475569' }}
-                                labelStyle={{ color: '#cbd5e1' }}
-                                formatter={(value: number) => [value, 'Grau de Conhecimento']}
-                            />
-                        </RadarChart>
-                    </ResponsiveContainer>
+                <div style={{ width: '100%', height: 500 }} className="flex items-center justify-center">
+                    {chartData.length >= 3 ? (
+                        <ResponsiveContainer>
+                            <RadarChart cx="50%" cy="50%" outerRadius="70%" data={chartData}>
+                                <PolarGrid stroke="#475569" />
+                                <PolarAngleAxis tick={false} />
+                                <PolarRadiusAxis angle={30} domain={[0, 3]} ticks={[0, 1, 2, 3]} stroke="#94a3b8" />
+                                <Radar name="Grau de Conhecimento" dataKey="value" stroke="#fb923c" fill="#fb923c" fillOpacity={0.6} label={renderRadarLabel} />
+                                <Tooltip 
+                                    contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #475569' }}
+                                    labelStyle={{ color: '#cbd5e1' }}
+                                    formatter={(value: number) => [value, 'Grau de Conhecimento']}
+                                />
+                            </RadarChart>
+                        </ResponsiveContainer>
+                    ) : (
+                        <p className="text-gray-400">
+                            {chartData.length > 0
+                                ? "É necessário ter pelo menos 3 conhecimentos para exibir o gráfico."
+                                : "Nenhum dado de conhecimento encontrado para esta unidade."}
+                        </p>
+                    )}
                 </div>
             )}
         </div>
