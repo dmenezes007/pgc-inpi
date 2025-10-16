@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import Papa from 'papaparse';
 import Select, { SingleValue } from 'react-select';
 import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Tooltip, ResponsiveContainer } from 'recharts';
-import rastreamentoCsvUrl from '/src/files/docs/rastreamento.csv';
+import rastreamentoCsvUrl from '/src/files/docs/rastreamento.csv?url';
 
 // --- Interfaces ---
 interface RastreamentoData {
