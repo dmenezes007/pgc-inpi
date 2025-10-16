@@ -188,21 +188,29 @@ const VisaoRadarChart: React.FC<{ data: RastreamentoData[], type: 'Essencial' | 
         }));
     }, [data, type, selectedUnidade]);
 
-    const renderRadarLabel = (props: any) => {
-        const { x, y, payload } = props;
-        if (!payload) return null;
+    const getGrauLabel = (grau: number | string): string => {
+        const numGrau = typeof grau === 'string' ? parseInt(grau, 10) : grau;
+        switch (numGrau) {
+            case 1: return '1 (Iniciante)';
+            case 2: return '2 (Intermediário)';
+            case 3: return '3 (Avançado)';
+            default: return `${grau} (desconhecido)`;
+        }
+    };
+
+    const renderCustomAngleTick = ({ payload, x, y, cx, cy, ...rest }: any) => {
         return (
             <text
-                x={x}
-                y={y}
-                dy={-10}
-                fill="#fb923c"
-                fontSize={14}
-                fontWeight="bold"
-                textAnchor="middle"
-                dominantBaseline="middle"
+                {...rest}
+                y={y + (y - cy) / 12}
+                x={x + (x - cx) / 12}
+                fill="#94a3b8"
+                textAnchor={x > cx ? 'start' : 'end'}
+                dominantBaseline="central"
+                fontSize={12}
+                style={{ textShadow: '0px 0px 5px #000' }}
             >
-                {payload.subject}
+                {payload.value}
             </text>
         );
     };
@@ -225,15 +233,16 @@ const VisaoRadarChart: React.FC<{ data: RastreamentoData[], type: 'Essencial' | 
                 <div style={{ width: '100%', height: 500 }} className="flex items-center justify-center">
                     {chartData.length >= 3 ? (
                         <ResponsiveContainer>
-                            <RadarChart cx="50%" cy="50%" outerRadius="70%" data={chartData}>
+                            <RadarChart cx="50%" cy="50%" outerRadius="60%" data={chartData}>
                                 <PolarGrid stroke="#475569" />
-                                <PolarAngleAxis dataKey="subject" tick={false} />
-                                <PolarRadiusAxis angle={30} domain={[0, 3]} ticks={[0, 1, 2, 3]} stroke="#94a3b8" />
-                                <Radar name="Grau de Conhecimento" dataKey="value" stroke="#fb923c" fill="#fb923c" fillOpacity={0.6} label={renderRadarLabel} />
-                                <Tooltip 
+                                <PolarAngleAxis dataKey="subject" tick={renderCustomAngleTick} />
+                                <PolarRadiusAxis angle={30} domain={[0, 3]} ticks={[0, 1, 2, 3]} stroke="#94a3b8" tick={{ fill: 'transparent' }} />
+                                <Radar name="Grau de Conhecimento" dataKey="value" stroke="#fb923c" fill="#fb923c" fillOpacity={0.6} />
+                                <Tooltip
                                     contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #475569' }}
-                                    labelStyle={{ color: '#cbd5e1' }}
-                                    formatter={(value: number) => [value, 'Grau de Conhecimento']}
+                                    labelStyle={{ color: '#cbd5e1', fontWeight: 'bold' }}
+                                    formatter={(value: number) => [getGrauLabel(value), 'Grau']}
+                                    labelFormatter={(label: string) => `Conhecimento: ${label}`}
                                 />
                             </RadarChart>
                         </ResponsiveContainer>
