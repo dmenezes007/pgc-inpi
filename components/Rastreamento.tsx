@@ -200,19 +200,53 @@ const VisaoRadarChart: React.FC<{ data: RastreamentoData[], type: 'Essencial' | 
     };
 
     const renderCustomAngleTick = ({ payload, x, y, cx, cy, ...rest }: any) => {
+        const isRightSide = x >= cx;
+        // Offset to push the card away from the chart's data point
+        const xOffset = isRightSide ? 16 : -16;
+        const cardWidth = 160; // Maximum width of the card
+        const cardHeight = 36; // Height of the card
+        // Calculate position for the foreignObject
+        const cardX = isRightSide ? x + xOffset : x + xOffset - cardWidth;
+        const cardY = y - (cardHeight / 2); // Center vertically
+
         return (
-            <text
-                {...rest}
-                y={y + (y - cy) / 12}
-                x={x + (x - cx) / 12}
-                fill="#94a3b8"
-                textAnchor={x > cx ? 'start' : 'end'}
-                dominantBaseline="central"
-                fontSize={12}
-                style={{ textShadow: '0px 0px 5px #000' }}
-            >
-                {payload.value}
-            </text>
+            // foreignObject allows embedding HTML inside SVG, perfect for creating a "card"
+            <foreignObject x={cardX} y={cardY} width={cardWidth} height={cardHeight} style={{ overflow: 'visible' }}>
+                <div
+                    xmlns="http://www.w3.org/1999/xhtml"
+                    style={{
+                        width: '100%',
+                        height: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        // Align card content to the left or right based on its position
+                        justifyContent: isRightSide ? 'flex-start' : 'flex-end',
+                    }}
+                >
+                    {/* The actual card element */}
+                    <div style={{
+                        padding: '5px 10px',
+                        backgroundColor: 'rgba(30, 41, 59, 0.85)', // slate-800 with opacity
+                        border: '1px solid #475569', // slate-700
+                        borderRadius: '8px',
+                        boxShadow: '0 2px 10px rgba(0,0,0,0.5)',
+                        backdropFilter: 'blur(3px)', // Frosted glass effect
+                        textAlign: isRightSide ? 'left' : 'right',
+                        maxWidth: cardWidth,
+                    }}>
+                        <span style={{
+                            color: '#fb923c', // orange-400
+                            fontSize: '14px', // Larger font
+                            fontWeight: 600,
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                        }}>
+                            {payload.value}
+                        </span>
+                    </div>
+                </div>
+            </foreignObject>
         );
     };
 
