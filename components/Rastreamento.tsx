@@ -154,6 +154,23 @@ const VisaoGeral: React.FC<{ data: RastreamentoData[] }> = ({ data }) => {
 const VisaoRadarChart: React.FC<{ data: RastreamentoData[], type: 'Essencial' | 'Crítico' }> = ({ data, type }) => {
     const [selectedUnidade, setSelectedUnidade] = useState<string>('');
 
+    const chartColors = useMemo(() => ({
+        'Essencial': {
+            stroke: '#facc15', // Cor Amarelo (yellow-400)
+            fill: '#facc15',
+            label: '#facc15',
+            border: 'rgba(250, 204, 21, 0.5)',
+        },
+        'Crítico': {
+            stroke: '#f87171', // Cor Vermelho (red-400)
+            fill: '#f87171',
+            label: '#f87171',
+            border: 'rgba(248, 113, 113, 0.5)',
+        }
+    }), []);
+
+    const colors = chartColors[type];
+
     const unidadeOptions = useMemo((): SelectOption[] => {
         const unidadesMap = new Map<string, string>();
         const relevantData = data.filter(item => item.Tipo_de_Conhecimento === type);
@@ -227,7 +244,7 @@ const VisaoRadarChart: React.FC<{ data: RastreamentoData[], type: 'Essencial' | 
                     <div style={{
                         padding: '5px 10px',
                         backgroundColor: 'rgba(30, 41, 59, 0.85)', // slate-800 with opacity
-                        border: '1px solid #475569', // slate-700
+                        border: `1px solid ${colors.border}`,
                         borderRadius: '8px',
                         boxShadow: '0 2px 10px rgba(0,0,0,0.5)',
                         backdropFilter: 'blur(3px)', // Frosted glass effect
@@ -239,7 +256,7 @@ const VisaoRadarChart: React.FC<{ data: RastreamentoData[], type: 'Essencial' | 
                         justifyContent: 'center',
                     }}>
                         <span style={{
-                            color: '#fb923c', // orange-400
+                            color: colors.label,
                             fontSize: '13px', // Slightly smaller font for better wrapping
                             fontWeight: 600,
                             whiteSpace: 'normal', // Allow text to wrap
@@ -276,7 +293,7 @@ const VisaoRadarChart: React.FC<{ data: RastreamentoData[], type: 'Essencial' | 
                                 <PolarGrid stroke="#475569" />
                                 <PolarAngleAxis dataKey="subject" tick={renderCustomAngleTick} />
                                 <PolarRadiusAxis angle={30} domain={[0, 3]} ticks={[0, 1, 2, 3]} stroke="#94a3b8" tick={{ fill: 'transparent' }} />
-                                <Radar name="Grau de Conhecimento" dataKey="value" stroke="#fb923c" fill="#fb923c" fillOpacity={0.6} />
+                                <Radar name="Grau de Conhecimento" dataKey="value" stroke={colors.stroke} fill={colors.fill} fillOpacity={0.6} />
                                 <Tooltip
                                     contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #475569' }}
                                     labelStyle={{ color: '#cbd5e1', fontWeight: 'bold' }}
