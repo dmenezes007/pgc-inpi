@@ -280,7 +280,7 @@ const VisaoRadarChart: React.FC<{ data: RastreamentoData[], type: 'Essencial' | 
                                 <Tooltip
                                     contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #475569' }}
                                     labelStyle={{ color: '#cbd5e1', fontWeight: 'bold' }}
-                                    formatter={(value: number) => [getGrauLabel(value), 'Grau']}
+                                    formatter={(value: number) => [getGrauLabel(value), 'Grau de Desenvolvimento']}
                                     labelFormatter={(label: string) => `Conhecimento: ${label}`}
                                 />
                             </RadarChart>
