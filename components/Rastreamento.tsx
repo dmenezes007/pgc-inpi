@@ -204,7 +204,7 @@ const VisaoRadarChart: React.FC<{ data: RastreamentoData[], type: 'Essencial' | 
         // Offset to push the card away from the chart's data point
         const xOffset = isRightSide ? 16 : -16;
         const cardWidth = 160; // Maximum width of the card
-        const cardHeight = 36; // Height of the card
+        const cardHeight = 55; // Increased height to accommodate wrapped text
         // Calculate position for the foreignObject
         const cardX = isRightSide ? x + xOffset : x + xOffset - cardWidth;
         const cardY = y - (cardHeight / 2); // Center vertically
@@ -233,14 +233,18 @@ const VisaoRadarChart: React.FC<{ data: RastreamentoData[], type: 'Essencial' | 
                         backdropFilter: 'blur(3px)', // Frosted glass effect
                         textAlign: isRightSide ? 'left' : 'right',
                         maxWidth: cardWidth,
+                        minHeight: cardHeight,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
                     }}>
                         <span style={{
                             color: '#fb923c', // orange-400
-                            fontSize: '14px', // Larger font
+                            fontSize: '13px', // Slightly smaller font for better wrapping
                             fontWeight: 600,
-                            whiteSpace: 'nowrap',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
+                            whiteSpace: 'normal', // Allow text to wrap
+                            wordBreak: 'break-word', // Break long words
+                            lineHeight: '1.3',
                         }}>
                             {payload.value}
                         </span>
