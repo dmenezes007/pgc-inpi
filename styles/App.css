@@ -1,3 +1,4 @@
+
 .app-container {
   display: flex;
   height: 100vh;
@@ -15,7 +16,7 @@
     position: absolute;
     left: -100%;
     transition: left 0.3s ease-in-out;
-    z-index: 10;
+    z-index: 30;
     height: 100%;
   }
 
@@ -25,6 +26,8 @@
 
   .main-content {
     width: 100%;
+    position: relative;
+    z-index: 1;
   }
 
   .hamburger-menu {
@@ -32,7 +35,7 @@
     position: fixed;
     top: 1rem;
     left: 1rem;
-    z-index: 20;
+    z-index: 40;
     background-color: #1e293b; /* slate-800 */
     border-radius: 9999px;
     padding: 0.5rem;
