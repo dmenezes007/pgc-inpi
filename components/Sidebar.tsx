@@ -5,13 +5,20 @@ interface SidebarProps {
   modules: string[];
   activeModule: string;
   isExpanded: boolean;
+  isMobileOpen: boolean;
   onModuleSelect: (moduleName: string) => void;
   onToggle: () => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ modules, activeModule, isExpanded, onModuleSelect, onToggle }) => {
+const Sidebar: React.FC<SidebarProps> = ({ modules, activeModule, isExpanded, isMobileOpen, onModuleSelect, onToggle }) => {
+  const sidebarClasses = `sidebar bg-slate-800 flex flex-col shadow-lg transition-all duration-300 ease-in-out ${
+    isMobileOpen ? 'expanded' : ''
+  } ${
+    isExpanded ? 'w-64' : 'w-20'
+  }`;
+
   return (
-    <aside className={`bg-slate-800 flex flex-col shadow-lg transition-all duration-300 ease-in-out ${isExpanded ? 'w-64' : 'w-20'}`}>
+    <aside className={sidebarClasses}>
       <div className={`p-6 flex items-center ${isExpanded ? 'justify-between' : 'justify-center'}`}>
         {isExpanded && (
           <div className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-orange-400">
