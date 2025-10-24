@@ -110,7 +110,7 @@ const VisaoGeral: React.FC<{ data: RastreamentoData[] }> = ({ data }) => {
             {selectedUnidade && (
                 <div className="mt-6 space-y-3">
                     {/* Cabeçalho */}
-                    <div className="flex items-center space-x-4 text-sm font-semibold text-gray-400 px-4 py-2 border-b border-slate-700">
+                    <div className="hidden md:flex items-center space-x-4 text-sm font-semibold text-gray-400 px-4 py-2 border-b border-slate-700">
                         <div className="w-6 text-center">#</div>
                         <div className="flex-grow">Conhecimento</div>
                         <div className="w-28 text-center">Tipo</div>
@@ -119,27 +119,39 @@ const VisaoGeral: React.FC<{ data: RastreamentoData[] }> = ({ data }) => {
                     </div>
 
                     {filteredData.map((item, index) => (
-                        <div key={index} className="bg-slate-900/70 p-4 rounded-lg border border-slate-700 flex items-center space-x-4">
-                            <span className="text-orange-400 font-bold text-lg w-6 text-center">{item.Ordem}.</span>
-                            <div className="flex-grow">
+                        <div key={index} className="bg-slate-900/70 p-4 rounded-lg border border-slate-700 flex flex-col md:flex-row md:items-center md:space-x-4">
+                            <div className="flex items-center space-x-4 mb-4 md:mb-0">
+                                <span className="text-orange-400 font-bold text-lg w-6 text-center">{item.Ordem}.</span>
+                                <div className="flex-grow md:hidden">
+                                    <p className="text-white font-medium">{item.Conhecimento}</p>
+                                </div>
+                            </div>
+                            <div className="flex-grow hidden md:block">
                                 <p className="text-white font-medium">{item.Conhecimento}</p>
                             </div>
-                            <div className="flex items-center space-x-4">
-                                <div className="w-28 flex justify-center">
+                            <div className="flex flex-col md:flex-row md:items-center md:space-x-4 space-y-4 md:space-y-0 mt-4 md:mt-0">
+                                <div className="flex items-center justify-between md:justify-center md:w-28">
+                                    <span className="md:hidden font-semibold text-gray-400">Tipo</span>
                                     <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getTypeColor(item.Tipo_de_Conhecimento)}`}>
                                         {item.Tipo_de_Conhecimento}
                                     </span>
                                 </div>
-                                <div className="w-28 flex justify-center" title={`Relevância: ${item['Relevancia (Score)']}`}>
-                                    <div className="flex items-center justify-center w-12 h-12 bg-slate-800 rounded-full border border-slate-600">
-                                        <span className="text-sm font-bold text-white">{parseFloat(item['Relevancia (Score)']).toFixed(0)}%</span>
+                                <div className="flex items-center justify-between md:justify-center md:w-28">
+                                    <span className="md:hidden font-semibold text-gray-400">Relevância</span>
+                                    <div title={`Relevância: ${item['Relevancia (Score)']}`}>
+                                        <div className="flex items-center justify-center w-12 h-12 bg-slate-800 rounded-full border border-slate-600">
+                                            <span className="text-sm font-bold text-white">{parseFloat(item['Relevancia (Score)']).toFixed(0)}%</span>
+                                        </div>
                                     </div>
                                 </div>
-                                <div className="w-32 flex justify-center" title={`Grau de Desenvolvimento: ${item.Grau_Conhecimento_Instalado}`}>
-                                    <div className="flex space-x-1.5">
-                                        <DevelopmentBar level={1} activeLevel={parseInt(item.Grau_Conhecimento_Instalado)} />
-                                        <DevelopmentBar level={2} activeLevel={parseInt(item.Grau_Conhecimento_Instalado)} />
-                                        <DevelopmentBar level={3} activeLevel={parseInt(item.Grau_Conhecimento_Instalado)} />
+                                <div className="flex items-center justify-between md:justify-center md:w-32">
+                                    <span className="md:hidden font-semibold text-gray-400">Grau de Desenvolvimento</span>
+                                    <div title={`Grau de Desenvolvimento: ${item.Grau_Conhecimento_Instalado}`}>
+                                        <div className="flex space-x-1.5">
+                                            <DevelopmentBar level={1} activeLevel={parseInt(item.Grau_Conhecimento_Instalado)} />
+                                            <DevelopmentBar level={2} activeLevel={parseInt(item.Grau_Conhecimento_Instalado)} />
+                                            <DevelopmentBar level={3} activeLevel={parseInt(item.Grau_Conhecimento_Instalado)} />
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -216,11 +228,28 @@ const VisaoRadarChart: React.FC<{ data: RastreamentoData[], type: 'Essencial' | 
         }
     };
 
+    const [chartHeight, setChartHeight] = useState(500);
+
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth < 768) {
+                setChartHeight(300);
+            } else {
+                setChartHeight(500);
+            }
+        };
+
+        window.addEventListener('resize', handleResize);
+        handleResize(); // Set initial height
+
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
     const renderCustomAngleTick = ({ payload, x, y, cx, cy, ...rest }: any) => {
         const isRightSide = x >= cx;
         // Offset to push the card away from the chart's data point
         const xOffset = isRightSide ? 16 : -16;
-        const cardWidth = 160; // Maximum width of the card
+        const cardWidth = window.innerWidth < 768 ? 100 : 160; // Maximum width of the card
         const cardHeight = 55; // Increased height to accommodate wrapped text
         // Calculate position for the foreignObject
         const cardX = isRightSide ? x + xOffset : x + xOffset - cardWidth;
@@ -257,7 +286,7 @@ const VisaoRadarChart: React.FC<{ data: RastreamentoData[], type: 'Essencial' | 
                     }}>
                         <span style={{
                             color: colors.label,
-                            fontSize: '13px', // Slightly smaller font for better wrapping
+                            fontSize: window.innerWidth < 768 ? '11px' : '13px', // Slightly smaller font for better wrapping
                             fontWeight: 600,
                             whiteSpace: 'normal', // Allow text to wrap
                             wordBreak: 'break-word', // Break long words
@@ -286,7 +315,7 @@ const VisaoRadarChart: React.FC<{ data: RastreamentoData[], type: 'Essencial' | 
                 />
             </div>
             {selectedUnidade && (
-                <div style={{ width: '100%', height: 500 }} className="flex items-center justify-center">
+                <div style={{ width: '100%', height: chartHeight }} className="flex items-center justify-center">
                     {chartData.length > 0 ? (
                         <ResponsiveContainer>
                             <RadarChart cx="50%" cy="50%" outerRadius="60%" data={chartData}>
@@ -365,7 +394,7 @@ const Rastreamento: React.FC = () => {
             
             <div className="w-full">
                 <div className="border-b border-slate-700">
-                    <nav className="-mb-px flex space-x-6" aria-label="Tabs">
+                    <nav className="-mb-px flex space-x-6 overflow-x-auto flex-nowrap" aria-label="Tabs">
                         {tabs.map(tab => (
                             <button
                                 key={tab.id}
