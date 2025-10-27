@@ -1,3 +1,4 @@
+
 import React from 'react';
 
 // --- Dados e Configuração ---
@@ -19,7 +20,7 @@ const categoryConfig = {
     conversao: { 
         title: "Conversão", 
         color: "bg-green-500", 
-        icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16l-4-4m0 0l4-4m-4 4h18m-7 4l4 4m0 0l-4 4m4-4H3" /></svg>
+        icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>
     },
     retencao: { 
         title: "Retenção", 
@@ -44,14 +45,14 @@ const categoryConfig = {
     publicidade: { 
         title: "Publicidade", 
         color: "bg-pink-500", 
-        icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.351A1.76 1.76 0 017.166 9.74l5.223-1.654a1.76 1.76 0 001.606-2.208l-.623-1.953a1.76 1.76 0 00-2.208-1.606L11 5.882z" /></svg>
+        icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
     },
 };
 
 // --- Subcomponentes ---
 
 const LuminousBar: React.FC<{ active: boolean; color: string; icon: React.ReactNode; title: string }> = ({ active, color, icon, title }) => {
-    const baseStyle = "flex items-center justify-center h-12 w-12 md:w-24 rounded-lg transition-all duration-300";
+    const baseStyle = "flex items-center justify-center h-12 w-full rounded-lg transition-all duration-300";
     const activeStyle = `${color} text-white shadow-lg`;
     const inactiveStyle = "bg-slate-700/50 text-slate-500";
 
@@ -80,27 +81,32 @@ const Instrumentos: React.FC = () => {
                 </p>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-3">
                 {/* Cabeçalho para Telas Maiores */}
-                <div className="hidden md:flex items-center space-x-4 text-sm font-semibold text-gray-400 px-4 py-2">
-                    <div className="flex-grow">Instrumento</div>
-                    {categories.map(key => (
-                        <div key={key} className="w-24 text-center">{categoryConfig[key].title}</div>
-                    ))}
+                <div className="hidden md:flex items-center text-sm font-semibold text-gray-400 px-4">
+                    <div className="flex-grow pr-4">Instrumento</div>
+                    <div className="flex-shrink-0 grid grid-cols-6 gap-2" style={{ width: '42rem' }}>
+                        {categories.map(key => (
+                            <div key={key} className="text-center">{categoryConfig[key].title}</div>
+                        ))}
+                    </div>
                 </div>
 
                 {/* Lista de Instrumentos */}
                 {instrumentData.map((item, index) => (
-                    <div key={index} className="bg-slate-900/70 p-4 rounded-lg border border-slate-700 flex flex-col md:flex-row md:items-center md:space-x-4">
+                    <div 
+                        key={index} 
+                        className="bg-slate-900/70 p-4 rounded-lg border border-slate-700 flex flex-col md:flex-row md:items-center transition-colors duration-300 hover:bg-slate-800/90 hover:border-slate-600"
+                    >
                         {/* Título do Instrumento */}
-                        <div className="flex-grow mb-4 md:mb-0">
-                            <p className="text-white font-medium text-lg">{item.name}</p>
+                        <div className="flex-grow mb-4 md:mb-0 pr-4">
+                            <p className="text-white font-medium text-base">{item.name}</p>
                         </div>
 
                         {/* Barras Luminosas */}
-                        <div className="flex flex-wrap md:flex-nowrap gap-2">
+                        <div className="flex-shrink-0 grid grid-cols-6 gap-2" style={{ width: '42rem' }}>
                             {categories.map(key => (
-                                <div key={key} className="flex-1 md:flex-auto">
+                                <div key={key}>
                                     {/* Rótulo para Telas Pequenas */}
                                     <span className="md:hidden text-xs text-gray-400">{categoryConfig[key].title}</span>
                                     <LuminousBar
