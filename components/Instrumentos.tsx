@@ -89,8 +89,7 @@ const Instrumentos: React.FC = () => {
             <div className="space-y-3">
                 {/* Cabeçalho para Telas Maiores */}
                 <div className="hidden md:flex items-center text-sm font-semibold text-gray-400 px-4">
-                    <div className="flex-grow pr-4">Instrumento</div>
-                    <div className="flex flex-shrink-0 gap-6">
+                    <div className="flex flex-shrink-0 gap-10">
                         {categories.map(key => (
                             <div key={key} className="w-24 text-center">{categoryConfig[key].title}</div>
                         ))}
@@ -109,7 +108,7 @@ const Instrumentos: React.FC = () => {
                         </div>
 
                         {/* Barras Luminosas */}
-                        <div className="flex flex-shrink-0 gap-6">
+                        <div className="flex flex-shrink-0 gap-10">
                             {categories.map(key => (
                                 <div key={key} className="w-24">
                                     {/* Rótulo para Telas Pequenas */}
