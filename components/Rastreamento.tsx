@@ -43,6 +43,7 @@ const customSelectStyles = {
     }),
     input: (provided: any) => ({ ...provided, color: 'white' }),
     placeholder: (provided: any) => ({ ...provided, color: '#94a3b8' }),
+    menuPortal: (base: any) => ({ ...base, zIndex: 9999 }),
 };
 
 // --- Subcomponentes para cada Aba ---
@@ -104,6 +105,7 @@ const VisaoGeral: React.FC<{ data: RastreamentoData[] }> = ({ data }) => {
                     styles={customSelectStyles}
                     placeholder="Selecione ou digite uma unidade..."
                     isClearable
+                    menuPortalTarget={document.body}
                 />
             </div>
 
@@ -312,6 +314,7 @@ const VisaoRadarChart: React.FC<{ data: RastreamentoData[], type: 'Essencial' | 
                     styles={customSelectStyles}
                     placeholder="Filtrar por unidade..."
                     isClearable
+                    menuPortalTarget={document.body}
                 />
             </div>
             {selectedUnidade && (
