@@ -37,34 +37,34 @@ const Monitoramento: React.FC = () => {
   };
 
   const desempenhoIndicators = [
-    { title: "Percentual de Unidades com Conhecimentos Essenciais e Críticos Mapeados", description: "Mede o avanço do mapeamento em relação ao total da instituição" },
-    { title: "Número de Mapas de Conhecimento (Taxonomias) Criados e Validados", description: "Quantifica a estruturação formal do conhecimento" },
-    { title: "Percentual de Conhecimentos Críticos com Detentores (Especialistas) Formalmente Identificados", description: "Mede o progresso da definição e identificação das 'pessoas detentoras'" },
     { title: "Grau de Maturidade do Diagnóstico de Gestão do Conhecimento", description: "Apura o percentual de execução ou nota de maturidade baseada no diagnóstico inicial" },
-    { title: "Número de Comunidades de Prática e de Interações de Gestão do Conhecimento Ativas", description: "Mede a existência de ambientes e redes de troca" },
-    { title: "Taxa de Engajamento nas Comunidades de Prática de Gestão do Conhecimento", description: "Apura o percentual de membros ativos, número de campanhas e reuniões" },
-    { title: "Número de Lições Aprendidas Registradas", description: "Quantifica a geração de conhecimento com base na experiência" },
-    { title: "Percentual de Aderência do Plano de Capacitação aos Conhecimentos Essenciais e Críticos Mapeados", description: "Mede a conexão entre treinamentos e necessidades estratégicas" },
-    { title: "Percentual de Conhecimentos Essenciais e Críticos Armazenados em Repositórios Oficiais de Conhecimento", description: "Mede o progresso da implementação de formas de armazenamento" },
-    { title: "Taxa de Atualização dos Conteúdos de Conhecimento", description: "Apura o percentual de documentos revisados no último ano" },
     { title: "Número de Ações de Reconhecimento Implementadas", description: "Quantifica as ações para valorizar os detentores de conhecimento" },
+    { title: "Número de Comunidades de Prática e de Interações de Gestão do Conhecimento Ativas", description: "Mede a existência de ambientes e redes de troca" },
+    { title: "Número de Lições Aprendidas Registradas", description: "Quantifica a geração de conhecimento com base na experiência" },
+    { title: "Número de Mapas de Conhecimento (Taxonomias) Criados e Validados", description: "Quantifica a estruturação formal do conhecimento" },
+    { title: "Percentual de Aderência do Plano de Capacitação aos Conhecimentos Essenciais e Críticos Mapeados", description: "Mede a conexão entre treinamentos e necessidades estratégicas" },
+    { title: "Percentual de Conhecimentos Críticos com Detentores (Especialistas) Formalmente Identificados", description: "Mede o progresso da definição e identificação das 'pessoas detentoras'" },
+    { title: "Percentual de Conhecimentos Essenciais e Críticos Armazenados em Repositórios Oficiais de Conhecimento", description: "Mede o progresso da implementação de formas de armazenamento" },
+    { title: "Percentual de Unidades com Conhecimentos Essenciais e Críticos Mapeados", description: "Mede o avanço do mapeamento em relação ao total da instituição" },
     { title: "Taxa de Acesso aos Repositórios Oficiais de Conhecimento", description: "Mede o número de visualizações, downloads e pesquisas" },
+    { title: "Taxa de Atualização dos Conteúdos de Conhecimento", description: "Apura o percentual de documentos revisados no último ano" },
+    { title: "Taxa de Engajamento nas Comunidades de Prática de Gestão do Conhecimento", description: "Apura o percentual de membros ativos, número de campanhas e reuniões" },
     { title: "Taxa de Participação em Eventos de Disseminação do Conhecimento", description: "Mede o compartilhamento dos conhecimentos" },
-  ];
+  ].sort((a, b) => a.title.localeCompare(b.title));
 
   const impactoIndicators = [
+    { title: "Aumento da Produtividade em Processos-Chave", description: "Quantifica a melhoria nos indicadores de negócio que dependem do conhecimento aplicado" },
+    { title: "Aumento no Índice de Inovação", description: "Quantifica o número de novas soluções, melhorias de processo ou projetos implementados a partir das redes de conhecimento" },
+    { title: "Índice de Conhecimento Salvo", description: "Apura o percentual de conhecimento essencial e crítico de egressos da instituição mantido retido" },
     { title: "Índice de Risco de Perda de Conhecimento", description: "Mede o cruzamento da criticidade do conhecimento com o risco de saída dos seus detentores" },
     { title: "Percentual de Alinhamento dos Conhecimentos Essenciais e Críticos Identificados com os Objetivos Estratégicos", description: "Garante o foco da Gestão do Conhecimento no que importa à consecução da missão e visão institucionais" },
-    { title: "Redução do Tempo Médio para Localização de Especialistas", description: "Mede a agilidade em encontrar a pessoa certa para uma nova demanda ou projeto" },
     { title: "Percentual de Lições Aprendidas Aplicadas a Novos Projetos", description: "Mede se o conhecimento gerado está sendo de fato utilizado para evitar erros ou replicar acertos" },
-    { title: "Aumento no Índice de Inovação", description: "Quantifica o número de novas soluções, melhorias de processo ou projetos implementados a partir das redes de conhecimento" },
+    { title: "Redução da Taxa de Retrabalho ou de Erros Recorrentes", description: "Demonstra o quanto o conhecimento está sendo aplicado na prática" },
     { title: "Redução da Taxa de Turnover de Talentos-Chave", description: "Mede a eficácia da retenção de pessoas, evitando a rotatividade" },
     { title: "Redução do Tempo de Onboarding de Novos Servidores e Colaboradores", description: "Mede a aceleração da integração e ambientação a partir da capacidade de retenção do conhecimento" },
-    { title: "Índice de Conhecimento Salvo", description: "Apura o percentual de conhecimento essencial e crítico de egressos da instituição mantido retido" },
     { title: "Redução do Tempo Médio de Solução de Problemas", description: "Indica o quanto as pessoas estão encontrando as respostas que precisam mais rapidamente" },
-    { title: "Redução da Taxa de Retrabalho ou de Erros Recorrentes", description: "Demonstra o quanto o conhecimento está sendo aplicado na prática" },
-    { title: "Aumento da Produtividade em Processos-Chave", description: "Quantifica a melhoria nos indicadores de negócio que dependem do conhecimento aplicado" },
-  ];
+    { title: "Redução do Tempo Médio para Localização de Especialistas", description: "Mede a agilidade em encontrar a pessoa certa para uma nova demanda ou projeto" },
+  ].sort((a, b) => a.title.localeCompare(b.title));
 
   const tabs = [
       { id: 'desempenho', title: 'Indicadores de Desempenho' },

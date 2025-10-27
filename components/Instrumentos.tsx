@@ -4,15 +4,15 @@ import React from 'react';
 
 const instrumentData = [
     { name: "Academia Virtual do INPI", conversao: true, retencao: true, utilizacao: true, compartilhamento: true, ensino: true, publicidade: false },
-    { name: "Portal do INPI", conversao: true, retencao: true, utilizacao: true, compartilhamento: false, ensino: false, publicidade: true },
-    { name: "Intranet do INPI", conversao: true, retencao: true, utilizacao: true, compartilhamento: false, ensino: false, publicidade: true },
-    { name: "Rede Institucional", conversao: true, retencao: true, utilizacao: true, compartilhamento: true, ensino: false, publicidade: false },
-    { name: "INPI Drive", conversao: true, retencao: true, utilizacao: true, compartilhamento: true, ensino: false, publicidade: false },
-    { name: "Redmine/Marcas Doc", conversao: true, retencao: true, utilizacao: true, compartilhamento: true, ensino: false, publicidade: false },
-    { name: "Siscap (DIRPA)", conversao: true, retencao: true, utilizacao: true, compartilhamento: true, ensino: false, publicidade: false },
-    { name: "E-mails", conversao: true, retencao: true, utilizacao: false, compartilhamento: false, ensino: false, publicidade: false },
     { name: "Docmost (CGTI)", conversao: true, retencao: true, utilizacao: true, compartilhamento: true, ensino: false, publicidade: false },
+    { name: "E-mails", conversao: true, retencao: true, utilizacao: false, compartilhamento: false, ensino: false, publicidade: false },
+    { name: "INPI Drive", conversao: true, retencao: true, utilizacao: true, compartilhamento: true, ensino: false, publicidade: false },
+    { name: "Intranet do INPI", conversao: true, retencao: true, utilizacao: true, compartilhamento: false, ensino: false, publicidade: true },
+    { name: "Portal do INPI", conversao: true, retencao: true, utilizacao: true, compartilhamento: false, ensino: false, publicidade: true },
+    { name: "Rede Institucional", conversao: true, retencao: true, utilizacao: true, compartilhamento: true, ensino: false, publicidade: false },
+    { name: "Redmine/Marcas Doc", conversao: true, retencao: true, utilizacao: true, compartilhamento: true, ensino: false, publicidade: false },
     { name: "Repositório Institucional (BIBLI)", conversao: true, retencao: true, utilizacao: true, compartilhamento: true, ensino: false, publicidade: true },
+    { name: "Siscap (DIRPA)", conversao: true, retencao: true, utilizacao: true, compartilhamento: true, ensino: false, publicidade: false },
 ];
 
 const categoryConfig = {
