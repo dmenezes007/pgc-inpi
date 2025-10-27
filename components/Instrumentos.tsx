@@ -87,13 +87,13 @@ const Instrumentos: React.FC = () => {
             </div>
 
             <div className="overflow-x-auto rounded-lg border border-slate-700">
-                <div className="min-w-[900px]">
+                <div className="min-w-[960px]">
                     {/* Cabeçalho */}
                     <div className="flex items-center bg-slate-900/70 text-sm font-semibold text-gray-400 px-4 py-3">
                         <div className="flex-1 pr-4">Instrumento</div>
-                        <div className="flex flex-shrink-0 gap-4">
+                        <div className="flex flex-shrink-0 gap-6">
                             {categories.map(key => (
-                                <div key={key} className="w-28 flex justify-center text-center">
+                                <div key={key} className="w-32 flex justify-center text-center">
                                     <span>{categoryConfig[key].title}</span>
                                 </div>
                             ))}
@@ -113,9 +113,9 @@ const Instrumentos: React.FC = () => {
                                 </div>
 
                                 {/* Barras Luminosas */}
-                                <div className="flex flex-shrink-0 gap-4">
+                                <div className="flex flex-shrink-0 gap-6">
                                     {categories.map(key => (
-                                        <div key={key} className="w-28">
+                                        <div key={key} className="w-32">
                                             <LuminousBar
                                                 active={item[key as keyof typeof item] as boolean}
                                                 classNames={{ active: categoryConfig[key].activeClasses, inactive: categoryConfig[key].inactiveClasses }}
