@@ -86,47 +86,49 @@ const Instrumentos: React.FC = () => {
                 </p>
             </div>
 
-            <div className="space-y-3">
-                {/* Cabeçalho para Telas Maiores */}
-                <div className="hidden md:flex items-center text-sm font-semibold text-gray-400 px-4">
-                    <div className="flex-grow pr-4">Instrumento</div>
-                    <div className="flex flex-shrink-0 gap-10">
-                        {categories.map(key => (
-                            <div key={key} className="w-24 flex justify-center">
-                                <span>{categoryConfig[key].title}</span>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Lista de Instrumentos */}
-                {instrumentData.map((item, index) => (
-                    <div 
-                        key={index} 
-                        className="bg-slate-900/70 p-4 rounded-lg border border-slate-700 flex flex-col md:flex-row md:items-center transition-colors duration-300 hover:bg-slate-800/90 hover:border-slate-600"
-                    >
-                        {/* Título do Instrumento */}
-                        <div className="flex-grow mb-4 md:mb-0 pr-4">
-                            <p className="text-white font-medium text-base">{item.name}</p>
-                        </div>
-
-                        {/* Barras Luminosas */}
-                        <div className="flex flex-shrink-0 gap-10">
+            <div className="overflow-x-auto rounded-lg border border-slate-700">
+                <div className="min-w-[900px]">
+                    {/* Cabeçalho */}
+                    <div className="flex items-center bg-slate-900/70 text-sm font-semibold text-gray-400 px-4 py-3">
+                        <div className="flex-1 pr-4">Instrumento</div>
+                        <div className="flex flex-shrink-0 gap-4">
                             {categories.map(key => (
-                                <div key={key} className="w-24">
-                                    {/* Rótulo para Telas Pequenas */}
-                                    <span className="md:hidden text-xs text-gray-400">{categoryConfig[key].title}</span>
-                                    <LuminousBar
-                                        active={item[key as keyof typeof item] as boolean}
-                                        classNames={{ active: categoryConfig[key].activeClasses, inactive: categoryConfig[key].inactiveClasses }}
-                                        icon={categoryConfig[key].icon}
-                                        title={categoryConfig[key].title}
-                                    />
+                                <div key={key} className="w-28 flex justify-center text-center">
+                                    <span>{categoryConfig[key].title}</span>
                                 </div>
                             ))}
                         </div>
                     </div>
-                ))}
+
+                    {/* Lista de Instrumentos */}
+                    <div className="space-y-2 p-2 bg-slate-800/50">
+                        {instrumentData.map((item, index) => (
+                            <div 
+                                key={index} 
+                                className="bg-slate-900/70 p-4 rounded-lg border border-transparent flex items-center transition-colors duration-300 hover:bg-slate-800/90 hover:border-slate-600"
+                            >
+                                {/* Título do Instrumento */}
+                                <div className="flex-1 pr-4">
+                                    <p className="text-white font-medium text-base">{item.name}</p>
+                                </div>
+
+                                {/* Barras Luminosas */}
+                                <div className="flex flex-shrink-0 gap-4">
+                                    {categories.map(key => (
+                                        <div key={key} className="w-28">
+                                            <LuminousBar
+                                                active={item[key as keyof typeof item] as boolean}
+                                                classNames={{ active: categoryConfig[key].activeClasses, inactive: categoryConfig[key].inactiveClasses }}
+                                                icon={categoryConfig[key].icon}
+                                                title={categoryConfig[key].title}
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
             </div>
         </div>
     );
