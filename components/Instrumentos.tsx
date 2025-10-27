@@ -85,8 +85,7 @@ const Instrumentos: React.FC = () => {
                 {/* Cabeçalho para Telas Maiores */}
                 <div className="hidden md:flex items-center text-sm font-semibold text-gray-400 px-4">
                     <div className="flex-grow pr-4">Instrumento</div>
-                    <div className="flex-shrink-0 grid grid-cols-6 gap-2" style={{ width: '42rem' }}>
-                        {categories.map(key => (
+                                            <div className="flex-shrink-0 grid grid-cols-6 gap-4" style={{ width: '42rem' }}>                        {categories.map(key => (
                             <div key={key} className="text-center">{categoryConfig[key].title}</div>
                         ))}
                     </div>
@@ -104,7 +103,7 @@ const Instrumentos: React.FC = () => {
                         </div>
 
                         {/* Barras Luminosas */}
-                        <div className="flex-shrink-0 grid grid-cols-6 gap-2" style={{ width: '42rem' }}>
+                    <div className="flex-shrink-0 grid grid-cols-6 gap-4" style={{ width: '42rem' }}>
                             {categories.map(key => (
                                 <div key={key}>
                                     {/* Rótulo para Telas Pequenas */}
