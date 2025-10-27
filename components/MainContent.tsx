@@ -13,6 +13,7 @@ import Planejamento from './Planejamento';
 import Autodesenvolvimento from './Autodesenvolvimento';
 import Rastreamento from './Rastreamento';
 import Instrumentos from './Instrumentos';
+import Monitoramento from './Monitoramento';
 
 interface MainContentProps {
   activeModule: string;
@@ -59,18 +60,8 @@ const MainContent: React.FC<MainContentProps> = ({ activeModule, onModuleSelect 
                 return <Rastreamento />;
             case 'Instrumentos':
                 return <Instrumentos />;
-            case 'Créditos':
-                 return (
-                    <div>
-                        <h1 className="text-4xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-orange-400">
-                            Créditos
-                        </h1>
-                        <div className="bg-slate-800 p-8 rounded-lg shadow-lg border border-slate-700 space-y-4 text-left">
-                            <p className="text-lg text-gray-300">
-                                Este programa reconhece e agradece o trabalho fundamental do <span className="font-semibold text-white">Centro de Educação Corporativa</span>, que subsidia o Instituto com atos, informações e elementos valiosos para a gestão do conhecimento. Agradecimentos especiais a todos que contribuem para o fortalecimento do nosso capital intelectual.</p>
-                        </div>
-                    </div>
-                );
+            case 'Monitoramento':
+                return <Monitoramento />;
             default:
                  return (
                     <div>

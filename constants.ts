@@ -11,5 +11,5 @@ export const MODULES = [
   "Autodesenvolvimento",
   "Rastreamento",
   "Instrumentos",
-  "Créditos"
+  "Monitoramento"
 ];
