@@ -74,6 +74,7 @@ const LuminousBar: React.FC<{ active: boolean; classNames: { active: string; ina
 
 const Instrumentos: React.FC = () => {
     const categories = Object.keys(categoryConfig) as (keyof typeof categoryConfig)[];
+    const gridCols = `grid-cols-[1fr_repeat(6,8rem)]`;
 
     return (
         <div>
@@ -89,17 +90,13 @@ const Instrumentos: React.FC = () => {
             <div className="overflow-x-auto rounded-lg border border-slate-700">
                 <div className="min-w-[960px]">
                     {/* Cabeçalho */}
-                    <div className="flex items-center bg-slate-900/70 text-sm font-semibold text-gray-400 px-4 py-3">
-                        <div className="flex-1 pr-4">Instrumento</div>
-                        <div className="flex flex-shrink-0 gap-6">
-                            {categories.map(key => (
-                                <div key={key} className="w-32">
-                                    <div className="flex items-center justify-center h-12">
-                                        <span>{categoryConfig[key].title}</span>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
+                    <div className={`grid ${gridCols} gap-x-6 items-center bg-slate-900/70 text-sm font-semibold text-gray-400 px-4`}>
+                        <div className="pr-4 py-3">Instrumento</div>
+                        {categories.map(key => (
+                            <div key={key} className="text-center py-3">
+                                {categoryConfig[key].title}
+                            </div>
+                        ))}
                     </div>
 
                     {/* Lista de Instrumentos */}
@@ -107,26 +104,21 @@ const Instrumentos: React.FC = () => {
                         {instrumentData.map((item, index) => (
                             <div 
                                 key={index} 
-                                className="bg-slate-900/70 p-4 rounded-lg border border-transparent flex items-center transition-colors duration-300 hover:bg-slate-800/90 hover:border-slate-600"
+                                className={`grid ${gridCols} gap-x-6 items-center bg-slate-900/70 p-4 rounded-lg border border-transparent transition-colors duration-300 hover:bg-slate-800/90 hover:border-slate-600`}
                             >
-                                {/* Título do Instrumento */}
-                                <div className="flex-1 pr-4">
+                                <div className="pr-4">
                                     <p className="text-white font-medium text-base">{item.name}</p>
                                 </div>
-
-                                {/* Barras Luminosas */}
-                                <div className="flex flex-shrink-0 gap-6">
-                                    {categories.map(key => (
-                                        <div key={key} className="w-32">
-                                            <LuminousBar
-                                                active={item[key as keyof typeof item] as boolean}
-                                                classNames={{ active: categoryConfig[key].activeClasses, inactive: categoryConfig[key].inactiveClasses }}
-                                                icon={categoryConfig[key].icon}
-                                                title={categoryConfig[key].title}
-                                            />
-                                        </div>
-                                    ))}
-                                </div>
+                                {categories.map(key => (
+                                    <div key={key}>
+                                        <LuminousBar
+                                            active={item[key as keyof typeof item] as boolean}
+                                            classNames={{ active: categoryConfig[key].activeClasses, inactive: categoryConfig[key].inactiveClasses }}
+                                            icon={categoryConfig[key].icon}
+                                            title={categoryConfig[key].title}
+                                        />
+                                    </div>
+                                ))}
                             </div>
                         ))}
                     </div>
