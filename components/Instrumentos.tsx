@@ -94,7 +94,9 @@ const Instrumentos: React.FC = () => {
                         <div className="flex flex-shrink-0 gap-6">
                             {categories.map(key => (
                                 <div key={key} className="w-32">
-                                    <span className="block text-center">{categoryConfig[key].title}</span>
+                                    <div className="flex items-center justify-center h-12">
+                                        <span>{categoryConfig[key].title}</span>
+                                    </div>
                                 </div>
                             ))}
                         </div>
