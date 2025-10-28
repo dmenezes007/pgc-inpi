@@ -93,8 +93,8 @@ const Instrumentos: React.FC = () => {
                     <div className={`grid ${gridCols} gap-x-6 items-center bg-slate-900/70 text-sm font-semibold text-gray-400 px-4`}>
                         <div className="pr-4 py-3">Instrumento</div>
                         {categories.map(key => (
-                            <div key={key} className="text-center py-3">
-                                {categoryConfig[key].title}
+                            <div key={key} className="flex justify-center items-center py-3">
+                                <span>{categoryConfig[key].title}</span>
                             </div>
                         ))}
                     </div>
