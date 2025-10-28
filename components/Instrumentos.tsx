@@ -69,7 +69,7 @@ const LuminousBar: React.FC<{ active: boolean; classNames: { active: string; ina
 
 const Instrumentos: React.FC = () => {
     const categories = Object.keys(categoryConfig) as (keyof typeof categoryConfig)[];
-    const gridCols = `grid-cols-[1fr_repeat(6,8rem)]`;
+    const gridCols = `grid-cols-[1fr_repeat(6,9rem)]`;
 
     return (
         <div>
@@ -83,7 +83,7 @@ const Instrumentos: React.FC = () => {
             </div>
 
             <div className="overflow-x-auto rounded-lg border border-slate-700 bg-slate-900/70">
-                <div className="min-w-[960px]">
+                <div className="min-w-[1200px]">
                     <div className={`grid ${gridCols} gap-x-6 items-center text-sm font-semibold text-gray-400 px-4`}>
                         {/* Cabeçalho */}
                         <div className="pr-4 py-3 sticky left-0 bg-slate-900/70">Instrumento</div>
