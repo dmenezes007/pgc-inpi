@@ -13,7 +13,7 @@ const instrumentData = [
     { name: "Redmine/Marcas Doc", conversao: true, retencao: true, utilizacao: true, compartilhamento: true, ensino: false, publicidade: false },
     { name: "Repositório Institucional (BIBLI)", conversao: true, retencao: true, utilizacao: true, compartilhamento: true, ensino: false, publicidade: true },
     { name: "Siscap (DIRPA)", conversao: true, retencao: true, utilizacao: true, compartilhamento: true, ensino: false, publicidade: false },
-];
+].sort((a, b) => a.name.localeCompare(b.name));
 
 const categoryConfig = {
     conversao: { 
@@ -54,8 +54,6 @@ const categoryConfig = {
     },
 };
 
-// --- Subcomponentes ---
-
 const LuminousBar: React.FC<{ active: boolean; classNames: { active: string; inactive: string }; icon: React.ReactNode; title: string }> = ({ active, classNames, icon, title }) => {
     const baseStyle = "flex items-center justify-center h-12 w-full rounded-lg transition-all duration-300 border";
     const stateStyle = active ? classNames.active : classNames.inactive;
@@ -68,9 +66,6 @@ const LuminousBar: React.FC<{ active: boolean; classNames: { active: string; ina
         </div>
     );
 };
-
-
-// --- Componente Principal ---
 
 const Instrumentos: React.FC = () => {
     const categories = Object.keys(categoryConfig) as (keyof typeof categoryConfig)[];
@@ -87,30 +82,29 @@ const Instrumentos: React.FC = () => {
                 </p>
             </div>
 
-            <div className="overflow-x-auto rounded-lg border border-slate-700">
+            <div className="overflow-x-auto rounded-lg border border-slate-700 bg-slate-900/70">
                 <div className="min-w-[960px]">
-                    {/* Cabeçalho */}
-                    <div className={`grid ${gridCols} gap-x-6 items-center bg-slate-900/70 text-sm font-semibold text-gray-400 px-4`}>
-                        <div className="pr-4 py-3">Instrumento</div>
+                    <div className={`grid ${gridCols} gap-x-6 items-center text-sm font-semibold text-gray-400 px-4`}>
+                        {/* Cabeçalho */}
+                        <div className="pr-4 py-3 sticky left-0 bg-slate-900/70">Instrumento</div>
                         {categories.map(key => (
-                            <div key={key} className="flex justify-center items-center py-3">
-                                <span>{categoryConfig[key].title}</span>
+                            <div key={key} className="text-center py-3">
+                                {categoryConfig[key].title}
                             </div>
                         ))}
                     </div>
 
-                    {/* Lista de Instrumentos */}
-                    <div className="space-y-2 p-2 bg-slate-800/50">
+                    <div className="bg-slate-800/50">
                         {instrumentData.map((item, index) => (
                             <div 
                                 key={index} 
-                                className={`grid ${gridCols} gap-x-6 items-center bg-slate-900/70 p-4 rounded-lg border border-transparent transition-colors duration-300 hover:bg-slate-800/90 hover:border-slate-600`}
+                                className={`grid ${gridCols} gap-x-6 items-center border-t border-slate-700/50 hover:bg-slate-800/90 px-4`}
                             >
-                                <div className="pr-4">
+                                <div className="pr-4 py-2 sticky left-0 bg-slate-800/50 hover:bg-slate-800/90">
                                     <p className="text-white font-medium text-base">{item.name}</p>
                                 </div>
                                 {categories.map(key => (
-                                    <div key={key}>
+                                    <div key={key} className="py-2">
                                         <LuminousBar
                                             active={item[key as keyof typeof item] as boolean}
                                             classNames={{ active: categoryConfig[key].activeClasses, inactive: categoryConfig[key].inactiveClasses }}
