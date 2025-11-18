@@ -52,6 +52,7 @@ const customStyles = {
         ...provided,
         color: '#94a3b8', // text-gray-400
     }),
+    menuPortal: (base: any) => ({ ...base, zIndex: 9999 }),
 };
 
 
@@ -125,6 +126,7 @@ const Tecnica: React.FC = () => {
                             styles={customStyles}
                             placeholder="Busque pelo Nível 1 de Conhecimento"
                             isClearable
+                            menuPortalTarget={document.body}
                         />
                     </div>
 
@@ -141,6 +143,7 @@ const Tecnica: React.FC = () => {
                             isDisabled={!selectedNivel1}
                             placeholder="Busque pelo Nível 2 de Conhecimento"
                             isClearable
+                            menuPortalTarget={document.body}
                         />
                     </div>
 
