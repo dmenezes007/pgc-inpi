@@ -12,6 +12,7 @@ const instrumentData = [
     { name: "Rede Institucional", conversao: true, retencao: true, utilizacao: true, compartilhamento: true, ensino: false, publicidade: false },
     { name: "Redmine/Marcas Doc", conversao: true, retencao: true, utilizacao: true, compartilhamento: true, ensino: false, publicidade: false },
     { name: "Repositório Institucional (BIBLI)", conversao: true, retencao: true, utilizacao: true, compartilhamento: true, ensino: false, publicidade: true },
+    { name: "Sistema Eletrônico de Informações (SEI)", conversao: true, retencao: true, utilizacao: true, compartilhamento: true, ensino: false, publicidade: false },
     { name: "Siscap (DIRPA)", conversao: true, retencao: true, utilizacao: true, compartilhamento: true, ensino: false, publicidade: false },
 ].sort((a, b) => a.name.localeCompare(b.name));
 
