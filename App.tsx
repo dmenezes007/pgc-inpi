@@ -43,8 +43,6 @@ const CORRECT_PASSWORD = 'PGC_INPI_2025';
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [activeModule, setActiveModule] = useState(MODULES[0]);
-  const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
-  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   useEffect(() => {
     const storedAuth = sessionStorage.getItem('isAuthenticated');
@@ -64,17 +62,6 @@ function App() {
 
   const handleModuleSelect = (moduleName: string) => {
     setActiveModule(moduleName);
-    if (window.innerWidth < 768) {
-      setIsMobileSidebarOpen(false);
-    }
-  };
-
-  const toggleSidebar = () => {
-    setIsSidebarExpanded(!isSidebarExpanded);
-  };
-
-  const toggleMobileSidebar = () => {
-    setIsMobileSidebarOpen(!isMobileSidebarOpen);
   };
 
   if (!isAuthenticated) {
@@ -83,24 +70,12 @@ function App() {
 
   return (
     <div className="app-container">
-      <button className="hamburger-menu" onClick={toggleMobileSidebar}>
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-        </svg>
-      </button>
       <Sidebar
         modules={MODULES}
         activeModule={activeModule}
-        isExpanded={isSidebarExpanded}
-        isMobileOpen={isMobileSidebarOpen}
         onModuleSelect={handleModuleSelect}
-        onToggle={toggleSidebar}
       />
-      <div className="main-content" onClick={() => {
-        if (isMobileSidebarOpen) {
-          setIsMobileSidebarOpen(false);
-        }
-      }}>
+      <div className="main-content">
         <MainContent 
           activeModule={activeModule} 
           onModuleSelect={handleModuleSelect}

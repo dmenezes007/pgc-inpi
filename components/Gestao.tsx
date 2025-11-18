@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import Papa from "papaparse";
+import Carreiras from './Carreiras';
 
 // --- Interfaces para Tipagem dos Dados ---
 interface MegData {
@@ -221,6 +222,7 @@ const Gestao: React.FC = () => {
         { id: 'meg', title: 'Modelo de Excelência da Gestão (MEG/FNQ)' },
         { id: 'iesgo', title: 'Levantamento de Governança (iESGo/TCU)' },
         { id: 'pgp', title: 'Política de Gestão de Pessoas do INPI' },
+        { id: 'carreiras', title: 'Plano de Carreiras e Cargos' },
     ];
 
     return (
@@ -228,16 +230,16 @@ const Gestao: React.FC = () => {
             <h1 className="text-4xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-orange-400">Gestão</h1>
             <div className="bg-slate-800 p-6 rounded-lg shadow-lg mb-10 border border-slate-700">
                 <p className="text-lg leading-relaxed text-gray-300">
-                    A gestão do conhecimento no INPI é orientada por <span className="text-orange-400 font-serif-highlight">modelos de referência</span> que estruturam as cadeias de conhecimento e guiam a excelência organizacional. Estes frameworks asseguram o alinhamento das práticas de conhecimento com as <span className="text-orange-400 font-serif-highlight">melhores práticas de governança e gestão</span>.
+                    A gestão do conhecimento no INPI é orientada por <span className="text-orange-400 font-semibold">modelos de referência</span> que estruturam as cadeias de conhecimento e guiam a excelência organizacional. Estes frameworks asseguram o alinhamento das práticas de conhecimento com as <span className="text-orange-400 font-semibold">melhores práticas de governança e gestão</span>.
                 </p>
             </div>
             <div className="w-full">
                 <div className="border-b border-slate-700">
-                    <nav className="-mb-px flex space-x-6" aria-label="Tabs">
+                    <nav className="-mb-px flex flex-wrap space-x-4" aria-label="Tabs">
                         {tabs.map(tab => (
                             <button
                                 key={tab.id} onClick={() => setActiveTab(tab.id)}
-                                className={`${activeTab === tab.id ? 'border-orange-500 text-orange-400' : 'border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500'} whitespace-nowrap py-4 px-2 border-b-2 font-medium text-sm sm:text-base transition-colors duration-200`}
+                                className={`${activeTab === tab.id ? 'border-orange-500 text-orange-400' : 'border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500'} whitespace-nowrap py-3 px-2 border-b-2 font-medium text-sm sm:text-base transition-colors duration-200`}
                             >
                                 {tab.title}
                             </button>
@@ -261,6 +263,9 @@ const Gestao: React.FC = () => {
                     )}
                     {activeTab === 'pgp' && (
                         <PoliticaGestaoPessoas />
+                    )}
+                    {activeTab === 'carreiras' && (
+                        <Carreiras />
                     )}
                 </div>
             </div>
