@@ -8,7 +8,7 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ modules, activeModule, onModuleSelect }) => {
-  const sidebarClasses = `sidebar bg-slate-800 flex flex-col shadow-lg transition-all duration-300 ease-in-out w-80`;
+  const sidebarClasses = `sidebar bg-slate-800 flex flex-col shadow-lg transition-all duration-300 ease-in-out w-80 h-screen sticky top-0`;
 
   return (
     <aside className={sidebarClasses}>
