@@ -318,7 +318,7 @@ const VisaoRadarChart: React.FC<{ data: RastreamentoData[], type: 'Essencial' | 
                 />
             </div>
             {selectedUnidade && (
-                <div style={{ width: '100%', height: chartHeight }} className="flex items-center justify-center">
+                <div style={{ width: '100%', height: chartHeight }} className={`flex items-center justify-center ${type === 'Essencial' ? 'intense-glow-yellow' : 'intense-glow-red'}`}>
                     {chartData.length > 0 ? (
                         <ResponsiveContainer>
                             <RadarChart cx="50%" cy="50%" outerRadius="60%" data={chartData}>

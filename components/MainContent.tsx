@@ -64,7 +64,7 @@ const MainContent: React.FC<MainContentProps> = ({ activeModule, onModuleSelect 
                 return <Monitoramento />;
             default:
                  return (
-                    <div>
+                    <div key={activeModule}>
                       <h1 className="text-4xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-orange-400">
                         {activeModule}
                       </h1>

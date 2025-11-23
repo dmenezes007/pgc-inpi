@@ -57,11 +57,19 @@
 
 
 .intense-glow {
+  filter: drop-shadow(0 0 5px rgba(249, 115, 22, 0.7))
+          drop-shadow(0 0 10px rgba(249, 115, 22, 0.5))
+          drop-shadow(0 0 20px rgba(249, 115, 22, 0.3));
+}
 
-  filter: drop-shadow(0 0 5px rgba(0, 255, 255, 0.7))
+.intense-glow-yellow {
+  filter: drop-shadow(0 0 5px rgba(250, 204, 21, 0.7))
+          drop-shadow(0 0 10px rgba(250, 204, 21, 0.5))
+          drop-shadow(0 0 20px rgba(250, 204, 21, 0.3));
+}
 
-          drop-shadow(0 0 10px rgba(0, 255, 255, 0.5))
-
-          drop-shadow(0 0 20px rgba(0, 255, 255, 0.3));
-
+.intense-glow-red {
+  filter: drop-shadow(0 0 5px rgba(248, 113, 113, 0.7))
+          drop-shadow(0 0 10px rgba(248, 113, 113, 0.5))
+          drop-shadow(0 0 20px rgba(248, 113, 113, 0.3));
 }
