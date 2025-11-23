@@ -43,6 +43,7 @@ const CORRECT_PASSWORD = 'PGC_INPI_2025';
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [activeModule, setActiveModule] = useState(MODULES[0]);
+  const [isExpanded, setIsExpanded] = useState(true);
 
   useEffect(() => {
     const storedAuth = sessionStorage.getItem('isAuthenticated');
@@ -64,6 +65,10 @@ function App() {
     setActiveModule(moduleName);
   };
 
+  const toggleSidebar = () => {
+    setIsExpanded(!isExpanded);
+  };
+
   if (!isAuthenticated) {
     return <LoginPage onLogin={handleLogin} />;
   }
@@ -74,8 +79,10 @@ function App() {
         modules={MODULES}
         activeModule={activeModule}
         onModuleSelect={handleModuleSelect}
+        isExpanded={isExpanded}
+        onToggle={toggleSidebar}
       />
-      <div className="main-content">
+      <div className="main-content custom-gradient-orange">
         <MainContent 
           activeModule={activeModule} 
           onModuleSelect={handleModuleSelect}

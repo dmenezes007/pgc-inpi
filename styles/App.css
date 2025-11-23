@@ -57,19 +57,20 @@
 
 
 .intense-glow {
-  filter: drop-shadow(0 0 5px rgba(249, 115, 22, 0.7))
-          drop-shadow(0 0 10px rgba(249, 115, 22, 0.5))
-          drop-shadow(0 0 20px rgba(249, 115, 22, 0.3));
+  filter: drop-shadow(0 0 3px rgba(249, 115, 22, 0.6))
+          drop-shadow(0 0 8px rgba(249, 115, 22, 0.4));
 }
 
 .intense-glow-yellow {
-  filter: drop-shadow(0 0 5px rgba(250, 204, 21, 0.7))
-          drop-shadow(0 0 10px rgba(250, 204, 21, 0.5))
-          drop-shadow(0 0 20px rgba(250, 204, 21, 0.3));
+  filter: drop-shadow(0 0 3px rgba(250, 204, 21, 0.6))
+          drop-shadow(0 0 8px rgba(250, 204, 21, 0.4));
 }
 
 .intense-glow-red {
-  filter: drop-shadow(0 0 5px rgba(248, 113, 113, 0.7))
-          drop-shadow(0 0 10px rgba(248, 113, 113, 0.5))
-          drop-shadow(0 0 20px rgba(248, 113, 113, 0.3));
+  filter: drop-shadow(0 0 3px rgba(248, 113, 113, 0.6))
+          drop-shadow(0 0 8px rgba(248, 113, 113, 0.4));
+}
+
+.custom-gradient-orange {
+  background-image: linear-gradient(to top right, rgba(249, 115, 22, 0.2), #0f172a);
 }

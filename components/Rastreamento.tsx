@@ -318,14 +318,24 @@ const VisaoRadarChart: React.FC<{ data: RastreamentoData[], type: 'Essencial' | 
                 />
             </div>
             {selectedUnidade && (
-                <div style={{ width: '100%', height: chartHeight }} className={`flex items-center justify-center ${type === 'Essencial' ? 'intense-glow-yellow' : 'intense-glow-red'}`}>
+                <div style={{ width: '100%', height: chartHeight }} className="flex items-center justify-center">
                     {chartData.length > 0 ? (
                         <ResponsiveContainer>
                             <RadarChart cx="50%" cy="50%" outerRadius="60%" data={chartData}>
+                                <defs>
+                                    <filter id="glow-yellow" x="-50%" y="-50%" width="200%" height="200%">
+                                        <feDropShadow dx="0" dy="0" stdDeviation="3" floodColor="rgba(250, 204, 21, 0.6)" />
+                                        <feDropShadow dx="0" dy="0" stdDeviation="8" floodColor="rgba(250, 204, 21, 0.4)" />
+                                    </filter>
+                                    <filter id="glow-red" x="-50%" y="-50%" width="200%" height="200%">
+                                        <feDropShadow dx="0" dy="0" stdDeviation="3" floodColor="rgba(248, 113, 113, 0.6)" />
+                                        <feDropShadow dx="0" dy="0" stdDeviation="8" floodColor="rgba(248, 113, 113, 0.4)" />
+                                    </filter>
+                                </defs>
                                 <PolarGrid stroke="#475569" />
                                 <PolarAngleAxis dataKey="subject" tick={renderCustomAngleTick} />
                                 <PolarRadiusAxis angle={30} domain={[0, 3]} ticks={[0, 1, 2, 3]} stroke="#94a3b8" tick={{ fill: 'transparent' }} />
-                                <Radar name="Grau de Conhecimento" dataKey="value" stroke={colors.stroke} fill={colors.fill} fillOpacity={0.6} />
+                                <Radar name="Grau de Conhecimento" dataKey="value" stroke={colors.stroke} fill={colors.fill} fillOpacity={0.6} filter={type === 'Essencial' ? 'url(#glow-yellow)' : 'url(#glow-red)'} />
                                 <Tooltip
                                     contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #475569' }}
                                     labelStyle={{ color: '#cbd5e1', fontWeight: 'bold' }}

@@ -21,19 +21,6 @@ interface MainContentProps {
 }
 
 const MainContent: React.FC<MainContentProps> = ({ activeModule, onModuleSelect }) => {
-    // A lógica de `projects` e `addProject` era do Rastreamento antigo e se tornou órfã.
-    // Mantida para evitar quebras, mas pode ser removida se não for usada em outro lugar.
-    const [projects, setProjects] = useState<Project[]>([]);
-
-    const addProject = (project: Omit<Project, 'id'>) => {
-        const newProject: Project = {
-            ...project,
-            id: `proj_${new Date().getTime()}`,
-        };
-        setProjects(prev => [...prev, newProject]);
-        alert(`Projeto "${newProject.title}" submetido com sucesso!`);
-    };
-
     const renderContent = () => {
         switch (activeModule) {
             case 'Início':
