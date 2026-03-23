@@ -73,6 +73,8 @@ const Estrutura: React.FC = () => {
                     isClearable
                     placeholder="Buscar por unidade ou sigla..."
                     aria-label="Buscar na estrutura organizacional"
+                    menuPortalTarget={document.body}
+                    menuPosition="fixed"
                     // Estilização para combinar com o layout original
                     styles={{
                         control: (base, state) => ({
@@ -114,6 +116,7 @@ const Estrutura: React.FC = () => {
                             '&:hover': { color: '#94a3b8' },
                         }),
                         indicatorSeparator: () => ({ display: 'none' }),
+                        menuPortal: (base) => ({ ...base, zIndex: 9999 }),
                     }}
                 />
 
