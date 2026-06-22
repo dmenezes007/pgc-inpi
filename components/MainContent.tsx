@@ -1,6 +1,5 @@
 
-import React, { useState } from 'react';
-import { Project } from '../App';
+import React from 'react';
 import Inicio from './Inicio';
 import Integracao from './Integracao';
 import Identidade from './Identidade';
@@ -64,7 +63,7 @@ const MainContent: React.FC<MainContentProps> = ({ activeModule, onModuleSelect 
     };
 
     return (
-        <main className="flex-1 p-4 sm:p-8 overflow-y-auto">
+        <main className="main-content-scroll-area flex-1 p-4 sm:p-8 overflow-y-auto">
             <div className="max-w-full mx-auto">
                 {renderContent()}
             </div>

@@ -5,96 +5,73 @@ interface ModuleIconProps {
   className?: string;
 }
 
-const ModuleIcon: React.FC<ModuleIconProps> = ({ moduleName, className = "h-6 w-6" }) => {
-  const finalClassName = `${className} intense-glow`;
+type IconDefinition = {
+  viewBox: string;
+  path: string;
+};
 
-  switch (moduleName) {
-    case 'Início':
-      return (
-        <svg xmlns="http://www.w3.org/2000/svg" className={finalClassName} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-        </svg>
-      );
-    case 'Integração':
-      return (
-        <svg xmlns="http://www.w3.org/2000/svg" className={finalClassName} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M17 14v6m-3-3h6M6 10h2a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v2a2 2 0 002 2zm10 0h2a2 2 0 002-2V6a2 2 0 00-2-2h-2a2 2 0 00-2 2v2a2 2 0 002 2zM6 20h2a2 2 0 002-2v-2a2 2 0 00-2-2H6a2 2 0 00-2 2v2a2 2 0 002 2z" />
-        </svg>
-      );
-    case 'Identidade':
-      return (
-        <svg xmlns="http://www.w3.org/2000/svg" className={finalClassName} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-        </svg>
-      );
-    case 'Estrutura':
-      return (
-        <svg xmlns="http://www.w3.org/2000/svg" className={finalClassName} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-        </svg>
-      );
-    case 'Gestão':
-      return (
-        <svg xmlns="http://www.w3.org/2000/svg" className={finalClassName} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-          <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-        </svg>
-      );
-    case 'Liderança':
-      return (
-        <svg xmlns="http://www.w3.org/2000/svg" className={finalClassName} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-        </svg>
-      );
-    case 'Transversalidade':
-      return (
-        <svg xmlns="http://www.w3.org/2000/svg" className={finalClassName} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-        </svg>
-      );
-    case 'Técnica':
-      return (
-        <svg xmlns="http://www.w3.org/2000/svg" className={finalClassName} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-        </svg>
-      );
-    case 'Planejamento':
-      return (
-        <svg xmlns="http://www.w3.org/2000/svg" className={finalClassName} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-        </svg>
-      );
-    case 'Autodesenvolvimento':
-      return (
-        <svg xmlns="http://www.w3.org/2000/svg" className={finalClassName} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-        </svg>
-      );
-    case 'Rastreamento':
-      return (
-        <svg xmlns="http://www.w3.org/2000/svg" className={finalClassName} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-        </svg>
-      );
-    case 'Instrumentos':
-      return (
-        <svg xmlns="http://www.w3.org/2000/svg" className={finalClassName} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-        </svg>
-      );
-    case 'Monitoramento':
-      return (
-        <svg xmlns="http://www.w3.org/2000/svg" className={finalClassName} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M5 5v14h14V5H5zm0 0l7 7 7-7" />
-        </svg>
-      );
-    default:
-      return (
-        <svg xmlns="http://www.w3.org/2000/svg" className={finalClassName} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-        </svg>
-      );
-  }
+const ModuleIcon: React.FC<ModuleIconProps> = ({ moduleName, className = "h-6 w-6" }) => {
+  const iconByModule: Record<string, IconDefinition> = {
+    'Início': {
+      viewBox: '0 0 24 24',
+      path: 'M12 3.2 3 10.4v10.4h6.4v-6h5.2v6H21V10.4z',
+    },
+    'Integração': {
+      viewBox: '0 0 24 24',
+      path: 'M7.8 7.8h3.8V4H7.8zm4.6 0h3.8V4h-3.8zM4 12.4h3.8V8.6H4zm12.2 0H20V8.6h-3.8zM7.8 20h3.8v-3.8H7.8zm4.6 0h3.8v-3.8h-3.8zM8.6 12h6.8v-1.2H8.6z',
+    },
+    'Identidade': {
+      viewBox: '0 0 24 24',
+      path: 'M12 3.8a4.2 4.2 0 1 1 0 8.4 4.2 4.2 0 0 1 0-8.4m0 10.2c4.2 0 7.6 2.1 7.6 4.7V21H4.4v-2.3c0-2.6 3.4-4.7 7.6-4.7',
+    },
+    'Estrutura': {
+      viewBox: '0 0 24 24',
+      path: 'M4 10h16V4H4zm2-4h3v2H6zm0 6h3v8H6zm5 0h3v8h-3zm5 0h3v8h-3z',
+    },
+    'Gestão': {
+      viewBox: '0 0 24 24',
+      path: 'M13.8 2h-3.6l-.6 2.2a7.6 7.6 0 0 0-1.8.8L5.8 3.8 3.2 6.4l1.2 2a7.6 7.6 0 0 0-.8 1.8L1.4 10.8v3.6l2.2.6c.2.6.5 1.2.8 1.8l-1.2 2 2.6 2.6 2-1.2c.6.3 1.2.6 1.8.8l.6 2.2h3.6l.6-2.2c.6-.2 1.2-.5 1.8-.8l2 1.2 2.6-2.6-1.2-2c.3-.6.6-1.2.8-1.8l2.2-.6v-3.6l-2.2-.6a7.6 7.6 0 0 0-.8-1.8l1.2-2-2.6-2.6-2 1.2a7.6 7.6 0 0 0-1.8-.8zM12 15.8A3.8 3.8 0 1 1 12 8a3.8 3.8 0 0 1 0 7.8',
+    },
+    'Liderança': {
+      viewBox: '0 0 24 24',
+      path: 'M12 3.6a3 3 0 1 1 0 6 3 3 0 0 1 0-6M6.6 8a2.4 2.4 0 1 1 0 4.8 2.4 2.4 0 0 1 0-4.8m10.8 0a2.4 2.4 0 1 1 0 4.8 2.4 2.4 0 0 1 0-4.8M12 11.4c3.2 0 5.8 1.8 5.8 4V20H6.2v-4.6c0-2.2 2.6-4 5.8-4',
+    },
+    'Transversalidade': {
+      viewBox: '0 0 24 24',
+      path: 'M12 2.8a9.2 9.2 0 1 0 0 18.4 9.2 9.2 0 0 0 0-18.4m-6.8 8.6h3a14 14 0 0 1 .8-4.2A7.2 7.2 0 0 0 5.2 11.4m0 1.2a7.2 7.2 0 0 0 3.8 4.2 14 14 0 0 1-.8-4.2zm4.2 0h5.2a12.7 12.7 0 0 1-1 4.6c-.5.1-1 .2-1.6.2s-1.1 0-1.6-.2a12.7 12.7 0 0 1-1-4.6m0-1.2c.1-1.7.4-3.3 1-4.6.5-.1 1-.2 1.6-.2s1.1 0 1.6.2c.6 1.3.9 2.9 1 4.6zm6.4 1.2h3a7.2 7.2 0 0 1-3.8 4.2 14 14 0 0 0 .8-4.2m0-1.2a14 14 0 0 0-.8-4.2 7.2 7.2 0 0 1 3.8 4.2z',
+    },
+    'Técnica': {
+      viewBox: '0 0 24 24',
+      path: 'M21 7.6 16.4 12l-1.8-1.8 4.6-4.4a4 4 0 0 0-4.8 5.2l-6.8 6.8a2.6 2.6 0 1 0 3.7 3.7l6.8-6.8A4 4 0 0 0 21 7.6M9.4 20a1 1 0 1 1 0-2 1 1 0 0 1 0 2',
+    },
+    'Planejamento': {
+      viewBox: '0 0 24 24',
+      path: 'M5 4h14v16H5zm2 3v2h2V7zm0 4v2h2v-2zm0 4v2h2v-2zm4-8h6v2h-6zm0 4h6v2h-6zm0 4h6v2h-6z',
+    },
+    'Autodesenvolvimento': {
+      viewBox: '0 0 24 24',
+      path: 'M9 3h6v3.2l4.8 8.4A4.8 4.8 0 0 1 15.6 22H8.4a4.8 4.8 0 0 1-4.2-7.4L9 6.2zm1.8 7.4-3.4 6h9.2l-3.4-6-.6 1.4h-1.2z',
+    },
+    'Rastreamento': {
+      viewBox: '0 0 24 24',
+      path: 'M3 15.4c2 0 2-6.8 4-6.8s2 10.4 4 10.4 2-13.8 4-13.8 2 8.2 4 8.2',
+    },
+    'Instrumentos': {
+      viewBox: '0 0 24 24',
+      path: 'M6 3h9l5 5v13H6zm8 1.8V9h4.2zM8 12h8v1.6H8zm0 3.2h8v1.6H8z',
+    },
+    'Monitoramento': {
+      viewBox: '0 0 24 24',
+      path: 'M12 3.2 21 7.4v9.2L12 20.8 3 16.6V7.4zM7.2 11.8l3 3 6.6-6.4-1.2-1.2-5.4 5.2-1.8-1.8z',
+    },
+  };
+  const icon = iconByModule[moduleName] ?? iconByModule['Integração'];
+
+  return (
+    <svg viewBox={icon.viewBox} className={className} fill="currentColor" aria-hidden="true" focusable="false">
+      <path d={icon.path} />
+    </svg>
+  );
 };
 
 export default ModuleIcon;

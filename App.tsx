@@ -83,10 +83,26 @@ function App() {
         onToggle={toggleSidebar}
       />
       <div className="main-content custom-gradient-orange">
+        <header className="gov-shell-header">
+          <div className="gov-shell-brand">
+            <img
+              src="/logo-inovacao.png"
+              alt="Logo da inovação"
+              className="gov-shell-mark"
+            />
+            <div>
+              <p className="gov-shell-kicker">Portal da Gestão do Conhecimento</p>
+              <h1 className="gov-shell-title">{activeModule}</h1>
+            </div>
+          </div>
+        </header>
+
+        <div className="gov-content-surface">
         <MainContent 
           activeModule={activeModule} 
           onModuleSelect={handleModuleSelect}
         />
+        </div>
       </div>
     </div>
   );

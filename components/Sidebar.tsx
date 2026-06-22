@@ -4,63 +4,70 @@ import ModuleIcon from './ModuleIcon';
 interface SidebarProps {
   modules: string[];
   activeModule: string;
-  onModuleSelect: (moduleName: string) => void;
   isExpanded: boolean;
+  onModuleSelect: (moduleName: string) => void;
   onToggle: () => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ modules, activeModule, onModuleSelect, isExpanded, onToggle }) => {
-  const sidebarClasses = `sidebar bg-slate-800 flex flex-col shadow-lg transition-all duration-300 ease-in-out h-screen sticky top-0 ${isExpanded ? 'w-80' : 'w-20'}`;
+  const sidebarClasses = `sidebar flex flex-col transition-all duration-300 ease-in-out h-screen sticky top-0 ${
+    isExpanded ? 'w-64' : 'w-16'
+  }`;
+
+  const navClasses = `sidebar-nav ${isExpanded ? 'is-expanded' : 'is-collapsed'}`;
 
   return (
     <aside className={sidebarClasses}>
-      <div className={`p-6 flex items-center ${isExpanded ? 'justify-between' : 'justify-center'}`}>
-        {isExpanded && (
-          <div className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-orange-400">
-            PGC
-          </div>
-        )}
-        <button onClick={onToggle} className="p-1 rounded-full text-gray-400 hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-orange-500">
-          <svg xmlns="http://www.w3.org/2000/svg" className={`h-6 w-6 transition-transform duration-300 ${isExpanded ? '' : 'rotate-180'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
-          </svg>
-        </button>
-      </div>
-      
-      <nav className="flex-grow px-4">
+      {isExpanded && (
+        <div className="sidebar-brand">
+          <img
+            src="https://www.gov.br/inpi/pt-br/central-de-conteudo/comunicacao/marca-do-inpi/logo_inpi_azul_fundo_transparente.png"
+            alt="Logomarca do INPI"
+            className="sidebar-logo"
+          />
+        </div>
+      )}
+
+      <button
+        onClick={onToggle}
+        className={`sidebar-toggle sidebar-toggle-floating ${isExpanded ? 'is-expanded' : 'is-collapsed'}`}
+        aria-label="Expandir ou recolher menu lateral"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 transition-transform duration-300 ${isExpanded ? '' : 'rotate-180'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+        </svg>
+      </button>
+
+      <nav className={navClasses}>
         <ul>
           {modules.map((moduleName) => (
-            <li key={moduleName} className="mb-2">
+            <li key={moduleName}>
               <a
                 href="#"
                 onClick={(e) => {
                   e.preventDefault();
                   onModuleSelect(moduleName);
                 }}
-                className={`flex items-center py-2.5 rounded-lg transition-colors duration-200 ${isExpanded ? 'px-4' : 'justify-center'} ${
-                  activeModule === moduleName
-                    ? 'bg-orange-600 text-white font-semibold shadow-md'
-                    : 'text-gray-300 hover:bg-slate-700 hover:text-white'
-                }`}
+                className={`sidebar-link ${isExpanded ? 'is-expanded' : 'is-collapsed'} ${activeModule === moduleName ? 'is-active' : ''}`}
                 title={!isExpanded ? moduleName : ''}
               >
-                <ModuleIcon moduleName={moduleName} className="h-5 w-5 flex-shrink-0" />
-                {isExpanded && <span className="ml-4 text-sm font-medium">{moduleName}</span>}
+                <ModuleIcon moduleName={moduleName} className="sidebar-link-icon" />
+                {isExpanded && <span className="sidebar-link-label">{moduleName}</span>}
               </a>
             </li>
           ))}
         </ul>
       </nav>
 
-      <div className="p-4 text-center">
-         <div className={`flex justify-center text-xs text-slate-500 mt-4 transition-opacity duration-300 ${isExpanded ? 'opacity-100' : 'opacity-0'}`}>
-        <img 
-            src="https://dmenezes007.github.io/pgi-inpi/files/imgs/logo_inpi_branco_fundo_transparente.png" 
-            alt="Logo do INPI" 
-            className="h-8"
-        />
-    </div>
-      </div>
+      {isExpanded && (
+        <div className="sidebar-footer-wrap">
+          <img
+            src="https://barra.sistema.gov.br/v1/assets/govbr.webp"
+            alt="Logomarca gov.br"
+            className="sidebar-footer-logo"
+          />
+        </div>
+      )}
     </aside>
   );
 };

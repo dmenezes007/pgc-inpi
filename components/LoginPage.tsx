@@ -13,17 +13,15 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
   };
 
   return (
-    <div className="flex items-center justify-center h-screen bg-slate-900">
-      <div className="w-full max-w-md p-8 space-y-8 bg-slate-800 rounded-2xl shadow-2xl shadow-orange-500/20">
-        <div className="text-center">
-            <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-orange-400">
-              <span className="block">Portal da Gestão</span>
-              <span className="block">do Conhecimento (PGC)</span>
-            </h1>
-            <p className="mt-2 text-sm text-gray-400">Acesso Restrito</p>
+    <div className="landing-root flex min-h-screen items-center justify-center px-4 py-10">
+      <div className="w-full max-w-md rounded-3xl border border-slate-200/70 bg-white/95 p-8 shadow-2xl shadow-slate-950/10 backdrop-blur">
+        <div className="mb-6 text-center">
+          <img src="/logo-inovacao.png" alt="Logo da inovação" className="mx-auto mb-4 h-12 w-auto" />
+          <p className="text-xs font-bold uppercase tracking-[0.14em] text-brand-accent">Portal da Gestão do Conhecimento</p>
+          <h1 className="mt-2 text-2xl font-bold text-slate-900">Acesso Restrito</h1>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="relative">
+        <form className="space-y-4" onSubmit={handleSubmit}>
+          <div>
             <input
               id="password"
               name="password"
@@ -32,29 +30,25 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="relative block w-full px-4 py-3 text-white bg-slate-700 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 placeholder-gray-400"
-              placeholder="Senha"
+              className="block w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20"
+              placeholder="Informe a senha"
             />
           </div>
-          <div>
-            <button
-              type="submit"
-              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-800 focus:ring-orange-500 transition-all duration-300 intense-glow"
-            >
-              Acessar
-            </button>
-          </div>
+          <button
+            type="submit"
+            className="w-full rounded-xl bg-brand-accent px-4 py-3 text-sm font-semibold text-white transition hover:bg-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-accent/30"
+          >
+            Acessar
+          </button>
         </form>
+        <footer className="mt-8 flex justify-center">
+          <img
+            src="https://barra.sistema.gov.br/v1/assets/govbr.webp"
+            alt="Logo gov.br"
+            className="h-7 w-auto"
+          />
+        </footer>
       </div>
-            <footer className="absolute bottom-8">
-        <img
-            key="logo_inpi"
-            // O 'src' é uma string que aponta para o arquivo na pasta 'public'
-            src="https://dmenezes007.github.io/pgi-inpi/files/imgs/logo_inpi_branco_fundo_transparente.png"
-            alt="Logo do INPI"
-            className="h-12 opacity-100"
-        />
-      </footer>
     </div>
   );
 };
