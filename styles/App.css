@@ -228,6 +228,10 @@ body,
   color: #334155 !important;
 }
 
+.app-container .text-white {
+  color: var(--gov-surface) !important;
+}
+
 .app-container .text-gray-200 {
   color: var(--gov-blue) !important;
 }
@@ -363,6 +367,14 @@ body,
 .landing-root .from-purple-500.to-purple-400 {
   --tw-gradient-from: var(--gov-blue) !important;
   --tw-gradient-to: #2670e8 !important;
+}
+
+.from-orange-600 {
+  --tw-gradient-from: #1e3a8a var(--tw-gradient-from-position);
+}
+
+.to-orange-500 {
+  --tw-gradient-to: #1d4ed8 var(--tw-gradient-to-position);
 }
 
 .to-blue-700 {
