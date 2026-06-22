@@ -1,7 +1,5 @@
 
-
-import React, { useState, useEffect } from 'react';
-import LoginPage from './components/LoginPage';
+import React, { useState } from 'react';
 import Sidebar from './components/Sidebar';
 import MainContent from './components/MainContent';
 import './styles/App.css';
@@ -36,30 +34,9 @@ export interface Project {
     impactIndicators: string[];
     resources: string;
 }
-
-
-const CORRECT_PASSWORD = 'PGC_INPI_2025';
-
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [activeModule, setActiveModule] = useState(MODULES[0]);
   const [isExpanded, setIsExpanded] = useState(true);
-
-  useEffect(() => {
-    const storedAuth = sessionStorage.getItem('isAuthenticated');
-    if (storedAuth === 'true') {
-      setIsAuthenticated(true);
-    }
-  }, []);
-
-  const handleLogin = (password: string) => {
-    if (password === CORRECT_PASSWORD) {
-      setIsAuthenticated(true);
-      sessionStorage.setItem('isAuthenticated', 'true');
-    } else {
-      alert('Senha incorreta');
-    }
-  };
 
   const handleModuleSelect = (moduleName: string) => {
     setActiveModule(moduleName);
@@ -68,10 +45,6 @@ function App() {
   const toggleSidebar = () => {
     setIsExpanded(!isExpanded);
   };
-
-  if (!isAuthenticated) {
-    return <LoginPage onLogin={handleLogin} />;
-  }
 
   return (
     <div className="app-container">
