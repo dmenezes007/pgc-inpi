@@ -225,7 +225,7 @@ body,
 .app-container .text-slate-200,
 .app-container .text-slate-300,
 .app-container .text-slate-400 {
-  color: var(--gov-surface) !important;
+  color: #334155 !important;
 }
 
 .app-container .text-gray-200 {
