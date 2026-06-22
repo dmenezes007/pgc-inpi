@@ -365,6 +365,10 @@ body,
   --tw-gradient-to: #2670e8 !important;
 }
 
+.to-blue-700 {
+  --tw-gradient-to: #1d4ed8 var(--tw-gradient-to-position);
+}
+
 .sidebar {
   position: sticky;
   top: 0;
