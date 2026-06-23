@@ -280,6 +280,10 @@ body,
   color: #334155 !important;
 }
 
+.w-4.h-4.mr-3.mt-0\.5.flex-shrink-0.text-orange-500 {
+  color: #fff !important;
+}
+
 .w-full.text-sm.text-left.text-gray-400 {
   color: var(--gov-blue) !important;
 }
