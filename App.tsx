@@ -59,7 +59,7 @@ function App() {
         <header className="gov-shell-header">
           <div className="gov-shell-brand">
             <img
-              src="/logo-inovacao.png"
+              src="/logo-conhecimento.png"
               alt="Logo da inovação"
               className="gov-shell-mark"
             />
