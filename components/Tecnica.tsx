@@ -103,9 +103,6 @@ const Tecnica: React.FC = () => {
 
     return (
         <div>
-            <h1 className="text-4xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-orange-400">
-                Técnica
-            </h1>
             <div className="bg-slate-800 p-6 rounded-lg shadow-lg mb-10 border border-slate-700">
                 <p className="text-lg leading-relaxed text-gray-300">
                     As competências técnicas representam o <span className="text-orange-400 font-serif-highlight">conhecimento especializado</span> necessário para a execução das atividades finalísticas e de suporte do INPI. Elas variam de acordo com as especificidades de cada <span className="text-orange-400 font-serif-highlight">cargo, unidade, formação e experiência</span>, sendo o alicerce para a <span className="text-orange-400 font-serif-highlight">qualidade e a precisão</span> de nossos serviços.

@@ -227,7 +227,6 @@ const Gestao: React.FC = () => {
 
     return (
         <div>
-            <h1 className="text-4xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-orange-400">Gestão</h1>
             <div className="bg-slate-800 p-6 rounded-lg shadow-lg mb-10 border border-slate-700">
                 <p className="text-lg leading-relaxed text-gray-300">
                     A gestão do conhecimento no INPI é orientada por <span className="text-orange-400 font-semibold">modelos de referência</span> que estruturam as cadeias de conhecimento e guiam a excelência organizacional. Estes frameworks asseguram o alinhamento das práticas de conhecimento com as <span className="text-orange-400 font-semibold">melhores práticas de governança e gestão</span>.

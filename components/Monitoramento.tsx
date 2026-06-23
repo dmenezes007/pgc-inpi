@@ -90,10 +90,6 @@ const Monitoramento: React.FC = () => {
 
   return (
     <div>
-      <h1 className="text-4xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-orange-400">
-        Monitoramento
-      </h1>
-
       <div className="bg-slate-800 p-6 rounded-lg shadow-lg mb-10 border border-slate-700">
           <p className="text-lg leading-relaxed text-gray-300">
             A definição de indicadores é uma etapa <span className="text-orange-400 font-serif-highlight">crucial</span> para transformar a Gestão do Conhecimento de um conceito abstrato em uma <span className="text-orange-400 font-serif-highlight">prática gerenciável</span> e com <span className="text-orange-400 font-serif-highlight">resultados mensuráveis</span>.

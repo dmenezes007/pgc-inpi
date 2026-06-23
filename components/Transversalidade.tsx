@@ -113,9 +113,6 @@ const Transversalidade: React.FC = () => {
 
     return (
         <div>
-            <h1 className="text-4xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-orange-400">
-                Transversalidade
-            </h1>
             <div className="bg-slate-800 p-6 rounded-lg shadow-lg mb-10 border border-slate-700">
                 <p className="text-lg leading-relaxed text-gray-300">
                     As competências transversais são a base para uma <span className="text-orange-400 font-serif-highlight">atuação integrada e eficiente</span> no serviço público. Elas permeiam todas as áreas e níveis da organização, sendo essenciais para a <span className="text-orange-400 font-serif-highlight">colaboração</span>, o compartilhamento de conhecimento e o <span className="text-orange-400 font-serif-highlight">desenvolvimento de uma cultura organizacional</span> coesa e orientada a resultados.

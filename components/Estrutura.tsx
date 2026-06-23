@@ -54,10 +54,7 @@ const Estrutura: React.FC = () => {
 
     return (
         <div>
-            {/* Seção de Título e Texto Introdutório (MANTIDOS DO CÓDIGO ORIGINAL) */}
-            <h1 className="text-4xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-orange-400">
-                Estrutura
-            </h1>
+            {/* Seção de Texto Introdutório */}
             <div className="bg-slate-800 p-6 rounded-lg shadow-lg mb-10 border border-slate-700">
                 <p className="text-lg leading-relaxed text-gray-300">
                     A gestão do conhecimento deve considerar as <span className="text-orange-400 font-serif-highlight">competências regimentais</span> estabelecidas na estrutura organizacional para o mapeamento e identificação dos <span className="text-orange-400 font-serif-highlight">conhecimentos essenciais e críticos</span>.
