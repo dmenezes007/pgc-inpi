@@ -284,6 +284,10 @@ body,
   color: #fff !important;
 }
 
+.w-5.h-5.mr-3.mt-0\.5.flex-shrink-0.text-orange-500 {
+  color: #fff !important;
+}
+
 .flex.items-start.p-3.w-full.text-sm.font-medium.text-left.rounded-lg.cursor-pointer.transition-all.duration-200.text-gray-300.bg-slate-700\/50.hover\:bg-slate-700 {
   color: #334155 !important;
 }
