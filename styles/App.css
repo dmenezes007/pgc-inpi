@@ -369,18 +369,63 @@ body,
   --tw-gradient-to: #2670e8 !important;
 }
 
-.from-orange-600 {
-  color: rgb(29 78 216 / var(--tw-text-opacity, 1));
+.app-container .text-orange-400,
+.app-container .text-orange-500,
+.landing-root .text-orange-400,
+.landing-root .text-orange-500 {
+  color: rgb(29 78 216 / var(--tw-text-opacity, 1)) !important;
 }
 
-.to-orange-500 {
-  color: rgb(29 78 216 / var(--tw-text-opacity, 1));
+.app-container .border-orange-500,
+.app-container .hover\:border-orange-500:hover,
+.landing-root .border-orange-500,
+.landing-root .hover\:border-orange-500:hover {
+  border-color: rgba(19, 81, 180, 0.42) !important;
 }
 
-.from-orange-500,
-.to-orange-400,
-.text-orange-400 {
-  color: rgb(29 78 216 / var(--tw-text-opacity, 1));
+.app-container .bg-orange-600,
+.app-container .bg-orange-700,
+.app-container .bg-orange-800,
+.app-container .hover\:bg-orange-700:hover,
+.app-container .hover\:bg-orange-800:hover,
+.landing-root .bg-orange-600,
+.landing-root .bg-orange-700,
+.landing-root .bg-orange-800,
+.landing-root .hover\:bg-orange-700:hover,
+.landing-root .hover\:bg-orange-800:hover {
+  background: linear-gradient(135deg, var(--gov-blue-dark), var(--gov-blue)) !important;
+  color: #ffffff !important;
+}
+
+.app-container .from-orange-500,
+.app-container .from-orange-600,
+.app-container .from-orange-700,
+.app-container .hover\:from-orange-700:hover,
+.landing-root .from-orange-500,
+.landing-root .from-orange-600,
+.landing-root .from-orange-700,
+.landing-root .hover\:from-orange-700:hover {
+  --tw-gradient-from: #1e3a8a var(--tw-gradient-from-position) !important;
+  --tw-gradient-to: rgb(30 58 138 / 0) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+}
+
+.app-container .to-orange-400,
+.app-container .to-orange-500,
+.app-container .to-orange-700,
+.app-container .to-orange-800,
+.app-container .hover\:to-orange-800:hover,
+.landing-root .to-orange-400,
+.landing-root .to-orange-500,
+.landing-root .to-orange-700,
+.landing-root .to-orange-800,
+.landing-root .hover\:to-orange-800:hover {
+  --tw-gradient-to: #1d4ed8 var(--tw-gradient-to-position) !important;
+}
+
+.app-container .focus\:ring-orange-500:focus,
+.landing-root .focus\:ring-orange-500:focus {
+  --tw-ring-color: rgb(29 78 216 / 0.45) !important;
 }
 
 .to-blue-700 {
