@@ -20,6 +20,15 @@ interface MainContentProps {
 }
 
 const MainContent: React.FC<MainContentProps> = ({ activeModule, onModuleSelect }) => {
+    const sharedIntro = (
+        <div className="module-intro mb-8">
+            <div className="module-kicker">AMBIENTE INSTITUCIONAL</div>
+            <p className="module-lead">
+                O <span className="text-orange-400 font-serif-highlight font-medium">Portal da Gestão do Conhecimento</span> consolida a proposta institucional da Coordenação-Geral de Recursos Humanos e da Academia de Propriedade Intelectual, Inovação e Desenvolvimento do INPI, reafirmando o <span className="text-orange-400 font-serif-highlight font-medium">conhecimento como pilar estratégico</span> para a <span className="text-orange-400 font-serif-highlight font-medium">transformação organizacional</span>, a melhoria da prestação de serviços e a geração de valor público.
+            </p>
+        </div>
+    );
+
     const renderContent = () => {
         switch (activeModule) {
             case 'Início':
@@ -65,6 +74,7 @@ const MainContent: React.FC<MainContentProps> = ({ activeModule, onModuleSelect 
     return (
         <main className="main-content-scroll-area flex-1 p-4 sm:p-8 overflow-y-auto">
             <div className="max-w-full mx-auto">
+                {sharedIntro}
                 {renderContent()}
             </div>
         </main>
