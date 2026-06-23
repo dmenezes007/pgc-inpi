@@ -232,6 +232,10 @@ body,
   color: var(--gov-surface) !important;
 }
 
+.font-semibold.text-white {
+  color: rgb(29 78 216 / var(--tw-text-opacity, 1)) !important;
+}
+
 .app-container .text-gray-200 {
   color: var(--gov-blue) !important;
 }
