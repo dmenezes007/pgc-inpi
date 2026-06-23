@@ -370,11 +370,17 @@ body,
 }
 
 .from-orange-600 {
-  --tw-gradient-from: #1e3a8a var(--tw-gradient-from-position);
+  color: rgb(29 78 216 / var(--tw-text-opacity, 1));
 }
 
 .to-orange-500 {
-  --tw-gradient-to: #1d4ed8 var(--tw-gradient-to-position);
+  color: rgb(29 78 216 / var(--tw-text-opacity, 1));
+}
+
+.from-orange-500,
+.to-orange-400,
+.text-orange-400 {
+  color: rgb(29 78 216 / var(--tw-text-opacity, 1));
 }
 
 .to-blue-700 {
