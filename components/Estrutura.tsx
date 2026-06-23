@@ -80,12 +80,12 @@ const Estrutura: React.FC = () => {
                         control: (base, state) => ({
                             ...base,
                             backgroundColor: '#1e293b',
-                            borderColor: state.isFocused ? '#f97316' : '#334155',
-                            boxShadow: state.isFocused ? '0 0 0 1px #f97316' : 'none',
+                            borderColor: state.isFocused ? 'var(--gov-blue)' : '#334155',
+                            boxShadow: state.isFocused ? '0 0 0 1px var(--gov-blue)' : 'none',
                             borderRadius: '0.5rem',
                             minHeight: '48px',
                             '&:hover': {
-                                borderColor: '#f97316'
+                                borderColor: 'var(--gov-blue)'
                             },
                             transition: 'border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
                         }),
