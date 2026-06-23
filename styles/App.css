@@ -228,6 +228,15 @@ body,
   color: #334155 !important;
 }
 
+.app-container .text-gray-300 {
+  color: #fff !important;
+}
+
+.bg-slate-900\/50,
+.app-container .bg-slate-900\/50 {
+  background: linear-gradient(135deg,var(--gov-blue-dark),var(--gov-blue)) !important;
+}
+
 .app-container .text-white {
   color: var(--gov-surface) !important;
 }
