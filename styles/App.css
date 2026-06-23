@@ -276,6 +276,10 @@ body,
   color: #fff !important;
 }
 
+.text-lg.leading-relaxed.text-gray-300 {
+  color: #334155 !important;
+}
+
 .w-full.text-sm.text-left.text-gray-400 {
   color: var(--gov-blue) !important;
 }
