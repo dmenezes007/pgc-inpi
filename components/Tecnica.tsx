@@ -169,7 +169,7 @@ const Tecnica: React.FC = () => {
                                     </div>
                                 ))
                             ) : (
-                                <div className="text-gray-400 text-sm p-3 bg-slate-900/50 rounded-md">
+                                <div className="tecnica-empty-state text-gray-400 text-sm p-3 bg-slate-900/50 rounded-md">
                                     {selectedNivel2 ? 'Nenhum item encontrado.' : 'Selecione os Níveis 1 e 2 de Conhecimento'}
                                 </div>
                             )}

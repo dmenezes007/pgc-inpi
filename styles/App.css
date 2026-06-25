@@ -356,6 +356,10 @@ body,
   color: #fff !important;
 }
 
+.tecnica-empty-state.text-gray-400.text-sm.p-3.bg-slate-900\/50.rounded-md {
+  color: #fff !important;
+}
+
 .app-container .hover\:bg-slate-700:hover,
 .app-container .hover\:bg-slate-700\/40:hover,
 .app-container .hover\:bg-slate-700\/50:hover {
