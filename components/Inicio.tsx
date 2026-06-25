@@ -12,7 +12,7 @@ const Inicio: React.FC<InicioProps> = ({ onModuleSelect }) => {
   return (
     <div className="space-y-8">
       <div className="module-intro">
-        <div className="module-kicker">VISÃO GERAL DO PORTAL</div>
+        <div className="module-kicker">VISÃO GERAL</div>
         <p className="module-lead">
           O <span className="text-orange-400 font-serif-highlight font-medium">Portal da Gestão do Conhecimento</span> consolida diretrizes, processos e instrumentos institucionais para transformar conhecimento em capacidade organizacional, fortalecendo a <span className="text-orange-400 font-serif-highlight font-medium">aprendizagem contínua</span>, a <span className="text-orange-400 font-serif-highlight font-medium">eficiência dos serviços</span> e a geração de valor público no INPI.
         </p>
