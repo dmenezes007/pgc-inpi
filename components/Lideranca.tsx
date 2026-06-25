@@ -1,5 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import Papa from 'papaparse';
+import RecommendedTraining from './RecommendedTraining';
+import { getRecommendedCourses } from './courseCuration';
 
 // --- AccordionItem sub-component (adapted from Metodologia.tsx) ---
 const AccordionItem = ({ title, icon, children, isOpen, onClick }: { title: string; icon: React.ReactNode; children: React.ReactNode; isOpen: boolean; onClick: () => void; }) => (
@@ -155,6 +157,7 @@ const Lideranca: React.FC = () => {
                                 <span>{especificacao}</span>
                             </div>
                         ))}
+                        <RecommendedTraining courses={getRecommendedCourses(conhecimento)} />
                     </AccordionItem>
                 ))}
             </div>

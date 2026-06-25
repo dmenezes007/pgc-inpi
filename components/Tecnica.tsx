@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import Papa from 'papaparse';
 import Select, { SingleValue } from 'react-select';
+import RecommendedTraining from './RecommendedTraining';
+import { getRecommendedCourses } from './courseCuration';
 
 interface TecnicaData {
     Nivel1: string;
@@ -103,6 +105,12 @@ const Tecnica: React.FC = () => {
         return uniqueNivel3.sort();
     }, [data, selectedNivel1, selectedNivel2]);
 
+    const selectedKnowledgeKey = selectedNivel2 || selectedNivel1;
+    const recommendedCourses = useMemo(
+        () => (selectedKnowledgeKey ? getRecommendedCourses(selectedKnowledgeKey) : []),
+        [selectedKnowledgeKey]
+    );
+
     const handleNivel1Change = (option: SingleValue<SelectOption>) => {
         setSelectedNivel1(option ? option.value : '');
         setSelectedNivel2('');
@@ -176,6 +184,12 @@ const Tecnica: React.FC = () => {
                         </div>
                     </div>
                 </div>
+
+                {selectedKnowledgeKey && (
+                    <div className="mt-6 border-t border-slate-700 pt-4">
+                        <RecommendedTraining courses={recommendedCourses} />
+                    </div>
+                )}
             </div>
         </div>
     );
