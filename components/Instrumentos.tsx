@@ -3,17 +3,17 @@ import React from 'react';
 // --- Dados e Configuração ---
 
 const instrumentData = [
-    { name: "Academia Virtual do INPI", conversao: true, retencao: true, utilizacao: true, compartilhamento: true, ensino: true, publicidade: false },
-    { name: "Docmost (CGTI)", conversao: true, retencao: true, utilizacao: true, compartilhamento: true, ensino: false, publicidade: false },
-    { name: "E-mails", conversao: true, retencao: true, utilizacao: false, compartilhamento: false, ensino: false, publicidade: false },
-    { name: "INPI Drive", conversao: true, retencao: true, utilizacao: true, compartilhamento: true, ensino: false, publicidade: false },
-    { name: "Intranet do INPI", conversao: true, retencao: true, utilizacao: true, compartilhamento: false, ensino: false, publicidade: true },
-    { name: "Portal do INPI", conversao: true, retencao: true, utilizacao: true, compartilhamento: false, ensino: false, publicidade: true },
-    { name: "Rede Institucional", conversao: true, retencao: true, utilizacao: true, compartilhamento: true, ensino: false, publicidade: false },
-    { name: "Redmine/Marcas Doc", conversao: true, retencao: true, utilizacao: true, compartilhamento: true, ensino: false, publicidade: false },
+    { name: "Academia Virtual do INPI", url: "https://academiavirtual.inpi.gov.br/", conversao: true, retencao: true, utilizacao: true, compartilhamento: true, ensino: true, publicidade: false },
+    { name: "Docmost e Redmine", url: "https://intranet.inpi.gov.br/index.php?view=article&id=1279:confira-a-gravacao-do-evento-sobre-as-ferramentas-docmost-e-redmine&catid=11&highlight=WyJkb2Ntb3N0Il0=", conversao: true, retencao: true, utilizacao: true, compartilhamento: true, ensino: false, publicidade: false },
+    { name: "E-mail Institucional", url: "https://mail.inpi.gov.br/", conversao: true, retencao: true, utilizacao: false, compartilhamento: false, ensino: false, publicidade: false },
+    { name: "INPI Drive", url: "https://inpidrive.inpi.gov.br/", conversao: true, retencao: true, utilizacao: true, compartilhamento: true, ensino: false, publicidade: false },
+    { name: "Intranet do INPI", url: "https://intranet.inpi.gov.br/", conversao: true, retencao: true, utilizacao: true, compartilhamento: false, ensino: false, publicidade: true },
+    { name: "Portal do INPI", url: "https://gov.br/inpi/", conversao: true, retencao: true, utilizacao: true, compartilhamento: false, ensino: false, publicidade: true },
+    { name: "Rede Institucional", url: "file:///N:/", conversao: true, retencao: true, utilizacao: true, compartilhamento: true, ensino: false, publicidade: false },
+    { name: "MarcasDoc", url: "http://marcasdoc.inpi.gov.br/", conversao: true, retencao: true, utilizacao: true, compartilhamento: true, ensino: false, publicidade: false },
     { name: "Repositório Institucional (BIBLI)", conversao: true, retencao: true, utilizacao: true, compartilhamento: true, ensino: false, publicidade: true },
-    { name: "Sistema Eletrônico de Informações (SEI)", conversao: true, retencao: true, utilizacao: true, compartilhamento: true, ensino: false, publicidade: false },
-    { name: "Siscap (DIRPA)", conversao: true, retencao: true, utilizacao: true, compartilhamento: true, ensino: false, publicidade: false },
+    { name: "Sistema Eletrônico de Informações (SEI)", url: "https://sei.inpi.gov.br/", conversao: true, retencao: true, utilizacao: true, compartilhamento: true, ensino: false, publicidade: false },
+    { name: "Sistema de Cadastramento da Produção (Siscap)", url: "https://siscap/adm/login.php", conversao: true, retencao: true, utilizacao: true, compartilhamento: true, ensino: false, publicidade: false },
 ].sort((a, b) => a.name.localeCompare(b.name));
 
 const categoryConfig = {
@@ -99,7 +99,18 @@ const Instrumentos: React.FC = () => {
                                 className={`grid ${gridCols} gap-x-6 items-center border-t border-blue-100 hover:bg-blue-50/80 px-4`}
                             >
                                 <div className="pr-4 py-2 sticky left-0 bg-white/95 hover:bg-blue-50/80">
-                                    <p className="text-blue-900 font-medium text-base">{item.name}</p>
+                                    {item.url ? (
+                                        <a
+                                            href={item.url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-blue-900 font-medium text-base underline decoration-blue-300 underline-offset-2 hover:text-blue-700"
+                                        >
+                                            {item.name}
+                                        </a>
+                                    ) : (
+                                        <p className="text-blue-900 font-medium text-base">{item.name}</p>
+                                    )}
                                 </div>
                                 {categories.map(key => (
                                     <div key={key} className="py-2">
