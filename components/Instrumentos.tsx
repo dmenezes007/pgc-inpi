@@ -69,7 +69,6 @@ const LuminousBar: React.FC<{ active: boolean; classNames: { active: string; ina
 
 const Instrumentos: React.FC = () => {
     const categories = Object.keys(categoryConfig) as (keyof typeof categoryConfig)[];
-    const gridCols = `grid-cols-[1fr_repeat(6,9rem)]`;
 
     return (
         <div>
@@ -80,24 +79,27 @@ const Instrumentos: React.FC = () => {
             </div>
 
             <div className="overflow-x-auto rounded-lg border border-blue-200 bg-blue-50/70">
-                <div className="min-w-[1200px]">
-                    <div className={`grid ${gridCols} gap-x-6 items-center text-sm font-semibold text-blue-900 px-4`}>
-                        {/* Cabeçalho */}
-                        <div className="pr-4 py-3 sticky left-0 bg-blue-50/90">Instrumento</div>
-                        {categories.map(key => (
-                            <div key={key} className="text-center py-3">
-                                {categoryConfig[key].title}
-                            </div>
+                <table className="w-full min-w-[1200px] table-fixed">
+                    <colgroup>
+                        <col className="w-[32%]" />
+                        {categories.map((key) => (
+                            <col key={key} className="w-[11.33%]" />
                         ))}
-                    </div>
-
-                    <div className="bg-white/90">
+                    </colgroup>
+                    <thead className="text-sm font-semibold text-blue-900">
+                        <tr>
+                            <th className="px-4 py-3 text-left">Instrumento</th>
+                            {categories.map((key) => (
+                                <th key={key} className="px-2 py-3 text-center">
+                                    {categoryConfig[key].title}
+                                </th>
+                            ))}
+                        </tr>
+                    </thead>
+                    <tbody className="bg-white/90">
                         {instrumentData.map((item, index) => (
-                            <div 
-                                key={index} 
-                                className={`grid ${gridCols} gap-x-6 items-center border-t border-blue-100 hover:bg-blue-50/80 px-4`}
-                            >
-                                <div className="pr-4 py-2 sticky left-0 bg-white/95 hover:bg-blue-50/80">
+                            <tr key={index} className="border-t border-blue-100 hover:bg-blue-50/80">
+                                <td className="px-4 py-2 align-middle">
                                     {item.url ? (
                                         <a
                                             href={item.url}
@@ -116,21 +118,21 @@ const Instrumentos: React.FC = () => {
                                     ) : (
                                         <p className="text-blue-900 font-medium text-base">{item.name}</p>
                                     )}
-                                </div>
-                                {categories.map(key => (
-                                    <div key={key} className="py-2">
+                                </td>
+                                {categories.map((key) => (
+                                    <td key={key} className="px-2 py-2 align-middle">
                                         <LuminousBar
                                             active={item[key as keyof typeof item] as boolean}
                                             classNames={{ active: categoryConfig[key].activeClasses, inactive: categoryConfig[key].inactiveClasses }}
                                             icon={categoryConfig[key].icon}
                                             title={categoryConfig[key].title}
                                         />
-                                    </div>
+                                    </td>
                                 ))}
-                            </div>
+                            </tr>
                         ))}
-                    </div>
-                </div>
+                    </tbody>
+                </table>
             </div>
         </div>
     );
