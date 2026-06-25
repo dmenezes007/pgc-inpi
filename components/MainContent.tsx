@@ -54,6 +54,7 @@ const moduleKickerTexts: Record<string, string> = {
 const MainContent: React.FC<MainContentProps> = ({ activeModule, onModuleSelect }) => {
     const introText = moduleIntroTexts[activeModule] || moduleIntroTexts['Início'];
     const kickerText = moduleKickerTexts[activeModule] || moduleKickerTexts['Início'];
+    const shouldRenderSharedIntro = activeModule !== 'Início';
 
     const sharedIntro = (
         <div className="module-intro mb-8">
@@ -109,7 +110,7 @@ const MainContent: React.FC<MainContentProps> = ({ activeModule, onModuleSelect 
     return (
         <main className="main-content-scroll-area flex-1 p-4 sm:p-8 overflow-y-auto">
             <div className="max-w-full mx-auto">
-                {sharedIntro}
+                {shouldRenderSharedIntro && sharedIntro}
                 {renderContent()}
             </div>
         </main>

@@ -10,12 +10,26 @@ const Inicio: React.FC<InicioProps> = ({ onModuleSelect }) => {
   const otherModules = MODULES.filter(m => m !== 'Início');
 
   return (
-    <div>
-      <h2 className="text-2xl font-semibold mb-6 text-gray-300">Navegue pelos Módulos</h2>
+    <div className="space-y-8">
+      <div className="module-intro">
+        <div className="module-kicker">VISÃO GERAL DO PORTAL</div>
+        <p className="module-lead">
+          O <span className="text-orange-400 font-serif-highlight font-medium">Portal da Gestão do Conhecimento</span> consolida diretrizes, processos e instrumentos institucionais para transformar conhecimento em capacidade organizacional, fortalecendo a <span className="text-orange-400 font-serif-highlight font-medium">aprendizagem contínua</span>, a <span className="text-orange-400 font-serif-highlight font-medium">eficiência dos serviços</span> e a geração de valor público no INPI.
+        </p>
+      </div>
+      <div className="flex items-end justify-between gap-4">
+        <div>
+          <p className="text-sm font-bold uppercase tracking-[0.16em] text-blue-700">Arquitetura do portal</p>
+          <h2 className="mt-2 text-2xl font-semibold text-slate-900">Navegação por Módulos</h2>
+        </div>
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {otherModules.map(moduleName => (
           <ModuleCard key={moduleName} moduleName={moduleName} onModuleSelect={onModuleSelect} />
         ))}
+      </div>
+      <div className="flex items-center justify-center rounded-2xl border border-slate-200 bg-white/80 p-5">
+        <p className="text-sm text-slate-500">© 2025 INPI · Portal da Gestão do Conhecimento</p>
       </div>
     </div>
   );
