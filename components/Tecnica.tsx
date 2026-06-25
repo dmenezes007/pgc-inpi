@@ -14,44 +14,55 @@ interface SelectOption {
 }
 
 const customStyles = {
-    control: (provided: any) => ({
+    control: (provided: any, state: { isFocused: boolean }) => ({
         ...provided,
-        backgroundColor: '#334155', // bg-slate-700
-        borderColor: '#475569', // border-slate-600
-        color: 'white',
+        backgroundColor: '#ffffff',
+        borderColor: state.isFocused ? 'var(--gov-blue)' : 'var(--gov-border)',
+        color: 'var(--gov-blue-dark)',
         borderRadius: '0.375rem', // rounded-md
         padding: '0.2rem',
-        border: '1px solid #475569',
-        boxShadow: 'none',
+        border: '1px solid var(--gov-border)',
+        boxShadow: state.isFocused ? '0 0 0 1px var(--gov-blue)' : 'none',
         '&:hover': {
-            borderColor: '#64748b', // border-slate-500
+            borderColor: 'var(--gov-blue)',
         },
     }),
     singleValue: (provided: any) => ({
         ...provided,
-        color: 'white',
+        color: 'var(--gov-blue-dark)',
     }),
     menu: (provided: any) => ({
         ...provided,
-        backgroundColor: '#1e293b', // bg-slate-800
-        borderColor: '#475569', // border-slate-600
+        backgroundColor: '#ffffff',
+        borderColor: 'var(--gov-border)',
     }),
     option: (provided: any, state: { isFocused: any; isSelected: any; }) => ({
         ...provided,
-        backgroundColor: state.isFocused ? '#475569' : state.isSelected ? '#f97316' : '#1e293b',
-        color: 'white',
+        backgroundColor: state.isSelected ? 'var(--gov-blue)' : state.isFocused ? 'var(--gov-blue-soft)' : '#ffffff',
+        color: state.isSelected ? '#ffffff' : 'var(--gov-blue-dark)',
         '&:active': {
-            backgroundColor: '#f97316',
+            backgroundColor: 'var(--gov-blue)',
         },
     }),
     input: (provided: any) => ({
         ...provided,
-        color: 'white',
+        color: 'var(--gov-blue-dark)',
     }),
     placeholder: (provided: any) => ({
         ...provided,
-        color: '#94a3b8', // text-gray-400
+        color: 'var(--gov-blue)',
     }),
+    clearIndicator: (provided: any) => ({
+        ...provided,
+        color: 'var(--gov-blue)',
+        '&:hover': { color: 'var(--gov-blue-dark)' },
+    }),
+    dropdownIndicator: (provided: any) => ({
+        ...provided,
+        color: 'var(--gov-blue)',
+        '&:hover': { color: 'var(--gov-blue-dark)' },
+    }),
+    indicatorSeparator: () => ({ display: 'none' }),
     menuPortal: (base: any) => ({ ...base, zIndex: 9999 }),
 };
 
@@ -113,10 +124,11 @@ const Tecnica: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {/* Nível 1 Dropdown */}
                     <div className="space-y-2">
-                        <label htmlFor="nivel1" className="block text-sm font-medium text-gray-300">Nível 1 de Conhecimento</label>
+                        <label htmlFor="nivel1" className="block text-sm font-medium text-blue-900">Nível 1 de Conhecimento</label>
                         <Select
                             id="nivel1"
                             instanceId="nivel1-select"
+                            classNamePrefix="tecnica-select"
                             value={selectedNivel1 ? { value: selectedNivel1, label: selectedNivel1 } : null}
                             onChange={handleNivel1Change}
                             options={nivel1Options}
@@ -129,10 +141,11 @@ const Tecnica: React.FC = () => {
 
                     {/* Nível 2 Dropdown */}
                     <div className="space-y-2">
-                        <label htmlFor="nivel2" className="block text-sm font-medium text-gray-300">Nível 2 de Conhecimento</label>
+                        <label htmlFor="nivel2" className="block text-sm font-medium text-blue-900">Nível 2 de Conhecimento</label>
                         <Select
                             id="nivel2"
                             instanceId="nivel2-select"
+                            classNamePrefix="tecnica-select"
                             value={selectedNivel2 ? { value: selectedNivel2, label: selectedNivel2 } : null}
                             onChange={handleNivel2Change}
                             options={nivel2Options}
@@ -146,7 +159,7 @@ const Tecnica: React.FC = () => {
 
                     {/* Nível 3 Display */}
                     <div className="space-y-2">
-                        <label className="block text-sm font-medium text-gray-300">Nível 3 de Conhecimento</label>
+                        <label className="block text-sm font-medium text-blue-900">Nível 3 de Conhecimento</label>
                         <div className="space-y-2 pt-2">
                             {nivel3Options.length > 0 ? (
                                 nivel3Options.map(item => (

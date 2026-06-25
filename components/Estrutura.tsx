@@ -68,6 +68,7 @@ const Estrutura: React.FC = () => {
                     onChange={handleUnitChange}
                     isSearchable
                     isClearable
+                    classNamePrefix="estrutura-select"
                     placeholder="Buscar por unidade ou sigla..."
                     aria-label="Buscar na estrutura organizacional"
                     menuPortalTarget={document.body}
@@ -76,8 +77,8 @@ const Estrutura: React.FC = () => {
                     styles={{
                         control: (base, state) => ({
                             ...base,
-                            backgroundColor: '#1e293b',
-                            borderColor: state.isFocused ? 'var(--gov-blue)' : '#334155',
+                            backgroundColor: '#ffffff',
+                            borderColor: state.isFocused ? 'var(--gov-blue)' : 'var(--gov-border)',
                             boxShadow: state.isFocused ? '0 0 0 1px var(--gov-blue)' : 'none',
                             borderRadius: '0.5rem',
                             minHeight: '48px',
@@ -86,31 +87,31 @@ const Estrutura: React.FC = () => {
                             },
                             transition: 'border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
                         }),
-                        singleValue: (base) => ({ ...base, color: '#f1f5f9' }),
-                        input: (base) => ({ ...base, color: '#f1f5f9' }),
+                        singleValue: (base) => ({ ...base, color: 'var(--gov-blue-dark)' }),
+                        input: (base) => ({ ...base, color: 'var(--gov-blue-dark)' }),
                         menu: (base) => ({
                             ...base,
-                            backgroundColor: '#1e293b',
+                            backgroundColor: '#ffffff',
                             borderRadius: '0.5rem',
-                            border: '1px solid #334155',
+                            border: '1px solid var(--gov-border)',
                         }),
                         option: (base, { isFocused, isSelected }) => ({
                             ...base,
-                            backgroundColor: isSelected ? '#ea580c' : isFocused ? 'rgba(249, 115, 22, 0.2)' : 'transparent',
-                            color: isSelected ? 'white' : '#f1f5f9',
+                            backgroundColor: isSelected ? 'var(--gov-blue)' : isFocused ? 'var(--gov-blue-soft)' : 'transparent',
+                            color: isSelected ? 'white' : 'var(--gov-blue-dark)',
                             borderRadius: '0.375rem',
-                            '&:active': { backgroundColor: '#c2410c' },
+                            '&:active': { backgroundColor: 'var(--gov-blue)' },
                         }),
-                        placeholder: (base) => ({ ...base, color: '#64748b' }),
+                        placeholder: (base) => ({ ...base, color: 'var(--gov-blue)' }),
                         clearIndicator: (base) => ({
                             ...base,
-                            color: '#64748b',
-                            '&:hover': { color: '#94a3b8' },
+                            color: 'var(--gov-blue)',
+                            '&:hover': { color: 'var(--gov-blue-dark)' },
                         }),
                         dropdownIndicator: (base) => ({
                             ...base,
-                            color: '#64748b',
-                            '&:hover': { color: '#94a3b8' },
+                            color: 'var(--gov-blue)',
+                            '&:hover': { color: 'var(--gov-blue-dark)' },
                         }),
                         indicatorSeparator: () => ({ display: 'none' }),
                         menuPortal: (base) => ({ ...base, zIndex: 9999 }),
