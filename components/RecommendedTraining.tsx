@@ -30,7 +30,7 @@ const RecommendedTraining: React.FC<RecommendedTrainingProps> = ({ courses }) =>
               rel="noopener noreferrer"
               className="group block rounded-xl border border-slate-300 bg-[#f7f8fa] px-3 py-3 shadow-sm transition-all duration-200 hover:border-blue-300 hover:shadow-md"
             >
-              <p className="text-[0.7rem] font-semibold uppercase tracking-wide text-slate-600">
+              <p className="text-[0.55rem] font-semibold uppercase tracking-wide text-slate-600">
                 {course.tematica || 'Capacitação'}
               </p>
               <h4 className="mt-1 text-base font-bold leading-snug text-[#0b3b7a] sm:text-base">
@@ -56,7 +56,7 @@ const RecommendedTraining: React.FC<RecommendedTrainingProps> = ({ courses }) =>
               key={`${course.curso}-nolink`}
               className="rounded-xl border border-slate-300 bg-[#f7f8fa] px-3 py-3 shadow-sm"
             >
-              <p className="text-[0.7rem] font-semibold uppercase tracking-wide text-slate-600">
+              <p className="text-[0.55rem] font-semibold uppercase tracking-wide text-slate-600">
                 {course.tematica || 'Capacitação'}
               </p>
               <h4 className="mt-1 text-base font-bold leading-snug text-[#0b3b7a] sm:text-base">
