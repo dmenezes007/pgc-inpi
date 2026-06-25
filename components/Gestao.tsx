@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import Papa from "papaparse";
 import Carreiras from './Carreiras';
+import iesgoCsvUrl from '../src/files/docs/iesgo.csv?url';
+import megCsvUrl from '../src/files/docs/meg.csv?url';
 
 // --- Interfaces para Tipagem dos Dados ---
 interface MegData {
@@ -47,7 +49,7 @@ const MegCorrelationSystem: React.FC = () => {
 
     useEffect(() => {
         // Busca e processa os dados do CSV para o MEG
-        Papa.parse<MegData>("https://dmenezes007.github.io/pgc-inpi/src/files/docs/meg.csv", {
+        Papa.parse<MegData>(megCsvUrl, {
             download: true, header: true, delimiter: ";", skipEmptyLines: true,
             complete: (results) => setData(results.data),
         });
@@ -110,7 +112,7 @@ const IesgoCorrelationSystem: React.FC = () => {
 
     useEffect(() => {
         // Busca e processa os dados do CSV para o iESGo
-        Papa.parse<IesgoData>("https://dmenezes007.github.io/pgc-inpi/src/files/docs/iesgo.csv", {
+        Papa.parse<IesgoData>(iesgoCsvUrl, {
             download: true, header: true, delimiter: ";", skipEmptyLines: true,
             complete: (results) => setData(results.data),
         });

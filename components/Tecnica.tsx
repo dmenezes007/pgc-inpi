@@ -3,6 +3,7 @@ import Papa from 'papaparse';
 import Select, { SingleValue } from 'react-select';
 import RecommendedTraining from './RecommendedTraining';
 import { getRecommendedCourses } from './courseCuration';
+import tecnicaCsvUrl from '../src/files/docs/tecnica.csv?url';
 
 interface TecnicaData {
     Nivel1: string;
@@ -75,7 +76,7 @@ const Tecnica: React.FC = () => {
     const [selectedNivel2, setSelectedNivel2] = useState<string>('');
 
     useEffect(() => {
-        Papa.parse<TecnicaData>('https://dmenezes007.github.io/pgc-inpi/src/files/docs/tecnica.csv', {
+        Papa.parse<TecnicaData>(tecnicaCsvUrl, {
             download: true,
             header: true,
             delimiter: ';',

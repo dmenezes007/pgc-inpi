@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Select, { SingleValue } from 'react-select';
 import Papa from 'papaparse';
+import estruturaCsvUrl from '../src/files/docs/estrutura.csv?url';
 
 // Define a estrutura de dados vinda do CSV
 interface CompRegData {
@@ -23,7 +24,7 @@ const Estrutura: React.FC = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch('https://dmenezes007.github.io/pgc-inpi/src/files/docs/estrutura.csv');
+                const response = await fetch(estruturaCsvUrl);
                 const csvText = await response.text();
 
                 Papa.parse<CompRegData>(csvText, {
