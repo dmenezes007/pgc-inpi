@@ -38,6 +38,7 @@ const ModuleIcon: React.FC<ModuleIconProps> = ({ moduleName, className = "h-6 w-
     'Rastreamento': faWaveSquare,
     'Instrumentos': faFileLines,
     'Monitoramento': faBullseye,
+    'Documentação': faFileLines,
   };
 
   return <FontAwesomeIcon icon={iconByModule[moduleName] ?? faCircleNodes} className={className} />;

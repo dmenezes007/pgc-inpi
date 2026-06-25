@@ -13,6 +13,7 @@ import Autodesenvolvimento from './Autodesenvolvimento';
 import Rastreamento from './Rastreamento';
 import Instrumentos from './Instrumentos';
 import Monitoramento from './Monitoramento';
+import Documentacao from './Documentacao';
 
 interface MainContentProps {
   activeModule: string;
@@ -32,7 +33,8 @@ const moduleIntroTexts: Record<string, string> = {
     'Autodesenvolvimento': 'Protagonismo do servidor no desenvolvimento contínuo amplia competências estratégicas com incentivo institucional.',
     'Rastreamento': 'Levantamento e análise de conhecimentos essenciais e críticos identificam lacunas e subsidiam decisões de desenvolvimento.',
     'Instrumentos': 'Ferramentas institucionais sustentam a identificação, o desenvolvimento, a retenção, a proteção e o uso do conhecimento organizacional.',
-    'Monitoramento': 'Indicadores estruturados acompanham desempenho e impacto da Gestão do Conhecimento, favorecendo avaliação contínua e melhoria de resultados.'
+    'Monitoramento': 'Indicadores estruturados acompanham desempenho e impacto da Gestão do Conhecimento, favorecendo avaliação contínua e melhoria de resultados.',
+    'Documentação': 'Registro institucional de minutas, documentos de referência e contribuições técnicas para consolidação de políticas e iniciativas do INPI.'
 };
 
 const moduleKickerTexts: Record<string, string> = {
@@ -48,13 +50,14 @@ const moduleKickerTexts: Record<string, string> = {
     'Autodesenvolvimento': 'PROTAGONISMO DO SERVIDOR',
     'Rastreamento': 'MAPEAMENTO DE CONHECIMENTO',
     'Instrumentos': 'FERRAMENTAS INSTITUCIONAIS',
-    'Monitoramento': 'INDICADORES E RESULTADOS'
+    'Monitoramento': 'INDICADORES E RESULTADOS',
+    'Documentação': 'REPOSITÓRIO INSTITUCIONAL'
 };
 
 const MainContent: React.FC<MainContentProps> = ({ activeModule, onModuleSelect }) => {
     const introText = moduleIntroTexts[activeModule] || moduleIntroTexts['Início'];
     const kickerText = moduleKickerTexts[activeModule] || moduleKickerTexts['Início'];
-    const shouldRenderSharedIntro = activeModule !== 'Início';
+    const shouldRenderSharedIntro = activeModule !== 'Início' && activeModule !== 'Documentação';
 
     const sharedIntro = (
         <div className="module-intro mb-8">
@@ -93,6 +96,8 @@ const MainContent: React.FC<MainContentProps> = ({ activeModule, onModuleSelect 
                 return <Instrumentos />;
             case 'Monitoramento':
                 return <Monitoramento />;
+            case 'Documentação':
+                return <Documentacao />;
             default:
                  return (
                     <div key={activeModule}>

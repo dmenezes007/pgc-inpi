@@ -1,35 +1,61 @@
 import React from 'react';
+import DocIcon from './DocIcon';
 
 const Documentacao: React.FC = () => {
     return (
-        <div>
-            <h1 className="text-4xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-orange-400">
+        <div className="module-page">
+            <h1 className="module-title">
                 Documentação
             </h1>
-            <div className="bg-slate-800 p-8 rounded-lg shadow-lg border border-slate-700 space-y-6">
-                <p className="text-lg text-gray-300 leading-relaxed">
-                    Agradecemos a todos que participaram do <span className="font-semibold text-white">Design Sprint Institucional</span> e contribuíram para a formulação da proposta da Política de Gestão da Inovação do INPI. Como resultado, compartilhamos abaixo as minutas dos documentos elaborados para apreciação e coleta de novas contribuições.
+            <div className="module-intro">
+                <div className="module-kicker">REPOSITÓRIO INSTITUCIONAL</div>
+                <p className="module-lead">
+                    Registro institucional dos resultados do <span className="font-semibold text-slate-900">Design Sprint Institucional</span>, com disponibilização das minutas elaboradas para apreciação técnica e recebimento de contribuições complementares.
                 </p>
+            </div>
 
-                <div className="space-y-4 pt-4">
-                     <h2 className="text-xl font-semibold text-gray-200">Minutas para Apreciação</h2>
-                     <a href="#" onClick={e => e.preventDefault()} className="flex items-center p-4 bg-slate-700/50 rounded-lg border border-slate-600 hover:border-orange-500 hover:bg-slate-700 transition-all group">
-                        <svg className="w-6 h-6 mr-4 text-orange-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                        <span className="text-gray-300 group-hover:text-white">Minuta: Política de Gestão da Inovação do INPI</span>
+            <div className="rounded-3xl border border-slate-200 bg-white/95 p-8 shadow-lg shadow-blue-100/50 space-y-8">
+                <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-6">
+                    <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                        <div>
+                            <h2 className="text-2xl font-bold text-slate-900">Minutas para apreciação</h2>
+                            <p className="mt-1 block text-sm text-slate-500 doc-subtext">Documentos centrais para leitura, análise técnica e contribuições complementares.</p>
+                        </div>
+                        <span className="inline-flex items-center rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-blue-700">3 documentos ativos</span>
+                    </div>
+                </div>
+
+                <div className="space-y-4">
+                    <a href="https://dmenezes007.github.io/pgi-inpi/files/docs/Minuta%20da%20Pol%C3%ADtica%20de%20Gest%C3%A3o%20da%20Inova%C3%A7%C3%A3o%20do%20INPI.docx" target="_blank" rel="noopener noreferrer" className="group flex items-center rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md">
+                        <DocIcon />
+                        <div>
+                            <span className="block text-sm font-semibold text-slate-900 group-hover:text-blue-700">Minuta: Política de Gestão da Inovação do INPI</span>
+                            <span className="mt-1 block text-sm text-slate-500">Documento base para diretrizes, princípios e governança da inovação.</span>
+                        </div>
                     </a>
-                     <a href="#" onClick={e => e.preventDefault()} className="flex items-center p-4 bg-slate-700/50 rounded-lg border border-slate-600 hover:border-orange-500 hover:bg-slate-700 transition-all group">
-                        <svg className="w-6 h-6 mr-4 text-orange-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                        <span className="text-gray-300 group-hover:text-white">Minuta: Política de Inovação da Academia do INPI</span>
+                    <a href="https://dmenezes007.github.io/pgi-inpi/files/docs/Minuta%20da%20Pol%C3%ADtica%20de%20Inova%C3%A7%C3%A3o%20da%20Academia%20do%20INPI.docx" target="_blank" rel="noopener noreferrer" className="group flex items-center rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md">
+                        <DocIcon />
+                        <div>
+                            <span className="block text-sm font-semibold text-slate-900 group-hover:text-blue-700">Minuta: Política de Inovação da Academia do INPI</span>
+                            <span className="mt-1 block text-sm text-slate-500">Diretrizes para articulação acadêmica, capacitação e inovação aplicada.</span>
+                        </div>
                     </a>
-                     <a href="#" onClick={e => e.preventDefault()} className="flex items-center p-4 bg-slate-700/50 rounded-lg border border-slate-600 hover:border-orange-500 hover:bg-slate-700 transition-all group">
-                        <svg className="w-6 h-6 mr-4 text-orange-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                        <span className="text-gray-300 group-hover:text-white">Minuta: Política de Relacionamento da Academia do INPI com Fundações de Apoio</span>
+                    <a href="https://dmenezes007.github.io/pgi-inpi/files/docs/Minuta%20da%20Pol%C3%ADtica%20de%20Relacionamento%20da%20Academia%20do%20INPI%20com%20Funda%C3%A7%C3%B5es%20de%20Apoio.docx" target="_blank" rel="noopener noreferrer" className="group flex items-center rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md">
+                        <DocIcon />
+                        <div>
+                            <span className="block text-sm font-semibold text-slate-900 group-hover:text-blue-700">Minuta: Política de Relacionamento da Academia do INPI com Fundações de Apoio</span>
+                            <span className="mt-1 block text-sm text-slate-500">Regras de relacionamento institucional e apoio à execução das iniciativas.</span>
+                        </div>
                     </a>
                 </div>
 
-                <div className="border-t border-slate-700 pt-6 space-y-3 text-sm">
-                     <p className="text-gray-400">Materiais de referência, apresentações e registros fotográficos da metaoficina estão disponíveis em: <a href="https://inpidrive.inpi.gov.br/index.php/s/8O5OUlrufgmof3d" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">Link para o Drive</a>.</p>
-                      <p className="text-gray-400">Um agradecimento especial aos condutores do Pólen/Fiocruz. Acompanhe a colab em: <a href="https://www.instagram.com/p/DOydE7sjYcF/" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">Post no Instagram</a>.</p>
+                <div className="grid gap-4 border-t border-slate-200 pt-6 md:grid-cols-2">
+                    <p className="rounded-2xl border border-slate-200 bg-slate-50/80 p-5 text-base text-slate-600">
+                        Materiais de referência, apresentações e registros da metaoficina estão disponíveis em: <a href="https://inpidrive.inpi.gov.br/index.php/s/8O5OUlrufgmof3d" target="_blank" rel="noopener noreferrer" className="font-semibold text-blue-700 hover:underline">Repositório institucional</a>.
+                    </p>
+                    <p className="rounded-2xl border border-slate-200 bg-slate-50/80 p-5 text-base text-slate-600">
+                        Registro externo da colaboração com o Pólen/Fiocruz: <a href="https://www.instagram.com/p/DOydE7sjYcF/" target="_blank" rel="noopener noreferrer" className="font-semibold text-blue-700 hover:underline">publicação de referência</a>.
+                    </p>
                 </div>
             </div>
         </div>
