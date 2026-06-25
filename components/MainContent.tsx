@@ -20,19 +20,19 @@ interface MainContentProps {
 }
 
 const moduleIntroTexts: Record<string, string> = {
-    'Início': 'Este portal organiza diretrizes, métodos e instrumentos para orientar a Gestão do Conhecimento no INPI, conectando pessoas, processos e decisões estratégicas.',
-    'Integração': 'Este módulo evidencia como a Gestão do Conhecimento se articula com sucessão, formação, inovação e desenvolvimento de competências para fortalecer resultados institucionais.',
-    'Identidade': 'Este módulo conecta missão, visão, valores e objetivos estratégicos do INPI às práticas de Gestão do Conhecimento, reforçando alinhamento institucional e foco em valor público.',
-    'Estrutura': 'Este módulo relaciona competências regimentais e estrutura organizacional para apoiar o mapeamento de conhecimentos essenciais e críticos por unidade.',
-    'Referências': 'Este módulo apresenta referenciais de governança e gestão que orientam a maturidade institucional e sustentam a Gestão do Conhecimento no INPI.',
-    'Liderança': 'Este módulo destaca competências de liderança necessárias para mobilizar equipes, promover aprendizagem contínua e consolidar uma cultura de compartilhamento do conhecimento.',
-    'Transversalidade': 'Este módulo reúne competências transversais que viabilizam colaboração, integração entre áreas e atuação orientada a resultados no serviço público.',
-    'Técnica': 'Este módulo organiza conhecimentos técnicos especializados por níveis e temas, apoiando a qualificação das atividades finalísticas e de suporte do Instituto.',
-    'Planejamento': 'Este módulo traduz necessidades de conhecimento em ações de desenvolvimento, com alinhamento ao planejamento institucional e à viabilidade orçamentária.',
-    'Autodesenvolvimento': 'Este módulo reforça o protagonismo do servidor no desenvolvimento contínuo, com incentivo institucional para ampliar competências estratégicas.',
-    'Rastreamento': 'Este módulo apoia o levantamento e a análise de conhecimentos essenciais e críticos, identificando lacunas e subsidiando decisões de desenvolvimento.',
-    'Instrumentos': 'Este módulo apresenta as ferramentas institucionais que sustentam identificação, desenvolvimento, retenção, proteção e uso do conhecimento organizacional.',
-    'Monitoramento': 'Este módulo estrutura indicadores para acompanhar desempenho e impacto da Gestão do Conhecimento, favorecendo avaliação contínua e melhoria de resultados.'
+    'Início': 'Diretrizes, métodos e instrumentos da Gestão do Conhecimento no INPI conectam pessoas, processos e decisões estratégicas em uma visão integrada.',
+    'Integração': 'A articulação entre Gestão do Conhecimento, sucessão, formação, inovação e desenvolvimento de competências fortalece resultados institucionais.',
+    'Identidade': 'Missão, visão, valores e objetivos estratégicos do INPI orientam as práticas de Gestão do Conhecimento com alinhamento institucional e foco em valor público.',
+    'Estrutura': 'Competências regimentais e estrutura organizacional sustentam o mapeamento de conhecimentos essenciais e críticos por unidade.',
+    'Referências': 'Referenciais de governança e gestão orientam a maturidade institucional e sustentam a Gestão do Conhecimento no INPI.',
+    'Liderança': 'Competências de liderança mobilizam equipes, promovem aprendizagem contínua e consolidam uma cultura de compartilhamento do conhecimento.',
+    'Transversalidade': 'Conhecimentos transversais viabilizam colaboração, integração entre áreas e atuação orientada a resultados no serviço público.',
+    'Técnica': 'Conhecimentos técnicos especializados, organizados por níveis e temas, apoiam a qualificação das atividades finalísticas e de suporte do Instituto.',
+    'Planejamento': 'Necessidades de conhecimento convertem-se em ações de desenvolvimento com alinhamento ao planejamento institucional e à viabilidade orçamentária.',
+    'Autodesenvolvimento': 'Protagonismo do servidor no desenvolvimento contínuo amplia competências estratégicas com incentivo institucional.',
+    'Rastreamento': 'Levantamento e análise de conhecimentos essenciais e críticos identificam lacunas e subsidiam decisões de desenvolvimento.',
+    'Instrumentos': 'Ferramentas institucionais sustentam a identificação, o desenvolvimento, a retenção, a proteção e o uso do conhecimento organizacional.',
+    'Monitoramento': 'Indicadores estruturados acompanham desempenho e impacto da Gestão do Conhecimento, favorecendo avaliação contínua e melhoria de resultados.'
 };
 
 const moduleKickerTexts: Record<string, string> = {
