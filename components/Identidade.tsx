@@ -189,7 +189,7 @@ const Identidade: React.FC = () => {
             </div>
 
             <div>
-                <h2 className="text-3xl font-bold text-center mb-8 text-gray-300">Valores Institucionais</h2>
+                <h2 className="identidade-valores-title text-3xl font-bold text-center mb-8 text-gray-300">Valores Institucionais</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {identityData.values.map(value => (
                         <div key={value.name} className="bg-slate-800 p-6 rounded-lg border border-slate-700 hover:border-orange-500/50 transition-colors duration-300">
