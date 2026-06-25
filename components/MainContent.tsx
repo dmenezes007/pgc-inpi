@@ -41,7 +41,7 @@ const moduleKickerTexts: Record<string, string> = {
     'Identidade': 'DIRECIONAMENTO ESTRATÉGICO',
     'Estrutura': 'COMPETÊNCIAS REGIMENTAIS',
     'Referências': 'GOVERNANÇA E MATURIDADE',
-    'Liderança': 'LIDERANÇA PARA CONHECIMENTO',
+    'Liderança': 'CONHECIMENTO PARA LIDERANÇA',
     'Transversalidade': 'COMPETÊNCIAS TRANSVERSAIS',
     'Técnica': 'CONHECIMENTO ESPECIALIZADO',
     'Planejamento': 'PLANO DE DESENVOLVIMENTO',
