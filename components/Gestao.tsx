@@ -84,9 +84,9 @@ const MegCorrelationSystem: React.FC = () => {
                         ))}
                     </div>
                 </div>
-                {/* Coluna Subtema */}
+                {/* Coluna Processo */}
                 <div className={`space-y-4 transition-opacity duration-300 ${selectedTema ? 'opacity-100' : 'opacity-30 pointer-events-none'}`}>
-                    <h4 className="font-semibold text-gray-200">Subtema</h4>
+                    <h4 className="font-semibold text-gray-200">Processo</h4>
                     <div className="space-y-2">
                          {subtemas.map(st => (
                             <div key={st} className="flex items-start text-gray-300 p-3 bg-slate-900/50 rounded-md">
