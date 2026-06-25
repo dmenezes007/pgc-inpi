@@ -7,9 +7,5 @@ export const MODULES = [
   "Liderança",
   "Transversalidade",
   "Técnica",
-  "Planejamento",
-  "Autodesenvolvimento",
-  "Rastreamento",
-  "Instrumentos",
-  "Monitoramento"
+  "Instrumentos"
 ];
