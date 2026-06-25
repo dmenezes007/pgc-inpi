@@ -296,7 +296,7 @@ body,
   color: rgb(29 78 216 / var(--tw-text-opacity, 1)) !important;
 }
 
-.identidade-valores-title {
+.app-container .identidade-valores-title.text-gray-300 {
   color: rgb(29 78 216 / var(--tw-text-opacity, 1)) !important;
 }
 
