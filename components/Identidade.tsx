@@ -131,7 +131,7 @@ const Identidade: React.FC = () => {
 
     const ObjectiveSelector: React.FC<{ objective: typeof identityData.strategicObjectives[0] }> = ({ objective }) => (
         <li>
-            <label className={`flex items-center p-3 w-full text-sm font-medium text-left rounded-lg cursor-pointer transition-all duration-200 ${selectedObjective === objective.id ? 'bg-orange-600 text-white shadow-lg' : 'text-gray-300 bg-slate-700/50 hover:bg-slate-700'}`}>
+            <label className={`flex items-center p-3 w-full text-sm font-medium text-left rounded-lg cursor-pointer transition-all duration-200 ${selectedObjective === objective.id ? 'bg-orange-600 text-white shadow-lg' : 'identidade-unselected-label text-gray-300 bg-slate-700/50 hover:bg-slate-700'}`}>
                 <input
                     type="radio"
                     name="objective"
