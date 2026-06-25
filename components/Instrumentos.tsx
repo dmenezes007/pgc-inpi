@@ -11,8 +11,8 @@ const instrumentData = [
     { name: "Portal do INPI", url: "https://gov.br/inpi/", conversao: true, retencao: true, utilizacao: true, compartilhamento: false, ensino: false, publicidade: true },
     { name: "Rede Institucional", url: "file:///N:/", conversao: true, retencao: true, utilizacao: true, compartilhamento: true, ensino: false, publicidade: false },
     { name: "MarcasDoc", url: "http://marcasdoc.inpi.gov.br/", conversao: true, retencao: true, utilizacao: true, compartilhamento: true, ensino: false, publicidade: false },
-    { name: "Sistema Eletrônico de Informações (SEI)", url: "https://sei.inpi.gov.br/", conversao: true, retencao: true, utilizacao: true, compartilhamento: true, ensino: false, publicidade: false },
-    { name: "Sistema de Cadastramento da Produção (Siscap)", url: "https://siscap/adm/login.php", conversao: true, retencao: true, utilizacao: true, compartilhamento: true, ensino: false, publicidade: false },
+    { name: "SEI (Sistema Eletrônico de Informações)", url: "https://sei.inpi.gov.br/", conversao: true, retencao: true, utilizacao: true, compartilhamento: true, ensino: false, publicidade: false },
+    { name: "SISCAP (Sistema de Cadastramento de Produção)", url: "https://siscap/adm/login.php", conversao: true, retencao: true, utilizacao: true, compartilhamento: true, ensino: false, publicidade: false },
 ].sort((a, b) => a.name.localeCompare(b.name));
 
 const categoryConfig = {
