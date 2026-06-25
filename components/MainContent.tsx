@@ -24,7 +24,7 @@ const moduleIntroTexts: Record<string, string> = {
     'Integração': 'Este módulo evidencia como a Gestão do Conhecimento se articula com sucessão, formação, inovação e desenvolvimento de competências para fortalecer resultados institucionais.',
     'Identidade': 'Este módulo conecta missão, visão, valores e objetivos estratégicos do INPI às práticas de Gestão do Conhecimento, reforçando alinhamento institucional e foco em valor público.',
     'Estrutura': 'Este módulo relaciona competências regimentais e estrutura organizacional para apoiar o mapeamento de conhecimentos essenciais e críticos por unidade.',
-    'Gestão': 'Este módulo apresenta referenciais de governança e gestão que orientam a maturidade institucional e sustentam a Gestão do Conhecimento no INPI.',
+    'Referências': 'Este módulo apresenta referenciais de governança e gestão que orientam a maturidade institucional e sustentam a Gestão do Conhecimento no INPI.',
     'Liderança': 'Este módulo destaca competências de liderança necessárias para mobilizar equipes, promover aprendizagem contínua e consolidar uma cultura de compartilhamento do conhecimento.',
     'Transversalidade': 'Este módulo reúne competências transversais que viabilizam colaboração, integração entre áreas e atuação orientada a resultados no serviço público.',
     'Técnica': 'Este módulo organiza conhecimentos técnicos especializados por níveis e temas, apoiando a qualificação das atividades finalísticas e de suporte do Instituto.',
@@ -40,7 +40,7 @@ const moduleKickerTexts: Record<string, string> = {
     'Integração': 'ARTICULAÇÃO INSTITUCIONAL',
     'Identidade': 'DIRECIONAMENTO ESTRATÉGICO',
     'Estrutura': 'COMPETÊNCIAS REGIMENTAIS',
-    'Gestão': 'GOVERNANÇA E MATURIDADE',
+    'Referências': 'GOVERNANÇA E MATURIDADE',
     'Liderança': 'LIDERANÇA PARA CONHECIMENTO',
     'Transversalidade': 'COMPETÊNCIAS TRANSVERSAIS',
     'Técnica': 'CONHECIMENTO ESPECIALIZADO',
@@ -75,7 +75,7 @@ const MainContent: React.FC<MainContentProps> = ({ activeModule, onModuleSelect 
                 return <Identidade />;
             case 'Estrutura':
                 return <Estrutura />;
-            case 'Gestão':
+              case 'Referências':
                  return <Gestao />;
             case 'Liderança':
                 return <Lideranca />;

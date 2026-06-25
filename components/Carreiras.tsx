@@ -29,16 +29,16 @@ const Carreiras: React.FC = () => {
     ];
 
     return (
-        <div className="space-y-8">
+        <div className="space-y-8 carreiras-tab-content">
             <h3 className="text-2xl font-semibold text-gray-200">Plano de Carreiras e Cargos do INPI</h3>
-            <p className="text-gray-300">
+            <p className="text-gray-300 carreiras-intro-text">
                 O Plano de Carreiras e Cargos do INPI, conforme o Art. 90 da Lei nº 11.355, de 19 de outubro de 2006, é composto pelas seguintes Carreiras e cargos:
             </p>
             <div className="space-y-4">
                 {carreiras.map((carreira, index) => (
                     <div key={index} className="p-4 bg-slate-900/50 rounded-lg border border-slate-700">
-                        <h4 className="font-bold text-orange-400">{carreira.titulo}</h4>
-                        <p className="text-gray-400 mt-2">{carreira.descricao}</p>
+                        <h4 className="font-bold text-orange-400 carreira-item-title">{carreira.titulo}</h4>
+                        <p className="text-gray-400 mt-2 carreira-item-description">{carreira.descricao}</p>
                     </div>
                 ))}
             </div>

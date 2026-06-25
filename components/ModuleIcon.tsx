@@ -1,6 +1,7 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
+  faBookOpen,
   faBuilding,
   faBullseye,
   faCircleNodes,
@@ -28,7 +29,7 @@ const ModuleIcon: React.FC<ModuleIconProps> = ({ moduleName, className = "h-6 w-
     'Integração': faCircleNodes,
     'Identidade': faUser,
     'Estrutura': faBuilding,
-    'Gestão': faGears,
+    'Referências': faBookOpen,
     'Liderança': faUsers,
     'Transversalidade': faGlobe,
     'Técnica': faScrewdriverWrench,

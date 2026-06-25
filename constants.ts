@@ -3,7 +3,7 @@ export const MODULES = [
   "Integração",
   "Identidade",
   "Estrutura",
-  "Gestão",
+  "Referências",
   "Liderança",
   "Transversalidade",
   "Técnica",

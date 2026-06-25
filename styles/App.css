@@ -347,6 +347,15 @@ body,
   box-shadow: 0 16px 30px rgba(19, 81, 180, 0.12) !important;
 }
 
+.carreiras-tab-content .carreiras-intro-text.text-gray-300 {
+  color: #334155 !important;
+}
+
+.carreiras-tab-content .carreira-item-title.font-bold.text-orange-400,
+.carreiras-tab-content .carreira-item-description.text-gray-400.mt-2 {
+  color: #fff !important;
+}
+
 .app-container .hover\:bg-slate-700:hover,
 .app-container .hover\:bg-slate-700\/40:hover,
 .app-container .hover\:bg-slate-700\/50:hover {
