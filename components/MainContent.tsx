@@ -35,12 +35,29 @@ const moduleIntroTexts: Record<string, string> = {
     'Monitoramento': 'Este módulo estrutura indicadores para acompanhar desempenho e impacto da Gestão do Conhecimento, favorecendo avaliação contínua e melhoria de resultados.'
 };
 
+const moduleKickerTexts: Record<string, string> = {
+    'Início': 'VISÃO GERAL DO PORTAL',
+    'Integração': 'ARTICULAÇÃO INSTITUCIONAL',
+    'Identidade': 'DIRECIONAMENTO ESTRATÉGICO',
+    'Estrutura': 'COMPETÊNCIAS REGIMENTAIS',
+    'Gestão': 'GOVERNANÇA E MATURIDADE',
+    'Liderança': 'LIDERANÇA PARA CONHECIMENTO',
+    'Transversalidade': 'COMPETÊNCIAS TRANSVERSAIS',
+    'Técnica': 'CONHECIMENTO ESPECIALIZADO',
+    'Planejamento': 'PLANO DE DESENVOLVIMENTO',
+    'Autodesenvolvimento': 'PROTAGONISMO DO SERVIDOR',
+    'Rastreamento': 'MAPEAMENTO DE CONHECIMENTO',
+    'Instrumentos': 'FERRAMENTAS INSTITUCIONAIS',
+    'Monitoramento': 'INDICADORES E RESULTADOS'
+};
+
 const MainContent: React.FC<MainContentProps> = ({ activeModule, onModuleSelect }) => {
     const introText = moduleIntroTexts[activeModule] || moduleIntroTexts['Início'];
+    const kickerText = moduleKickerTexts[activeModule] || moduleKickerTexts['Início'];
 
     const sharedIntro = (
         <div className="module-intro mb-8">
-            <div className="module-kicker">AMBIENTE INSTITUCIONAL</div>
+            <div className="module-kicker">{kickerText}</div>
             <p className="module-lead">
                 {introText}
             </p>
