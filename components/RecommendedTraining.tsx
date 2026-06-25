@@ -18,7 +18,7 @@ const RecommendedTraining: React.FC<RecommendedTrainingProps> = ({ courses }) =>
   }
 
   return (
-    <div className="mt-3 space-y-3">
+    <div className="recommended-training mt-3 space-y-3">
       <p className="text-xs font-bold uppercase tracking-[0.14em] text-blue-700">Capacitação recomendada</p>
       <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
         {courses.map((course) => (
@@ -30,7 +30,10 @@ const RecommendedTraining: React.FC<RecommendedTrainingProps> = ({ courses }) =>
               rel="noopener noreferrer"
               className="group block rounded-xl border border-slate-300 bg-[#f7f8fa] px-3 py-3 shadow-sm transition-all duration-200 hover:border-blue-300 hover:shadow-md"
             >
-              <h4 className="text-base font-bold leading-snug text-[#0b3b7a] sm:text-lg">
+              <p className="text-[0.7rem] font-semibold uppercase tracking-wide text-slate-600">
+                {course.tematica || 'Capacitação'}
+              </p>
+              <h4 className="mt-1 text-base font-bold leading-snug text-[#0b3b7a] sm:text-base">
                 {course.curso}
               </h4>
               <div className="mt-3 flex items-center justify-between gap-2">
@@ -53,7 +56,10 @@ const RecommendedTraining: React.FC<RecommendedTrainingProps> = ({ courses }) =>
               key={`${course.curso}-nolink`}
               className="rounded-xl border border-slate-300 bg-[#f7f8fa] px-3 py-3 shadow-sm"
             >
-              <h4 className="text-base font-bold leading-snug text-[#0b3b7a] sm:text-lg">
+              <p className="text-[0.7rem] font-semibold uppercase tracking-wide text-slate-600">
+                {course.tematica || 'Capacitação'}
+              </p>
+              <h4 className="mt-1 text-base font-bold leading-snug text-[#0b3b7a] sm:text-base">
                 {course.curso}
               </h4>
               <div className="mt-3 flex items-center justify-between gap-2">

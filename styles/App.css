@@ -280,6 +280,13 @@ body,
   color: #334155 !important;
 }
 
+@media (min-width: 640px) {
+  .recommended-training .sm\:text-base {
+    font-size: 0.75rem;
+    line-height: 1rem;
+  }
+}
+
 .w-4.h-4.mr-3.mt-0\.5.flex-shrink-0.text-orange-500 {
   color: #fff !important;
 }
