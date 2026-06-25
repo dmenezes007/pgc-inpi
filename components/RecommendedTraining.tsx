@@ -28,23 +28,20 @@ const RecommendedTraining: React.FC<RecommendedTrainingProps> = ({ courses }) =>
               href={course.link}
               target="_blank"
               rel="noopener noreferrer"
-              className="group block rounded-xl border border-slate-300 bg-[#f7f8fa] px-4 py-4 shadow-sm transition-all duration-200 hover:border-blue-300 hover:shadow-md"
+              className="group block rounded-xl border border-slate-300 bg-[#f7f8fa] px-3 py-3 shadow-sm transition-all duration-200 hover:border-blue-300 hover:shadow-md"
             >
-              <p className="text-sm font-medium uppercase tracking-wide text-slate-600">
-                {course.tematica || 'Capacitação'}
-              </p>
-              <h4 className="mt-2 text-xl font-bold leading-snug text-[#0b3b7a] sm:text-2xl">
+              <h4 className="text-base font-bold leading-snug text-[#0b3b7a] sm:text-lg">
                 {course.curso}
               </h4>
-              <div className="mt-4 flex items-end justify-between gap-3">
+              <div className="mt-3 flex items-center justify-between gap-2">
                 <img
                   src={course.logoInstituicao || fallbackLogo}
                   alt={course.instituicao || 'Instituição'}
-                  className="h-7 w-auto object-contain"
+                  className="h-5 w-auto object-contain"
                   loading="lazy"
                 />
-                <div className="inline-flex items-center gap-1.5 text-lg font-semibold text-slate-600 sm:text-xl">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                <div className="inline-flex items-center gap-1 text-sm font-semibold text-slate-600 sm:text-base">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 sm:h-5 sm:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   <span>{course.ch ? `${course.ch} HORAS` : 'CARGA HORÁRIA N/D'}</span>
@@ -54,23 +51,20 @@ const RecommendedTraining: React.FC<RecommendedTrainingProps> = ({ courses }) =>
           ) : (
             <div
               key={`${course.curso}-nolink`}
-              className="rounded-xl border border-slate-300 bg-[#f7f8fa] px-4 py-4 shadow-sm"
+              className="rounded-xl border border-slate-300 bg-[#f7f8fa] px-3 py-3 shadow-sm"
             >
-              <p className="text-sm font-medium uppercase tracking-wide text-slate-600">
-                {course.tematica || 'Capacitação'}
-              </p>
-              <h4 className="mt-2 text-xl font-bold leading-snug text-[#0b3b7a] sm:text-2xl">
+              <h4 className="text-base font-bold leading-snug text-[#0b3b7a] sm:text-lg">
                 {course.curso}
               </h4>
-              <div className="mt-4 flex items-end justify-between gap-3">
+              <div className="mt-3 flex items-center justify-between gap-2">
                 <img
                   src={course.logoInstituicao || fallbackLogo}
                   alt={course.instituicao || 'Instituição'}
-                  className="h-7 w-auto object-contain"
+                  className="h-5 w-auto object-contain"
                   loading="lazy"
                 />
-                <div className="inline-flex items-center gap-1.5 text-lg font-semibold text-slate-600 sm:text-xl">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                <div className="inline-flex items-center gap-1 text-sm font-semibold text-slate-600 sm:text-base">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 sm:h-5 sm:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   <span>{course.ch ? `${course.ch} HORAS` : 'CARGA HORÁRIA N/D'}</span>
