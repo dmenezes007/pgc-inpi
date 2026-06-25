@@ -38,7 +38,7 @@ const Integracao: React.FC = () => {
         <div>
             <div className="bg-slate-800 p-6 rounded-lg shadow-lg mb-10 border border-slate-700">
                 <p className="text-lg leading-relaxed text-gray-300">
-                    A Gestão do Conhecimento não é uma disciplina isolada. Ela se fortalece e gera valor quando se <span className="text-orange-400 font-serif-highlight">integra sinergicamente</span> com outros processos-chave de gestão de pessoas e da organização, formando um <span className="text-orange-400 font-serif-highlight">ecossistema coeso e interdependente</span>.
+                    A Gestão do Conhecimento não é um processo isolado. Ela se fortalece e gera valor quando se <span className="text-orange-400 font-serif-highlight">integra sinergicamente</span> com outros processos-chave de gestão de pessoas e da organização, formando um <span className="text-orange-400 font-serif-highlight">ecossistema coeso e interdependente</span>.
                 </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
