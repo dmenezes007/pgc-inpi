@@ -33,7 +33,7 @@ const RecommendedTraining: React.FC<RecommendedTrainingProps> = ({ courses }) =>
               <p className="text-[0.55rem] font-semibold uppercase tracking-wide text-slate-600">
                 {course.tematica || 'Capacitação'}
               </p>
-              <h4 className="mt-1 text-base font-bold leading-snug text-[#0b3b7a] sm:text-base">
+              <h4 className="mt-1 text-base font-bold leading-snug uppercase text-[#0b3b7a] sm:text-base">
                 {course.curso}
               </h4>
               <div className="mt-3 flex items-center justify-between gap-2">
@@ -59,7 +59,7 @@ const RecommendedTraining: React.FC<RecommendedTrainingProps> = ({ courses }) =>
               <p className="text-[0.55rem] font-semibold uppercase tracking-wide text-slate-600">
                 {course.tematica || 'Capacitação'}
               </p>
-              <h4 className="mt-1 text-base font-bold leading-snug text-[#0b3b7a] sm:text-base">
+              <h4 className="mt-1 text-base font-bold leading-snug uppercase text-[#0b3b7a] sm:text-base">
                 {course.curso}
               </h4>
               <div className="mt-3 flex items-center justify-between gap-2">
