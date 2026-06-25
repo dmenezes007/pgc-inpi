@@ -42,7 +42,7 @@ const moduleKickerTexts: Record<string, string> = {
     'Estrutura': 'COMPETÊNCIAS REGIMENTAIS',
     'Referências': 'GOVERNANÇA E MATURIDADE',
     'Liderança': 'CONHECIMENTO PARA LIDERANÇA',
-    'Transversalidade': 'COMPETÊNCIAS TRANSVERSAIS',
+    'Transversalidade': 'CONHECIMENTO TRANSVERSAL',
     'Técnica': 'CONHECIMENTO ESPECIALIZADO',
     'Planejamento': 'PLANO DE DESENVOLVIMENTO',
     'Autodesenvolvimento': 'PROTAGONISMO DO SERVIDOR',
