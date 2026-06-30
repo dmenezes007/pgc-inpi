@@ -58,7 +58,7 @@ const Documentacao: React.FC = () => {
                         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                             <div>
                                 <h2 className="text-2xl font-bold text-slate-900">Estrutura do Processo de Gestão do Conhecimento</h2>
-                                <p className="mt-1 block text-sm text-slate-500 doc-subtext">Representação da árvore institucional para orientação dos instrumentos e módulos operacionais.</p>
+                                <p className="mt-1 block text-sm text-slate-500 doc-subtext">Representação da árvore de processo para orientação dos instrumentos e módulos operacionais.</p>
                             </div>
                             <span className="inline-flex items-center rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-blue-700">Processo de Nível 3 ativo</span>
                         </div>

@@ -1,6 +1,7 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useDeferredValue, useEffect, useMemo, useState } from 'react';
 import * as XLSX from 'xlsx';
 import Papa from 'papaparse';
+import CreatableSelect from 'react-select/creatable';
 import baseCapacitacoesUrl from '../base-capacitacoes.xlsx?url';
 import tecnicaCsvUrl from '../src/files/docs/tecnica.csv?url';
 
@@ -24,6 +25,16 @@ interface JoinedRow {
   ano: string;
   cargaHoraria: string;
   natureza: NaturezaConhecimento;
+}
+
+interface IndexedRow extends JoinedRow {
+  servidorKey: string;
+  searchKey: string;
+}
+
+interface SelectOption {
+  value: string;
+  label: string;
 }
 
 interface TecnicaRow {
@@ -149,6 +160,61 @@ const bestAreaMatch = (source: string, options: string[]): string | '' => {
   return bestScore > 0 ? best : '';
 };
 
+const toOption = (value: string): SelectOption => ({ value, label: value });
+
+const selectStyles = {
+  control: (provided: any, state: { isFocused: boolean; isDisabled: boolean }) => ({
+    ...provided,
+    backgroundColor: state.isDisabled ? '#e5e7eb' : '#ffffff',
+    borderColor: state.isFocused ? 'var(--gov-blue)' : 'var(--gov-border)',
+    color: 'var(--gov-blue-dark)',
+    borderRadius: '0.5rem',
+    padding: '0.1rem',
+    border: '1px solid var(--gov-border)',
+    boxShadow: state.isFocused ? '0 0 0 1px var(--gov-blue)' : 'none',
+    '&:hover': {
+      borderColor: 'var(--gov-blue)',
+    },
+  }),
+  singleValue: (provided: any) => ({
+    ...provided,
+    color: 'var(--gov-blue-dark)',
+  }),
+  menu: (provided: any) => ({
+    ...provided,
+    backgroundColor: '#ffffff',
+    borderColor: 'var(--gov-border)',
+  }),
+  option: (provided: any, state: { isFocused: boolean; isSelected: boolean }) => ({
+    ...provided,
+    backgroundColor: state.isSelected ? 'var(--gov-blue)' : state.isFocused ? 'var(--gov-blue-soft)' : '#ffffff',
+    color: state.isSelected ? '#ffffff' : 'var(--gov-blue-dark)',
+    '&:active': {
+      backgroundColor: 'var(--gov-blue)',
+    },
+  }),
+  input: (provided: any) => ({
+    ...provided,
+    color: 'var(--gov-blue-dark)',
+  }),
+  placeholder: (provided: any) => ({
+    ...provided,
+    color: 'var(--gov-blue)',
+  }),
+  clearIndicator: (provided: any) => ({
+    ...provided,
+    color: 'var(--gov-blue)',
+    '&:hover': { color: 'var(--gov-blue-dark)' },
+  }),
+  dropdownIndicator: (provided: any) => ({
+    ...provided,
+    color: 'var(--gov-blue)',
+    '&:hover': { color: 'var(--gov-blue-dark)' },
+  }),
+  indicatorSeparator: () => ({ display: 'none' }),
+  menuPortal: (base: any) => ({ ...base, zIndex: 9999 }),
+};
+
 const classifyNatureza = (row: Record<string, any>): NaturezaConhecimento => {
   const eventText = normalizeText(getCell(row, ['evento', 'curso', 'acao', 'capacita']));
   const lineText = normalizeText(getCell(row, ['linha de capacitacao', 'programa', 'uorg']));
@@ -170,14 +236,16 @@ const classifyNatureza = (row: Record<string, any>): NaturezaConhecimento => {
 
 const Detentores: React.FC = () => {
   const DETAIL_PAGE_SIZE = 8;
-  const [rows, setRows] = useState<JoinedRow[]>([]);
+  const [rows, setRows] = useState<IndexedRow[]>([]);
   const [queryConhecimento, setQueryConhecimento] = useState('');
   const [queryServidor, setQueryServidor] = useState('');
   const [queryNatureza, setQueryNatureza] = useState<'Todos' | NaturezaConhecimento>('Todos');
-  const [pageSize, setPageSize] = useState(5);
+  const [pageSize, setPageSize] = useState(10);
   const [page, setPage] = useState(1);
   const [expandedServidores, setExpandedServidores] = useState<Record<string, boolean>>({});
   const [detailVisibleRows, setDetailVisibleRows] = useState<Record<string, number>>({});
+  const deferredQueryConhecimento = useDeferredValue(queryConhecimento);
+  const deferredQueryServidor = useDeferredValue(queryServidor);
 
   useEffect(() => {
     const load = async () => {
@@ -229,7 +297,7 @@ const Detentores: React.FC = () => {
           }))
           .filter((r) => r.servidor && (r.conhecimento || r.capacitacao));
 
-        const joined: JoinedRow[] = capacitacoes.map((c) => {
+        const joined: IndexedRow[] = capacitacoes.map((c) => {
           const knowledgeKey = normalizeKey(c.conhecimento);
           const capacitacaoKey = normalizeKey(c.capacitacao);
           const combinedText = normalizeText([c.conhecimento, c.capacitacao, c.linhaCapacitacao, c.programa, c.uorg].filter(Boolean).join(' '));
@@ -274,6 +342,8 @@ const Detentores: React.FC = () => {
             ano: detectAno(c.ano, [c.capacitacao, c.conhecimento, c.programa].filter(Boolean).join(' ')),
             cargaHoraria: c.cargaHoraria || '-',
             natureza,
+            servidorKey: normalizeKey(c.servidor),
+            searchKey: normalizeKey(`${conhecimentoMapeado} ${c.capacitacao}`),
           };
         });
 
@@ -287,21 +357,38 @@ const Detentores: React.FC = () => {
     load();
   }, []);
 
+  const conhecimentoOptions = useMemo(() => {
+    const unique = new Set<string>();
+    rows.forEach((r) => {
+      if (r.conhecimento) unique.add(r.conhecimento);
+      if (r.capacitacao) unique.add(r.capacitacao);
+    });
+    return Array.from(unique)
+      .sort((a, b) => a.localeCompare(b, 'pt-BR'))
+      .slice(0, 1500)
+      .map(toOption);
+  }, [rows]);
+
+  const servidorOptions = useMemo(() => {
+    const unique = Array.from(new Set(rows.map((r) => r.servidor)));
+    return unique
+      .sort((a, b) => a.localeCompare(b, 'pt-BR'))
+      .slice(0, 1500)
+      .map(toOption);
+  }, [rows]);
+
   const filtered = useMemo(() => {
+    const conhecimentoKey = normalizeKey(deferredQueryConhecimento);
+    const servidorKey = normalizeKey(deferredQueryServidor);
     return rows
       .filter((r) => {
-        const byConhecimento =
-          !queryConhecimento ||
-          r.conhecimento.toLowerCase().includes(queryConhecimento.toLowerCase()) ||
-          r.capacitacao.toLowerCase().includes(queryConhecimento.toLowerCase());
-
-        const byServidor = !queryServidor || r.servidor.toLowerCase().includes(queryServidor.toLowerCase());
+        const byConhecimento = !conhecimentoKey || r.searchKey.includes(conhecimentoKey);
+        const byServidor = !servidorKey || r.servidorKey.includes(servidorKey);
         const byNatureza = queryNatureza === 'Todos' || r.natureza === queryNatureza;
-
         return byConhecimento && byServidor && byNatureza;
       })
       .sort((a, b) => a.servidor.localeCompare(b.servidor, 'pt-BR'));
-  }, [rows, queryConhecimento, queryServidor, queryNatureza]);
+  }, [rows, deferredQueryConhecimento, deferredQueryServidor, queryNatureza]);
 
   const grouped = useMemo(() => {
     const groups = new Map<string, JoinedRow[]>();
@@ -356,17 +443,41 @@ const Detentores: React.FC = () => {
     <div className="space-y-6">
       <div className="detentores-filters-container rounded-xl border border-slate-200 bg-slate-50/70 p-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <input
-            value={queryConhecimento}
-            onChange={(e) => setQueryConhecimento(e.target.value)}
+          <CreatableSelect
+            instanceId="detentores-conhecimento"
+            classNamePrefix="tecnica-select"
+            value={queryConhecimento ? toOption(queryConhecimento) : null}
+            onChange={(option) => setQueryConhecimento(option?.value || '')}
+            onInputChange={(input, meta) => {
+              if (meta.action === 'input-change') {
+                setQueryConhecimento(input);
+              }
+            }}
+            options={conhecimentoOptions}
+            styles={selectStyles}
             placeholder="Buscar por conhecimento/capacitação"
-            className="px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-700"
+            isClearable
+            isSearchable
+            menuPortalTarget={document.body}
+            formatCreateLabel={(input) => `Buscar por: ${input}`}
           />
-          <input
-            value={queryServidor}
-            onChange={(e) => setQueryServidor(e.target.value)}
+          <CreatableSelect
+            instanceId="detentores-servidor"
+            classNamePrefix="tecnica-select"
+            value={queryServidor ? toOption(queryServidor) : null}
+            onChange={(option) => setQueryServidor(option?.value || '')}
+            onInputChange={(input, meta) => {
+              if (meta.action === 'input-change') {
+                setQueryServidor(input);
+              }
+            }}
+            options={servidorOptions}
+            styles={selectStyles}
             placeholder="Buscar por servidor"
-            className="px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-700"
+            isClearable
+            isSearchable
+            menuPortalTarget={document.body}
+            formatCreateLabel={(input) => `Buscar por: ${input}`}
           />
           <select
             value={queryNatureza}
@@ -409,7 +520,9 @@ const Detentores: React.FC = () => {
                     <td className="px-4 py-3 text-slate-700">{group.quantidade}</td>
                     <td className="px-4 py-3 text-slate-700">{group.naturezas || '-'}</td>
                     <td className="px-4 py-3 text-slate-700">{group.ultimoAno}</td>
-                    <td className="px-4 py-3 text-lg text-slate-700" aria-label={expanded ? 'Ocultar' : 'Expandir'}>{expanded ? '▴' : '▾'}</td>
+                    <td className="px-4 py-3 text-lg text-slate-700" aria-label={expanded ? 'Ocultar' : 'Expandir'}>
+                      <i className={expanded ? 'fa fa-chevron-up' : 'fa fa-chevron-down'} aria-hidden="true" />
+                    </td>
                   </tr>
 
                   {expanded && (
@@ -499,10 +612,9 @@ const Detentores: React.FC = () => {
               onChange={(e) => setPageSize(Number.parseInt(e.target.value, 10))}
               className="px-2 py-1 rounded border border-slate-300 bg-white text-slate-700"
             >
-              <option value={5}>5</option>
               <option value={10}>10</option>
-              <option value={15}>15</option>
-              <option value={20}>20</option>
+              <option value={25}>25</option>
+              <option value={50}>50</option>
             </select>
           </div>
 

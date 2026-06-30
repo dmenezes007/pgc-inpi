@@ -503,7 +503,7 @@ const Mapa: React.FC = () => {
     let acc = 0;
 
     return (
-      <div className="w-[240px] shrink-0 rounded-xl border border-slate-200 bg-white p-4">
+      <div className="w-full min-w-0 rounded-xl border border-slate-200 bg-white p-4">
         <h4 className="text-sm font-semibold text-slate-800 mb-3 truncate" title={title}>{title}</h4>
         <div className="flex items-center justify-center mb-3">
           <svg width="120" height="120" viewBox="0 0 120 120" role="img" aria-label={title}>
@@ -890,7 +890,7 @@ const Mapa: React.FC = () => {
           Clique nos gráficos para aplicar filtros e sincronizar os campos.
         </p>
 
-        <div className="flex flex-nowrap gap-4 overflow-x-auto pb-1">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
           {renderDonutFacet('Natureza', naturezaStats, (value) => {
             const parsed = NATUREZA_OPTIONS.find((item) => item === value);
             const next = parsed && selectedNatureza === parsed ? '' : (parsed || '');
