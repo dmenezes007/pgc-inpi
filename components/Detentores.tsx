@@ -157,7 +157,17 @@ const bestAreaMatch = (source: string, options: string[]): string | '' => {
     }
   });
 
-  return bestScore > 0 ? best : '';
+  return bestScore > 1 ? best : '';
+};
+
+const scoreAreaMatch = (source: string, option: string): number => {
+  const sourceTokens = tokenize(source);
+  if (sourceTokens.length === 0) return 0;
+
+  const optionTokens = tokenize(option);
+  const tokenHits = optionTokens.filter((token) => sourceTokens.includes(token)).length;
+  const directBoost = normalizeText(source).includes(normalizeText(option)) ? 2 : 0;
+  return tokenHits + directBoost;
 };
 
 const toOption = (value: string): SelectOption => ({ value, label: value });
@@ -244,11 +254,13 @@ const Detentores: React.FC = () => {
   const [page, setPage] = useState(1);
   const [expandedServidores, setExpandedServidores] = useState<Record<string, boolean>>({});
   const [detailVisibleRows, setDetailVisibleRows] = useState<Record<string, number>>({});
+  const [isLoading, setIsLoading] = useState(true);
   const deferredQueryConhecimento = useDeferredValue(queryConhecimento);
   const deferredQueryServidor = useDeferredValue(queryServidor);
 
   useEffect(() => {
     const load = async () => {
+      setIsLoading(true);
       try {
         const [excelResp, tecnicaResp] = await Promise.all([
           fetch(baseCapacitacoesUrl),
@@ -319,20 +331,30 @@ const Detentores: React.FC = () => {
           }
 
           let conhecimentoMapeado = c.conhecimento || c.capacitacao;
+          let confidence = 0;
 
           if (natureza === 'Liderança') {
-            conhecimentoMapeado =
-              bestAreaMatch(sourceText, LIDERANCA_OPTIONS) ||
-              LIDERANCA_OPTIONS[0];
+            const match = bestAreaMatch(sourceText, LIDERANCA_OPTIONS);
+            if (match) {
+              conhecimentoMapeado = match;
+              confidence = scoreAreaMatch(sourceText, match);
+            }
           } else if (natureza === 'Transversal') {
-            conhecimentoMapeado =
-              bestAreaMatch(sourceText, TRANSVERSAL_OPTIONS) ||
-              TRANSVERSAL_OPTIONS[0];
+            const match = bestAreaMatch(sourceText, TRANSVERSAL_OPTIONS);
+            if (match) {
+              conhecimentoMapeado = match;
+              confidence = scoreAreaMatch(sourceText, match);
+            }
           } else {
-            conhecimentoMapeado =
-              bestAreaMatch(sourceText, tecnicaAreas) ||
-              tecnicaAreas[0] ||
-              conhecimentoMapeado;
+            const match = bestAreaMatch(sourceText, tecnicaAreas);
+            if (match) {
+              conhecimentoMapeado = match;
+              confidence = scoreAreaMatch(sourceText, match);
+            }
+          }
+
+          if (confidence < 2) {
+            conhecimentoMapeado = c.conhecimento || c.capacitacao || 'Não classificado';
           }
 
           return {
@@ -351,6 +373,8 @@ const Detentores: React.FC = () => {
       } catch (error) {
         console.error('Falha ao carregar o módulo Detentores:', error);
         setRows([]);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -492,6 +516,13 @@ const Detentores: React.FC = () => {
           </select>
         </div>
       </div>
+
+      {isLoading && (
+        <div className="flex items-center gap-3 rounded-xl border border-blue-200 bg-blue-50 px-4 py-4 text-blue-800">
+          <span className="inline-flex h-10 w-10 items-center justify-center rounded-full border-2 border-blue-200 border-t-blue-700 animate-spin" aria-hidden="true" />
+          <p className="text-sm font-medium">Carregando a fonte de dados. Este processo pode levar alguns minutos.</p>
+        </div>
+      )}
 
       <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
         <table className="w-full text-sm">

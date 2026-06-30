@@ -504,7 +504,7 @@ const Mapa: React.FC = () => {
 
     return (
       <div className="w-full min-w-0 rounded-xl border border-slate-200 bg-white p-4">
-        <h4 className="text-sm font-semibold text-slate-800 mb-3 truncate" title={title}>{title}</h4>
+        <h4 className="mb-3 truncate rounded-lg border border-blue-200 bg-white px-3 py-2 text-sm font-semibold text-blue-700" title={title}>{title}</h4>
         <div className="flex items-center justify-center mb-3">
           <svg width="120" height="120" viewBox="0 0 120 120" role="img" aria-label={title}>
             <circle cx="60" cy="60" r={radius} stroke="#e2e8f0" strokeWidth="14" fill="none" />
