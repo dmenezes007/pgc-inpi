@@ -1,6 +1,8 @@
 import React from 'react';
 import DocIcon from './DocIcon';
 
+const DOCS_BASE_PATH = `${import.meta.env.BASE_URL}docs/`;
+
 const PROCESSOS_NIVEL_4 = [
     {
         titulo: '4.1 Identificação e Rastreamento dos Conhecimentos',
@@ -109,28 +111,28 @@ const Documentacao: React.FC = () => {
 
                 <div className="space-y-4">
                     <h2 className="text-2xl font-bold text-slate-900">Normas Estruturantes da Gestão do Conhecimento</h2>
-                    <a href="/docs/Minuta%20do%20Programa%20de%20Incentivos%20Educacionais.pdf" download="Minuta do Programa de Incentivos Educacionais.pdf" className="group flex items-center rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md">
+                    <a href={`${DOCS_BASE_PATH}Minuta%20do%20Programa%20de%20Incentivos%20Educacionais.pdf`} download="Minuta do Programa de Incentivos Educacionais.pdf" className="group flex items-center rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md">
                         <DocIcon />
                         <div>
                             <span className="block text-sm font-semibold text-slate-900 group-hover:text-blue-700">Minuta do Programa de Incentivos Educacionais</span>
                             <span className="mt-1 block text-sm text-slate-500">Documento de referência para diretrizes de incentivo ao autodesenvolvimento e formação continuada.</span>
                         </div>
                     </a>
-                    <a href="/docs/Minuta%20da%20Pol%C3%ADtica%20de%20Direitos%20Autorais%20da%20Academia.pdf" download="Minuta da Política de Direitos Autorais da Academia.pdf" className="group flex items-center rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md">
+                    <a href={`${DOCS_BASE_PATH}Minuta%20da%20Pol%C3%ADtica%20de%20Direitos%20Autorais%20da%20Academia.pdf`} download="Minuta da Política de Direitos Autorais da Academia.pdf" className="group flex items-center rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md">
                         <DocIcon />
                         <div>
                             <span className="block text-sm font-semibold text-slate-900 group-hover:text-blue-700">Minuta da Política de Direitos Autorais da Academia</span>
                             <span className="mt-1 block text-sm text-slate-500">Documento de referência para proteção, uso e compartilhamento de conteúdos acadêmicos.</span>
                         </div>
                     </a>
-                    <a href="/docs/Minuta%20da%20Pol%C3%ADtica%20Editorial%20da%20Academia.pdf" download="Minuta da Política Editorial da Academia.pdf" className="group flex items-center rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md">
+                    <a href={`${DOCS_BASE_PATH}Minuta%20da%20Pol%C3%ADtica%20Editorial%20da%20Academia.pdf`} download="Minuta da Política Editorial da Academia.pdf" className="group flex items-center rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md">
                         <DocIcon />
                         <div>
                             <span className="block text-sm font-semibold text-slate-900 group-hover:text-blue-700">Minuta da Política Editorial da Academia</span>
                             <span className="mt-1 block text-sm text-slate-500">Documento de referência para critérios editoriais, qualidade e curadoria institucional.</span>
                         </div>
                     </a>
-                    <a href="/docs/Minuta%20do%20Regulamento%20da%20Revista%20Interfaces%20da%20PI.pdf" download="Minuta do Regulamento da Revista Interfaces da PI.pdf" className="group flex items-center rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md">
+                    <a href={`${DOCS_BASE_PATH}Minuta%20do%20Regulamento%20da%20Revista%20Interfaces%20da%20PI.pdf`} download="Minuta do Regulamento da Revista Interfaces da PI.pdf" className="group flex items-center rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md">
                         <DocIcon />
                         <div>
                             <span className="block text-sm font-semibold text-slate-900 group-hover:text-blue-700">Minuta do Regulamento da Revista Interfaces da PI</span>

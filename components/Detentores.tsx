@@ -2,6 +2,8 @@ import React, { useDeferredValue, useEffect, useMemo, useState } from 'react';
 import * as XLSX from 'xlsx';
 import Papa from 'papaparse';
 import CreatableSelect from 'react-select/creatable';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import baseCapacitacoesUrl from '../base-capacitacoes.xlsx?url';
 import tecnicaCsvUrl from '../src/files/docs/tecnica.csv?url';
 
@@ -579,7 +581,7 @@ const Detentores: React.FC = () => {
                               className="inline-flex h-6 w-6 items-center justify-center text-blue-700 hover:text-blue-900"
                               aria-label={expanded ? 'Recolher linha' : 'Expandir linha'}
                             >
-                              <i className={expanded ? 'fa fa-chevron-up' : 'fa fa-chevron-down'} aria-hidden="true" />
+                              <FontAwesomeIcon icon={expanded ? faChevronUp : faChevronDown} aria-hidden="true" />
                             </button>
                             <span>{group.servidor}</span>
                           </div>
