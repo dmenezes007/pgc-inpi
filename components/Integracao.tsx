@@ -9,27 +9,27 @@ const integrationAreas = [
   {
     icon: '🚀',
     title: 'Formação Inicial e Continuada',
-    description: 'Estrutura o conhecimento essencial que novos servidores precisam e mapeia as competências a serem desenvolvidas continuamente por todos.',
+    description: 'A GC estrutura o conhecimento essencial que novos servidores precisam e mapeia as competências a serem desenvolvidas continuamente por todos.',
   },
   {
     icon: '💡',
     title: 'Gestão da Inovação',
-    description: 'Funciona como o motor da inovação, organizando o conhecimento existente para que novas ideias possam ser geradas e transformadas em projetos concretos.',
+    description: 'A GC funciona como o motor da inovação, organizando o conhecimento existente para que novas ideias possam ser geradas e transformadas em projetos concretos.',
   },
   {
     icon: '🌟',
     title: 'Desenvolvimento de Competências',
-    description: 'Identifica as lacunas de conhecimento (gaps) na organização e orienta os programas de capacitação para que sejam mais estratégicos e eficazes.',
+    description: 'A GC identifica as lacunas de conhecimento (gaps) no Instituto e orienta os programas de capacitação para que sejam mais estratégicos e eficazes.',
   },
   {
     icon: '🌱',
     title: 'Cultura e Clima Organizacional',
-    description: 'Promove uma cultura de colaboração e aprendizado contínuo, onde compartilhar conhecimento é valorizado, melhorando o clima e o engajamento.',
+    description: 'A GC promove uma cultura de colaboração e aprendizado contínuo, onde compartilhar conhecimento é valorizado, melhorando o clima e o engajamento.',
   },
   {
     icon: '🎯',
     title: 'Compromisso com a Estratégia',
-    description: 'Assegura que o conhecimento coletivo da organização esteja alinhado e seja aplicado para alcançar os objetivos estratégicos definidos no planejamento.',
+    description: 'A GC assegura que o conhecimento coletivo do Instituto esteja alinhado e seja aplicado para alcançar os objetivos estratégicos definidos no planejamento.',
   },
 ];
 
@@ -38,7 +38,7 @@ const Integracao: React.FC = () => {
         <div>
             <div className="bg-slate-800 p-6 rounded-lg shadow-lg mb-10 border border-slate-700">
                 <p className="text-lg leading-relaxed text-gray-300">
-                    A Gestão do Conhecimento não é um processo isolado. Ela se fortalece e gera valor quando se <span className="text-orange-400 font-serif-highlight">integra sinergicamente</span> com outros processos-chave de gestão de pessoas e da organização, formando um <span className="text-orange-400 font-serif-highlight">ecossistema coeso e interdependente</span>.
+                    A Gestão do Conhecimento (GC) não é um processo isolado. Ela se fortalece e gera valor quando se <span className="text-orange-400 font-serif-highlight">integra sinergicamente</span> com outros processos-chave de gestão de pessoas e do Instituto, formando um <span className="text-orange-400 font-serif-highlight">ecossistema coeso e interdependente</span>.
                 </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -22,11 +22,11 @@ interface MainContentProps {
 
 const moduleIntroTexts: Record<string, string> = {
     'Início': 'Diretrizes, métodos e instrumentos da Gestão do Conhecimento no INPI conectam pessoas, processos e decisões estratégicas em uma visão integrada.',
-    'Integração': 'A articulação entre Gestão do Conhecimento, sucessão, formação, inovação e desenvolvimento de competências fortalece resultados institucionais.',
+    'Integração': 'A articulação entre gestão do conhecimento, sucessão, formação, inovação e desenvolvimento de competências fortalece resultados institucionais.',
     'Identidade': 'Missão, visão, valores e objetivos estratégicos do INPI orientam as práticas de Gestão do Conhecimento com alinhamento institucional e foco em valor público.',
     'Estrutura': 'Competências regimentais e estrutura organizacional sustentam o mapeamento de conhecimentos essenciais e críticos por unidade.',
     'Referências': 'Referenciais de governança e gestão orientam a maturidade institucional e sustentam a Gestão do Conhecimento no INPI.',
-    'Liderança': 'Competências de liderança mobilizam equipes, promovem aprendizagem contínua e consolidam uma cultura de compartilhamento do conhecimento.',
+    'Liderança': 'Conhecimentos de liderança mobilizam equipes, promovem aprendizagem contínua e consolidam uma cultura de compartilhamento do conhecimento.',
     'Transversalidade': 'Conhecimentos transversais viabilizam colaboração, integração entre áreas e atuação orientada a resultados no serviço público.',
     'Técnica': 'Conhecimentos técnicos especializados, organizados por níveis e temas, apoiam a qualificação das atividades finalísticas e de suporte do Instituto.',
     'Planejamento': 'Necessidades de conhecimento convertem-se em ações de desenvolvimento com alinhamento ao planejamento institucional e à viabilidade orçamentária.',

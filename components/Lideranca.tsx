@@ -149,7 +149,7 @@ const Lideranca: React.FC = () => {
         <div>
             <div className="bg-slate-800 p-6 rounded-lg shadow-lg mb-10 border border-slate-700">
                 <p className="text-lg leading-relaxed text-gray-300">
-                    O desenvolvimento da liderança é crucial para o sucesso da gestão do conhecimento. Este módulo apresenta as <span className="text-orange-400 font-serif-highlight">competências essenciais de liderança</span> previstas para a qualificação do serviço público federal, que capacitam nossos gestores a <span className="text-orange-400 font-serif-highlight">inspirar equipes</span> e a <span className="text-orange-400 font-serif-highlight">guiar a organização</span> em direção a uma cultura de aprendizado e inovação.
+                    O desenvolvimento da liderança é crucial para o sucesso da gestão do conhecimento. Este módulo apresenta os <span className="text-orange-400 font-serif-highlight">conhecimentos essenciais de liderança</span> previstos para a qualificação do serviço público federal, que capacitam gestores a <span className="text-orange-400 font-serif-highlight">inspirar equipes</span> e a <span className="text-orange-400 font-serif-highlight">guiar o Instituto</span> em direção a uma cultura de aprendizado e inovação.
                 </p>
             </div>
 
