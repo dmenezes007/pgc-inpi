@@ -256,6 +256,7 @@ const Mapa: React.FC = () => {
   const [saveMessage, setSaveMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const fieldClass = (enabled: boolean, filled: boolean): string => {
     if (enabled || filled) {
@@ -276,6 +277,7 @@ const Mapa: React.FC = () => {
 
   useEffect(() => {
     const hydrate = async () => {
+      setIsLoading(true);
       const [estruturaRows, tecnicaRows] = await Promise.all([
         parseCsvFromUrl<EstruturaRow>(estruturaCsvUrl),
         parseCsvFromUrl<TecnicaRow>(tecnicaCsvUrl),
@@ -369,7 +371,9 @@ const Mapa: React.FC = () => {
       saveLocal(basePre);
     };
 
-    hydrate().catch(() => setErrorMessage('Não foi possível carregar as referências do mapa.'));
+    hydrate()
+      .catch(() => setErrorMessage('Não foi possível carregar as referências do mapa.'))
+      .finally(() => setIsLoading(false));
   }, []);
 
   const selectedUnidadeInfo = useMemo(() => findUnidade(selectedUnidade), [selectedUnidade, unidades]);
@@ -951,6 +955,13 @@ const Mapa: React.FC = () => {
 
       {errorMessage && <p className="text-sm text-red-500">{errorMessage}</p>}
       {saveMessage && <p className="text-sm text-slate-600">{saveMessage}</p>}
+
+      {isLoading && (
+        <div className="flex items-center gap-3 rounded-xl border border-blue-200 bg-blue-50 px-4 py-4 text-blue-800">
+          <span className="inline-flex h-10 w-10 items-center justify-center rounded-full border-2 border-blue-200 border-t-blue-700 animate-spin" aria-hidden="true" />
+          <p className="text-sm font-medium">Carregando referências do mapa. Aguarde um instante.</p>
+        </div>
+      )}
 
       <div className="bg-slate-800 p-6 rounded-lg border border-slate-700">
         <div className="flex items-center justify-between gap-3 mb-4">

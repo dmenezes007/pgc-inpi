@@ -5,7 +5,7 @@ import CreatableSelect from 'react-select/creatable';
 import baseCapacitacoesUrl from '../base-capacitacoes.xlsx?url';
 import tecnicaCsvUrl from '../src/files/docs/tecnica.csv?url';
 
-type NaturezaConhecimento = 'Liderança' | 'Transversal' | 'Técnico' | 'Não classificado';
+type NaturezaConhecimento = 'Liderança' | 'Transversal' | 'Técnico';
 
 interface CapacitacaoRow {
   servidor: string;
@@ -20,7 +20,6 @@ interface CapacitacaoRow {
 
 interface JoinedRow {
   servidor: string;
-  unidade: string;
   conhecimento: string;
   capacitacao: string;
   ano: string;
@@ -144,6 +143,36 @@ const tokenize = (value: string): string[] =>
     .split(/[^A-Z0-9]+/)
     .filter((token) => token.length > 2);
 
+const STOP_WORDS = new Set([
+  'CURSO', 'EVENTO', 'CAPACITACAO', 'BATE', 'PAPO', 'SOBRE', 'PESSOAS', 'COM', 'PARA', 'DAS', 'DOS', 'DA', 'DE', 'DO', 'EM', 'NO', 'NA', 'E', 'A', 'O', 'AS', 'OS'
+]);
+
+const tokenizeMeaningful = (value: string): string[] =>
+  tokenize(value).filter((token) => !STOP_WORDS.has(token));
+
+const bestAreaMatchWithScore = (source: string, options: string[]): { match: string; score: number } => {
+  const sourceTokens = tokenizeMeaningful(source);
+  if (sourceTokens.length === 0) return { match: '', score: 0 };
+
+  let best = '';
+  let bestScore = 0;
+
+  options.forEach((option) => {
+    const optionTokens = tokenizeMeaningful(option);
+    const tokenHits = optionTokens.filter((token) => sourceTokens.includes(token)).length;
+    const directBoost = normalizeText(source).includes(normalizeText(option)) ? 3 : 0;
+    const partialBoost = sourceTokens.some((token) => normalizeText(option).includes(token)) ? 1 : 0;
+    const score = tokenHits + directBoost + partialBoost;
+
+    if (score > bestScore) {
+      best = option;
+      bestScore = score;
+    }
+  });
+
+  return { match: best, score: bestScore };
+};
+
 const bestAreaMatch = (source: string, options: string[]): string | '' => {
   const sourceTokens = tokenize(source);
   if (sourceTokens.length === 0) return '';
@@ -166,32 +195,22 @@ const bestAreaMatch = (source: string, options: string[]): string | '' => {
   return bestScore > 1 ? best : '';
 };
 
-const scoreAreaMatch = (source: string, option: string): number => {
-  const sourceTokens = tokenize(source);
-  if (sourceTokens.length === 0) return 0;
-
-  const optionTokens = tokenize(option);
-  const tokenHits = optionTokens.filter((token) => sourceTokens.includes(token)).length;
-  const directBoost = normalizeText(source).includes(normalizeText(option)) ? 2 : 0;
-  return tokenHits + directBoost;
-};
-
 const pickTechnicalKnowledge = (competencia: string, options: string[]): string => {
-  const exact = bestAreaMatch(competencia, options);
-  if (exact) return exact;
-  return options[0] || 'Não classificado';
+  const best = bestAreaMatchWithScore(competencia, options);
+  if (best.score >= 2) return best.match;
+  return options[0] || '';
 };
 
 const resolveKnowledgeByNature = (competencia: string, natureza: NaturezaConhecimento, options: string[]): string => {
-  const exact = bestAreaMatch(competencia, options);
-  if (exact) return exact;
+  const composed = bestAreaMatchWithScore(competencia, options);
+  if (composed.score >= 2) return composed.match;
 
   if (natureza === 'Técnico') {
     const technicalMatch = pickTechnicalKnowledge(competencia, options);
     if (technicalMatch) return technicalMatch;
   }
 
-  return options[0] || 'Não classificado';
+  return options[0] || '';
 };
 
 const toOption = (value: string): SelectOption => ({ value, label: value });
@@ -318,20 +337,7 @@ const Detentores: React.FC = () => {
 
         const wb = XLSX.read(buffer, { type: 'array' });
         const capacitacoesSheet = wb.Sheets['BASE CETEC'] || wb.Sheets[wb.SheetNames[0]];
-        const pessoalSheet = wb.Sheets['ESTAT.PESSOAL 11-25'] || wb.Sheets[wb.SheetNames[1]];
         const capRaw = XLSX.utils.sheet_to_json<Record<string, any>>(capacitacoesSheet, { defval: '' });
-        const pessoalRaw = XLSX.utils.sheet_to_json<Record<string, any>>(pessoalSheet, { defval: '' });
-
-        const unidadeByServidor = new Map<string, string>();
-        pessoalRaw.forEach((row) => {
-          const servidor = getCell(row, ['nome servidor']);
-          const unidade = getCell(row, ['unidade']);
-          if (!servidor || !unidade) return;
-          const key = normalizeKey(servidor);
-          if (!unidadeByServidor.has(key)) {
-            unidadeByServidor.set(key, unidade);
-          }
-        });
 
         const capacitacoes: CapacitacaoRow[] = capRaw
           .map((row) => ({
@@ -350,8 +356,7 @@ const Detentores: React.FC = () => {
           const knowledgeKey = normalizeKey(c.conhecimento);
           const capacitacaoKey = normalizeKey(c.capacitacao);
           const combinedText = normalizeText([c.conhecimento, c.capacitacao, c.linhaCapacitacao, c.programa, c.uorg].filter(Boolean).join(' '));
-          const sourceText = [c.conhecimento, c.capacitacao, c.linhaCapacitacao, c.programa, c.uorg].filter(Boolean).join(' ');
-          const unidade = unidadeByServidor.get(normalizeKey(c.servidor)) || '-';
+          const sourceText = [c.capacitacao, c.conhecimento, c.linhaCapacitacao, c.programa, c.uorg].filter(Boolean).join(' ');
           let natureza = classifyNatureza({
             conhecimento: combinedText,
             evento: capacitacaoKey,
@@ -377,7 +382,6 @@ const Detentores: React.FC = () => {
 
           return {
             servidor: c.servidor,
-            unidade,
             conhecimento: conhecimentoMapeado,
             capacitacao: c.capacitacao.toUpperCase(),
             ano: detectAno(c.ano, [c.capacitacao, c.conhecimento, c.programa].filter(Boolean).join(' ')),
@@ -444,7 +448,6 @@ const Detentores: React.FC = () => {
     return Array.from(groups.entries())
       .map(([servidor, items]) => {
         const naturezas = Array.from(new Set(items.map((item) => item.natureza))).join(', ');
-        const unidades = Array.from(new Set(items.map((item) => item.unidade).filter(Boolean))).join(', ');
         const latestAno = items
           .map((item) => Number.parseInt(item.ano, 10))
           .filter((value) => Number.isFinite(value))
@@ -452,7 +455,6 @@ const Detentores: React.FC = () => {
         return {
           servidor,
           items,
-          unidade: unidades || '-',
           quantidade: items.length,
           naturezas,
           ultimoAno: Number.isFinite(latestAno) ? String(latestAno) : '-',
@@ -533,7 +535,6 @@ const Detentores: React.FC = () => {
             <option value="Liderança">Liderança</option>
             <option value="Transversal">Transversal</option>
             <option value="Técnico">Técnico</option>
-            <option value="Não classificado">Não classificado</option>
           </select>
         </div>
       </div>
@@ -550,11 +551,9 @@ const Detentores: React.FC = () => {
           <thead className="bg-slate-50 text-slate-700">
             <tr>
               <th className="text-left px-4 py-3">Servidor</th>
-              <th className="text-left px-4 py-3">Unidade</th>
               <th className="text-left px-4 py-3">Qtd. Registros</th>
               <th className="text-left px-4 py-3">Desenolvimento</th>
               <th className="text-left px-4 py-3">Último Ano</th>
-              <th className="text-left px-4 py-3"><span className="sr-only">Detalhes</span></th>
             </tr>
           </thead>
           <tbody>
@@ -585,7 +584,6 @@ const Detentores: React.FC = () => {
                             <span>{group.servidor}</span>
                           </div>
                         </td>
-                    <td className="px-4 py-3 text-slate-700">{group.unidade}</td>
                     <td className="px-4 py-3 text-slate-700">{group.quantidade}</td>
                     <td className="px-4 py-3 text-slate-700">{group.naturezas || '-'}</td>
                     <td className="px-4 py-3 text-slate-700">{group.ultimoAno}</td>
@@ -593,7 +591,7 @@ const Detentores: React.FC = () => {
 
                   {expanded && (
                     <tr className="border-t border-slate-100 bg-slate-50/50">
-                      <td colSpan={5} className="px-4 py-4">
+                      <td colSpan={4} className="px-4 py-4">
                         <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
                           <table className="w-full text-sm">
                             <thead className="bg-slate-100 text-slate-700">
@@ -662,7 +660,7 @@ const Detentores: React.FC = () => {
 
             {pagedGroups.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-4 py-6 text-center text-slate-500">
+                <td colSpan={4} className="px-4 py-6 text-center text-slate-500">
                   Sem registros para os filtros atuais.
                 </td>
               </tr>
