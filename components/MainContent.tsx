@@ -160,19 +160,37 @@ const MainContent: React.FC<MainContentProps> = ({ activeModule, onModuleSelect 
                 )}
                 {activeModule === 'Mapa' && (
                     <div className="bg-slate-800 p-6 rounded-lg shadow-lg mb-10 border border-slate-700">
-                        <p className="text-lg leading-relaxed text-gray-300">
-                            O Mapa de Conhecimentos organiza, por unidade, os conhecimentos de{' '}
-                            <span className="text-orange-400 font-serif-highlight">Liderança</span>,{' '}
-                            <span className="text-orange-400 font-serif-highlight">Transversal</span> e{' '}
-                            <span className="text-orange-400 font-serif-highlight">Técnico</span>, orientando o
-                            preenchimento gerencial em sequência para garantir consistência e rastreabilidade. Cada
-                            gestor deve iniciar pela sigla da unidade (conforme o módulo Estrutura), selecionar a
-                            natureza do conhecimento, definir o item correspondente, classificar o tipo como Apoio,
-                            Essencial ou Crítico, informar a relevância percentual e registrar o grau instalado
-                            (Inexistente, Iniciante, Intermediário ou Avançado). Esse fluxo padronizado apoia o
-                            diagnóstico de lacunas, a priorização de desenvolvimento e a tomada de decisão orientada
-                            por evidências.
+                        <p className="text-base leading-relaxed text-gray-300 mb-5">
+                            Preencha o Mapa de Conhecimentos em fluxo único por unidade para registrar prioridades,
+                            lacunas e grau de domínio com rastreabilidade gerencial.
                         </p>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-6 gap-3">
+                            <div className="rounded-lg border border-slate-600 bg-slate-900/40 p-3 text-sm text-gray-200">
+                                <p className="text-xs text-orange-400 font-semibold mb-1">PASSO 1</p>
+                                Unidade (sigla + nome)
+                            </div>
+                            <div className="rounded-lg border border-slate-600 bg-slate-900/40 p-3 text-sm text-gray-200">
+                                <p className="text-xs text-orange-400 font-semibold mb-1">PASSO 2</p>
+                                Natureza do conhecimento
+                            </div>
+                            <div className="rounded-lg border border-slate-600 bg-slate-900/40 p-3 text-sm text-gray-200">
+                                <p className="text-xs text-orange-400 font-semibold mb-1">PASSO 3</p>
+                                Conhecimento aplicável
+                            </div>
+                            <div className="rounded-lg border border-slate-600 bg-slate-900/40 p-3 text-sm text-gray-200">
+                                <p className="text-xs text-orange-400 font-semibold mb-1">PASSO 4</p>
+                                Tipo: Apoio, Essencial ou Crítico
+                            </div>
+                            <div className="rounded-lg border border-slate-600 bg-slate-900/40 p-3 text-sm text-gray-200">
+                                <p className="text-xs text-orange-400 font-semibold mb-1">PASSO 5</p>
+                                Relevância por faixa
+                            </div>
+                            <div className="rounded-lg border border-slate-600 bg-slate-900/40 p-3 text-sm text-gray-200">
+                                <p className="text-xs text-orange-400 font-semibold mb-1">PASSO 6</p>
+                                Grau instalado
+                            </div>
+                        </div>
                     </div>
                 )}
                 {renderContent()}
