@@ -166,27 +166,27 @@ const MainContent: React.FC<MainContentProps> = ({ activeModule, onModuleSelect 
                         </p>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-6 gap-3">
-                            <div className="rounded-lg border border-slate-600 bg-slate-900/40 p-3 text-sm text-gray-200 [border-color:var(--gov-blue)!important] [background-color:#ffffff!important] !text-slate-700 !border-0 !text-white [background-color:var(--gov-blue)!important]">
+                            <div className="rounded-lg border border-slate-600 bg-slate-900/40 p-3 text-sm text-gray-200 [border-color:var(--gov-blue)!important] [background-color:#ffffff!important] !text-slate-700 !border-0 !text-white [background-color:var(--gov-blue)!important] [color:#ffffff!important]">
                                 <p className="text-xs !text-white font-semibold mb-1">PASSO 1</p>
                                 Unidade
                             </div>
-                            <div className="rounded-lg border border-slate-600 bg-slate-900/40 p-3 text-sm text-gray-200 [border-color:var(--gov-blue)!important] [background-color:#ffffff!important] !text-slate-700 !border-0 !text-white [background-color:var(--gov-blue)!important]">
+                            <div className="rounded-lg border border-slate-600 bg-slate-900/40 p-3 text-sm text-gray-200 [border-color:var(--gov-blue)!important] [background-color:#ffffff!important] !text-slate-700 !border-0 !text-white [background-color:var(--gov-blue)!important] [color:#ffffff!important]">
                                 <p className="text-xs !text-white font-semibold mb-1">PASSO 2</p>
                                 Natureza do Conhecimento
                             </div>
-                            <div className="rounded-lg border border-slate-600 bg-slate-900/40 p-3 text-sm text-gray-200 [border-color:var(--gov-blue)!important] [background-color:#ffffff!important] !text-slate-700 !border-0 !text-white [background-color:var(--gov-blue)!important]">
+                            <div className="rounded-lg border border-slate-600 bg-slate-900/40 p-3 text-sm text-gray-200 [border-color:var(--gov-blue)!important] [background-color:#ffffff!important] !text-slate-700 !border-0 !text-white [background-color:var(--gov-blue)!important] [color:#ffffff!important]">
                                 <p className="text-xs !text-white font-semibold mb-1">PASSO 3</p>
                                 Conhecimento Aplicável
                             </div>
-                            <div className="rounded-lg border border-slate-600 bg-slate-900/40 p-3 text-sm text-gray-200 [border-color:var(--gov-blue)!important] [background-color:#ffffff!important] !text-slate-700 !border-0 !text-white [background-color:var(--gov-blue)!important]">
+                            <div className="rounded-lg border border-slate-600 bg-slate-900/40 p-3 text-sm text-gray-200 [border-color:var(--gov-blue)!important] [background-color:#ffffff!important] !text-slate-700 !border-0 !text-white [background-color:var(--gov-blue)!important] [color:#ffffff!important]">
                                 <p className="text-xs !text-white font-semibold mb-1">PASSO 4</p>
                                 Tipo de Conhecimento
                             </div>
-                            <div className="rounded-lg border border-slate-600 bg-slate-900/40 p-3 text-sm text-gray-200 [border-color:var(--gov-blue)!important] [background-color:#ffffff!important] !text-slate-700 !border-0 !text-white [background-color:var(--gov-blue)!important]">
+                            <div className="rounded-lg border border-slate-600 bg-slate-900/40 p-3 text-sm text-gray-200 [border-color:var(--gov-blue)!important] [background-color:#ffffff!important] !text-slate-700 !border-0 !text-white [background-color:var(--gov-blue)!important] [color:#ffffff!important]">
                                 <p className="text-xs !text-white font-semibold mb-1">PASSO 5</p>
                                 Relevância do Conhecimento
                             </div>
-                            <div className="rounded-lg border border-slate-600 bg-slate-900/40 p-3 text-sm text-gray-200 [border-color:var(--gov-blue)!important] [background-color:#ffffff!important] !text-slate-700 !border-0 !text-white [background-color:var(--gov-blue)!important]">
+                            <div className="rounded-lg border border-slate-600 bg-slate-900/40 p-3 text-sm text-gray-200 [border-color:var(--gov-blue)!important] [background-color:#ffffff!important] !text-slate-700 !border-0 !text-white [background-color:var(--gov-blue)!important] [color:#ffffff!important]">
                                 <p className="text-xs !text-white font-semibold mb-1">PASSO 6</p>
                                 Grau de Conhecimento Instalado
                             </div>

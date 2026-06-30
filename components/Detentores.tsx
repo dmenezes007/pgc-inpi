@@ -109,7 +109,7 @@ const getCell = (obj: Record<string, any>, candidates: string[]): string => {
   return '';
 };
 
-const detectAno = (anoValue: string, cursoValue: string): string => {
+const detectAno = (anoValue: string, cursoValue: string = ''): string => {
   if (anoValue) return anoValue;
   const match = cursoValue.match(/(19|20)\d{2}/);
   return match ? match[0] : '-';
@@ -149,80 +149,85 @@ const Detentores: React.FC = () => {
 
   useEffect(() => {
     const load = async () => {
-      const [excelResp, tecnicaResp] = await Promise.all([
-        fetch(baseCapacitacoesUrl),
-        fetch(tecnicaCsvUrl),
-      ]);
+      try {
+        const [excelResp, tecnicaResp] = await Promise.all([
+          fetch(baseCapacitacoesUrl),
+          fetch(tecnicaCsvUrl),
+        ]);
 
-      const [buffer, tecnicaCsv] = await Promise.all([
-        excelResp.arrayBuffer(),
-        tecnicaResp.text(),
-      ]);
+        const [buffer, tecnicaCsv] = await Promise.all([
+          excelResp.arrayBuffer(),
+          tecnicaResp.text(),
+        ]);
 
-      const tecnicaParsed = Papa.parse<TecnicaRow>(tecnicaCsv, {
-        header: true,
-        skipEmptyLines: true,
-        delimiter: ';',
-      });
-
-      const tecnicaSet = new Set<string>();
-      tecnicaParsed.data.forEach((row) => {
-        if (row.Nivel1) tecnicaSet.add(normalizeKey(row.Nivel1));
-        if (row.Nivel2) tecnicaSet.add(normalizeKey(row.Nivel2));
-        if (row.Nivel3) tecnicaSet.add(normalizeKey(row.Nivel3));
-      });
-
-      const liderancaSet = new Set(LIDERANCA_OPTIONS.map(normalizeKey));
-      const transversalSet = new Set(TRANSVERSAL_OPTIONS.map(normalizeKey));
-
-      const wb = XLSX.read(buffer, { type: 'array' });
-      const capacitacoesSheet = wb.Sheets[wb.SheetNames[0]];
-      const capRaw = XLSX.utils.sheet_to_json<Record<string, any>>(capacitacoesSheet, { defval: '' });
-
-      const capacitacoes: CapacitacaoRow[] = capRaw
-        .map((row) => ({
-          servidor: getCell(row, ['servidor', 'nome']),
-          conhecimento: getCell(row, ['conhecimento', 'tema', 'assunto', 'capacita']),
-          capacitacao: getCell(row, ['evento']),
-          ano: getCell(row, ['ano', 'year']),
-          cargaHoraria: getCell(row, ['carga horaria', 'carga']),
-          linhaCapacitacao: getCell(row, ['linha de capacitacao']),
-          programa: getCell(row, ['programa']),
-          uorg: getCell(row, ['uorg']),
-        }))
-        .filter((r) => r.servidor && (r.conhecimento || r.capacitacao));
-
-      const joined: JoinedRow[] = capacitacoes.map((c) => {
-        const knowledgeKey = normalizeKey(c.conhecimento);
-        const capacitacaoKey = normalizeKey(c.capacitacao);
-        const combinedText = normalizeText([c.conhecimento, c.capacitacao, c.linhaCapacitacao, c.programa, c.uorg].filter(Boolean).join(' '));
-        let natureza = classifyNatureza({
-          conhecimento: combinedText,
-          evento: capacitacaoKey,
-          'linha de capacitacao': c.linhaCapacitacao,
-          programa: c.programa,
-          uorg: c.uorg,
+        const tecnicaParsed = Papa.parse<TecnicaRow>(tecnicaCsv, {
+          header: true,
+          skipEmptyLines: true,
+          delimiter: ';',
         });
 
-        if (liderancaSet.has(knowledgeKey) || liderancaSet.has(capacitacaoKey)) {
-          natureza = 'Liderança';
-        } else if (transversalSet.has(knowledgeKey) || transversalSet.has(capacitacaoKey)) {
-          natureza = 'Transversal';
-        } else if (tecnicaSet.has(knowledgeKey) || tecnicaSet.has(capacitacaoKey)) {
-          natureza = 'Técnico';
-        }
+        const tecnicaSet = new Set<string>();
+        tecnicaParsed.data.forEach((row) => {
+          if (row.Nivel1) tecnicaSet.add(normalizeKey(row.Nivel1));
+          if (row.Nivel2) tecnicaSet.add(normalizeKey(row.Nivel2));
+          if (row.Nivel3) tecnicaSet.add(normalizeKey(row.Nivel3));
+        });
 
-        return {
-          servidor: c.servidor,
-          conhecimento: c.conhecimento || c.capacitacao,
-          capacitacao: c.capacitacao.toUpperCase(),
-          ano: detectAno(c.ano, c.curso),
-          cargaHoraria: c.cargaHoraria || '-',
-          natureza,
-        };
-      });
+        const liderancaSet = new Set(LIDERANCA_OPTIONS.map(normalizeKey));
+        const transversalSet = new Set(TRANSVERSAL_OPTIONS.map(normalizeKey));
 
-      setRows(joined);
+        const wb = XLSX.read(buffer, { type: 'array' });
+        const capacitacoesSheet = wb.Sheets[wb.SheetNames[0]];
+        const capRaw = XLSX.utils.sheet_to_json<Record<string, any>>(capacitacoesSheet, { defval: '' });
+
+        const capacitacoes: CapacitacaoRow[] = capRaw
+          .map((row) => ({
+            servidor: getCell(row, ['servidor', 'nome']),
+            conhecimento: getCell(row, ['conhecimento', 'tema', 'assunto', 'capacita']),
+            capacitacao: getCell(row, ['evento']),
+            ano: getCell(row, ['ano', 'year']),
+            cargaHoraria: getCell(row, ['carga horaria', 'carga']),
+            linhaCapacitacao: getCell(row, ['linha de capacitacao']),
+            programa: getCell(row, ['programa']),
+            uorg: getCell(row, ['uorg']),
+          }))
+          .filter((r) => r.servidor && (r.conhecimento || r.capacitacao));
+
+        const joined: JoinedRow[] = capacitacoes.map((c) => {
+          const knowledgeKey = normalizeKey(c.conhecimento);
+          const capacitacaoKey = normalizeKey(c.capacitacao);
+          const combinedText = normalizeText([c.conhecimento, c.capacitacao, c.linhaCapacitacao, c.programa, c.uorg].filter(Boolean).join(' '));
+          let natureza = classifyNatureza({
+            conhecimento: combinedText,
+            evento: capacitacaoKey,
+            'linha de capacitacao': c.linhaCapacitacao,
+            programa: c.programa,
+            uorg: c.uorg,
+          });
+
+          if (liderancaSet.has(knowledgeKey) || liderancaSet.has(capacitacaoKey)) {
+            natureza = 'Liderança';
+          } else if (transversalSet.has(knowledgeKey) || transversalSet.has(capacitacaoKey)) {
+            natureza = 'Transversal';
+          } else if (tecnicaSet.has(knowledgeKey) || tecnicaSet.has(capacitacaoKey)) {
+            natureza = 'Técnico';
+          }
+
+          return {
+            servidor: c.servidor,
+            conhecimento: c.conhecimento || c.capacitacao,
+            capacitacao: c.capacitacao.toUpperCase(),
+            ano: detectAno(c.ano, [c.capacitacao, c.conhecimento, c.programa].filter(Boolean).join(' ')),
+            cargaHoraria: c.cargaHoraria || '-',
+            natureza,
+          };
+        });
+
+        setRows(joined);
+      } catch (error) {
+        console.error('Falha ao carregar o módulo Detentores:', error);
+        setRows([]);
+      }
     };
 
     load();
