@@ -51,6 +51,7 @@ const STORAGE_KEY = 'pgc_mapa_conhecimento_v5';
 const NATUREZA_OPTIONS: NaturezaConhecimento[] = ['Liderança', 'Transversal', 'Técnico'];
 const TIPO_OPTIONS: TipoConhecimento[] = ['Apoio', 'Essencial', 'Crítico'];
 const GRAU_OPTIONS: GrauInstalado[] = ['Inexistente', 'Iniciante', 'Intermediário', 'Avançado'];
+const GRAU_PRECRUZADO_OPTIONS: Array<Exclude<GrauInstalado, 'Inexistente'>> = ['Iniciante', 'Intermediário', 'Avançado'];
 const RELEVANCIA_OPTIONS: RelevanciaFaixa[] = ['De 1 a 25%', 'De 26 a 50%', 'De 51 a 75%', 'De 76 a 100%'];
 
 const LIDERANCA_OPTIONS = [
@@ -231,7 +232,7 @@ const Mapa: React.FC = () => {
           conhecimento: lideranca,
           tipo: TIPO_OPTIONS[idx % TIPO_OPTIONS.length],
           relevanciaFaixa: RELEVANCIA_OPTIONS[idx % RELEVANCIA_OPTIONS.length],
-          grauInstalado: GRAU_OPTIONS[idx % GRAU_OPTIONS.length],
+          grauInstalado: GRAU_PRECRUZADO_OPTIONS[idx % GRAU_PRECRUZADO_OPTIONS.length],
           origem: 'precruzada',
         });
 
@@ -243,7 +244,7 @@ const Mapa: React.FC = () => {
           conhecimento: transversal,
           tipo: TIPO_OPTIONS[(idx + 1) % TIPO_OPTIONS.length],
           relevanciaFaixa: RELEVANCIA_OPTIONS[(idx + 1) % RELEVANCIA_OPTIONS.length],
-          grauInstalado: GRAU_OPTIONS[(idx + 1) % GRAU_OPTIONS.length],
+          grauInstalado: GRAU_PRECRUZADO_OPTIONS[(idx + 1) % GRAU_PRECRUZADO_OPTIONS.length],
           origem: 'precruzada',
         });
 
@@ -258,7 +259,7 @@ const Mapa: React.FC = () => {
             conhecimento: tecnico.conhecimento,
             tipo: TIPO_OPTIONS[(idx + 2) % TIPO_OPTIONS.length],
             relevanciaFaixa: RELEVANCIA_OPTIONS[(idx + 2) % RELEVANCIA_OPTIONS.length],
-            grauInstalado: GRAU_OPTIONS[(idx + 2) % GRAU_OPTIONS.length],
+            grauInstalado: GRAU_PRECRUZADO_OPTIONS[(idx + 2) % GRAU_PRECRUZADO_OPTIONS.length],
             origem: 'precruzada',
           });
         }
@@ -417,6 +418,112 @@ const Mapa: React.FC = () => {
       return byUnidade && byNatureza && byNivel1 && byNivel2 && byConhecimento && byTipo && byRelevancia && byGrau;
     });
   }, [rows, selectedUnidade, selectedNatureza, selectedNivel1, selectedNivel2, finalConhecimento, selectedTipo, selectedRelevancia, selectedGrau]);
+
+  const getRowsForFacet = (facet: 'natureza' | 'conhecimento' | 'tipo' | 'relevancia' | 'grau') => {
+    return rows.filter((row) => {
+      const byUnidade = !selectedUnidade || normalize(row.unidadeSigla) === normalize(selectedUnidade);
+      const byNatureza = facet === 'natureza' || !selectedNatureza || row.natureza === selectedNatureza;
+      const byNivel1 = !selectedNivel1 || normalize(row.nivel1 || '') === normalize(selectedNivel1);
+      const byNivel2 = !selectedNivel2 || normalize(row.nivel2 || '') === normalize(selectedNivel2);
+      const byConhecimento = facet === 'conhecimento' || !finalConhecimento || normalize(row.conhecimento).includes(normalize(finalConhecimento));
+      const byTipo = facet === 'tipo' || !selectedTipo || row.tipo === selectedTipo;
+      const byRelevancia = facet === 'relevancia' || !selectedRelevancia || row.relevanciaFaixa === selectedRelevancia;
+      const byGrau = facet === 'grau' || !selectedGrau || row.grauInstalado === selectedGrau;
+      return byUnidade && byNatureza && byNivel1 && byNivel2 && byConhecimento && byTipo && byRelevancia && byGrau;
+    });
+  };
+
+  const naturezaStats = useMemo(() => {
+    const source = getRowsForFacet('natureza');
+    return NATUREZA_OPTIONS.map((item) => ({
+      label: item,
+      value: item,
+      count: source.filter((row) => row.natureza === item).length,
+      active: selectedNatureza === item,
+    }));
+  }, [rows, selectedUnidade, selectedNatureza, selectedNivel1, selectedNivel2, finalConhecimento, selectedTipo, selectedRelevancia, selectedGrau]);
+
+  const conhecimentoStats = useMemo(() => {
+    const source = getRowsForFacet('conhecimento');
+    const counts = new Map<string, number>();
+    source.forEach((row) => {
+      counts.set(row.conhecimento, (counts.get(row.conhecimento) || 0) + 1);
+    });
+    return Array.from(counts.entries())
+      .map(([label, count]) => ({
+        label,
+        value: label,
+        count,
+        active: finalConhecimento !== '' && normalize(finalConhecimento) === normalize(label),
+      }))
+      .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label, 'pt-BR'))
+      .slice(0, 10);
+  }, [rows, selectedUnidade, selectedNatureza, selectedNivel1, selectedNivel2, finalConhecimento, selectedTipo, selectedRelevancia, selectedGrau]);
+
+  const tipoStats = useMemo(() => {
+    const source = getRowsForFacet('tipo');
+    return TIPO_OPTIONS.map((item) => ({
+      label: item,
+      value: item,
+      count: source.filter((row) => row.tipo === item).length,
+      active: selectedTipo === item,
+    }));
+  }, [rows, selectedUnidade, selectedNatureza, selectedNivel1, selectedNivel2, finalConhecimento, selectedTipo, selectedRelevancia, selectedGrau]);
+
+  const relevanciaStats = useMemo(() => {
+    const source = getRowsForFacet('relevancia');
+    return RELEVANCIA_OPTIONS.map((item) => ({
+      label: item,
+      value: item,
+      count: source.filter((row) => row.relevanciaFaixa === item).length,
+      active: selectedRelevancia === item,
+    }));
+  }, [rows, selectedUnidade, selectedNatureza, selectedNivel1, selectedNivel2, finalConhecimento, selectedTipo, selectedRelevancia, selectedGrau]);
+
+  const grauStats = useMemo(() => {
+    const source = getRowsForFacet('grau');
+    return GRAU_OPTIONS.map((item) => ({
+      label: item,
+      value: item,
+      count: source.filter((row) => row.grauInstalado === item).length,
+      active: selectedGrau === item,
+    }));
+  }, [rows, selectedUnidade, selectedNatureza, selectedNivel1, selectedNivel2, finalConhecimento, selectedTipo, selectedRelevancia, selectedGrau]);
+
+  const renderFacet = (
+    title: string,
+    items: Array<{ label: string; value: string; count: number; active: boolean }>,
+    onSelect: (value: string) => void
+  ) => {
+    const max = Math.max(1, ...items.map((item) => item.count));
+    return (
+      <div className="rounded-xl border border-slate-200 bg-white p-4">
+        <h4 className="text-sm font-semibold text-slate-800 mb-3">{title}</h4>
+        <div className="space-y-2">
+          {items.length === 0 && <p className="text-xs text-slate-500">Sem dados para o recorte atual.</p>}
+          {items.map((item) => {
+            const width = `${Math.max(8, Math.round((item.count / max) * 100))}%`;
+            return (
+              <button
+                key={item.value}
+                onClick={() => onSelect(item.value)}
+                className={`w-full rounded-lg border px-3 py-2 text-left transition ${item.active ? 'border-blue-700 bg-blue-50' : 'border-slate-200 bg-white hover:border-blue-300 hover:bg-blue-50/40'}`}
+                title={item.label}
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-xs font-medium text-slate-700 truncate">{item.label}</span>
+                  <span className="text-xs font-semibold text-slate-900">{item.count}</span>
+                </div>
+                <div className="mt-2 h-1.5 rounded-full bg-slate-100">
+                  <div className="h-1.5 rounded-full bg-[var(--gov-blue)]" style={{ width }} />
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
 
   useEffect(() => {
     setPage(1);
@@ -682,31 +789,108 @@ const Mapa: React.FC = () => {
           </div>
         </div>
 
-        <div className="mt-6 flex flex-col sm:flex-row gap-3">
-          <button onClick={handleAddRegistro} className="px-4 py-2 rounded-lg font-semibold text-white bg-orange-600 hover:bg-orange-700">
-            Adicionar ao Mapa
-          </button>
+        <div className="mt-6 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex flex-col sm:flex-row gap-3">
+            <button onClick={handleAddRegistro} className="px-4 py-2 rounded-lg font-semibold text-white bg-orange-600 hover:bg-orange-700">
+              Adicionar ao Mapa
+            </button>
 
-          <button
-            onClick={saveToSheet}
-            disabled={isSaving}
-            className="px-4 py-2 rounded-lg font-semibold border [border-color:var(--gov-blue)!important] [background-color:#ffffff!important] !text-[var(--gov-blue-dark)] hover:!bg-[var(--gov-blue-soft)] disabled:opacity-60"
-          >
-            {isSaving ? 'Salvando...' : 'Salvar Mapa'}
-          </button>
+            <button
+              onClick={saveToSheet}
+              disabled={isSaving}
+              className="px-4 py-2 rounded-lg font-semibold border [border-color:var(--gov-blue)!important] [background-color:#ffffff!important] !text-[var(--gov-blue-dark)] hover:!bg-[var(--gov-blue-soft)] disabled:opacity-60"
+            >
+              {isSaving ? 'Salvando...' : 'Salvar Mapa'}
+            </button>
+          </div>
 
-          <button onClick={downloadCsv} className="px-4 py-2 rounded-lg font-semibold text-white bg-slate-700 hover:bg-slate-800">
-            Download CSV
-          </button>
+          <div className="flex flex-col sm:flex-row gap-3 lg:justify-end">
+            <button
+              onClick={downloadCsv}
+              className="px-4 py-2 rounded-lg font-semibold border [border-color:var(--gov-blue)!important] [background-color:#ffffff!important] !text-[var(--gov-blue-dark)] hover:!bg-[var(--gov-blue-soft)]"
+            >
+              Download CSV
+            </button>
 
-          <button onClick={downloadXlsx} className="px-4 py-2 rounded-lg font-semibold text-white bg-slate-700 hover:bg-slate-800">
-            Download XLSX
-          </button>
+            <button
+              onClick={downloadXlsx}
+              className="px-4 py-2 rounded-lg font-semibold border [border-color:var(--gov-blue)!important] [background-color:#ffffff!important] !text-[var(--gov-blue-dark)] hover:!bg-[var(--gov-blue-soft)]"
+            >
+              Download XLSX
+            </button>
+          </div>
         </div>
       </div>
 
       {errorMessage && <p className="text-sm text-red-500">{errorMessage}</p>}
       {saveMessage && <p className="text-sm text-slate-600">{saveMessage}</p>}
+
+      <div className="bg-slate-800 p-6 rounded-lg border border-slate-700">
+        <div className="flex items-center justify-between gap-3 mb-4">
+          <h3 className="text-lg font-semibold !text-white">Painel Interativo de Filtros</h3>
+          <button
+            onClick={() => {
+              setSelectedNatureza('');
+              setSelectedNivel1('');
+              setSelectedNivel2('');
+              setSelectedConhecimento('');
+              setCustomNivel3('');
+              setSelectedTipo('');
+              setSelectedRelevancia('');
+              setSelectedGrau('');
+            }}
+            className="px-3 py-1.5 rounded-md text-xs font-semibold border [border-color:var(--gov-blue)!important] [background-color:#ffffff!important] !text-[var(--gov-blue-dark)] hover:!bg-[var(--gov-blue-soft)]"
+          >
+            Limpar filtros visuais
+          </button>
+        </div>
+
+        <p className="text-sm text-slate-100 mb-4">
+          Clique nas barras para filtrar a tabela e sincronizar os campos de Natureza, Conhecimento, Tipo, Relevância e Grau Instalado.
+        </p>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          {renderFacet('Natureza', naturezaStats, (value) => {
+            const parsed = NATUREZA_OPTIONS.find((item) => item === value);
+            const next = parsed && selectedNatureza === parsed ? '' : (parsed || '');
+            setSelectedNatureza(next as NaturezaConhecimento | '');
+            if (next !== 'Técnico') {
+              setSelectedNivel1('');
+              setSelectedNivel2('');
+            }
+            setSelectedConhecimento('');
+            setCustomNivel3('');
+          })}
+
+          {renderFacet('Conhecimento (Top 10)', conhecimentoStats, (value) => {
+            if (normalize(finalConhecimento) === normalize(value)) {
+              setSelectedConhecimento('');
+              setCustomNivel3('');
+              return;
+            }
+            setSelectedConhecimento(value);
+            setCustomNivel3('');
+          })}
+
+          {renderFacet('Tipo', tipoStats, (value) => {
+            const parsed = TIPO_OPTIONS.find((item) => item === value);
+            const next = parsed && selectedTipo === parsed ? '' : (parsed || '');
+            setSelectedTipo(next as TipoConhecimento | '');
+          })}
+
+          {renderFacet('Relevância', relevanciaStats, (value) => {
+            const parsed = RELEVANCIA_OPTIONS.find((item) => item === value);
+            const next = parsed && selectedRelevancia === parsed ? '' : (parsed || '');
+            setSelectedRelevancia(next as RelevanciaFaixa | '');
+          })}
+
+          {renderFacet('Grau Instalado', grauStats, (value) => {
+            const parsed = GRAU_OPTIONS.find((item) => item === value);
+            const next = parsed && selectedGrau === parsed ? '' : (parsed || '');
+            setSelectedGrau(next as GrauInstalado | '');
+          })}
+        </div>
+      </div>
 
       <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
         <table className="w-full text-sm">
@@ -718,7 +902,6 @@ const Mapa: React.FC = () => {
               <th className="text-left px-4 py-3">Tipo</th>
               <th className="text-left px-4 py-3">Relevância</th>
               <th className="text-left px-4 py-3">Grau Instalado</th>
-              <th className="text-left px-4 py-3">Origem</th>
               <th className="text-left px-4 py-3">Ações</th>
             </tr>
           </thead>
@@ -776,7 +959,6 @@ const Mapa: React.FC = () => {
                     ))}
                   </select>
                 </td>
-                <td className="px-4 py-3 align-top text-slate-600">{row.origem === 'precruzada' ? 'Pré-cruzada' : 'Manual'}</td>
                 <td className="px-4 py-3 align-top">
                   <div className="flex items-center gap-2">
                     <button
@@ -797,7 +979,7 @@ const Mapa: React.FC = () => {
             ))}
             {pagedRows.length === 0 && (
               <tr>
-                <td colSpan={8} className="px-4 py-6 text-center text-slate-500">
+                <td colSpan={7} className="px-4 py-6 text-center text-slate-500">
                   Sem registros para os filtros atuais.
                 </td>
               </tr>

@@ -146,6 +146,9 @@ const Detentores: React.FC = () => {
   const [queryConhecimento, setQueryConhecimento] = useState('');
   const [queryServidor, setQueryServidor] = useState('');
   const [queryNatureza, setQueryNatureza] = useState<'Todos' | NaturezaConhecimento>('Todos');
+  const [pageSize, setPageSize] = useState(5);
+  const [page, setPage] = useState(1);
+  const [expandedServidores, setExpandedServidores] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     const load = async () => {
@@ -249,6 +252,46 @@ const Detentores: React.FC = () => {
       .sort((a, b) => a.servidor.localeCompare(b.servidor, 'pt-BR'));
   }, [rows, queryConhecimento, queryServidor, queryNatureza]);
 
+  const grouped = useMemo(() => {
+    const groups = new Map<string, JoinedRow[]>();
+    filtered.forEach((row) => {
+      const key = row.servidor;
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key)!.push(row);
+    });
+
+    return Array.from(groups.entries())
+      .map(([servidor, items]) => {
+        const naturezas = Array.from(new Set(items.map((item) => item.natureza))).join(', ');
+        const latestAno = items
+          .map((item) => Number.parseInt(item.ano, 10))
+          .filter((value) => Number.isFinite(value))
+          .sort((a, b) => b - a)[0];
+        return {
+          servidor,
+          items,
+          quantidade: items.length,
+          naturezas,
+          ultimoAno: Number.isFinite(latestAno) ? String(latestAno) : '-',
+        };
+      })
+      .sort((a, b) => a.servidor.localeCompare(b.servidor, 'pt-BR'));
+  }, [filtered]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [grouped.length, pageSize]);
+
+  const totalPages = Math.max(1, Math.ceil(grouped.length / pageSize));
+  const pagedGroups = useMemo(() => {
+    const start = (page - 1) * pageSize;
+    return grouped.slice(start, start + pageSize);
+  }, [grouped, page, pageSize]);
+
+  const toggleExpand = (servidor: string) => {
+    setExpandedServidores((prev) => ({ ...prev, [servidor]: !prev[servidor] }));
+  };
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -282,26 +325,97 @@ const Detentores: React.FC = () => {
           <thead className="bg-slate-50 text-slate-700">
             <tr>
               <th className="text-left px-4 py-3">Servidor</th>
-              <th className="text-left px-4 py-3">Ano</th>
-              <th className="text-left px-4 py-3">Natureza do Conhecimento</th>
-              <th className="text-left px-4 py-3">Conhecimento</th>
-              <th className="text-left px-4 py-3">Capacitação</th>
-              <th className="text-left px-4 py-3">Carga Horária</th>
+              <th className="text-left px-4 py-3">Qtd. Registros</th>
+              <th className="text-left px-4 py-3">Naturezas</th>
+              <th className="text-left px-4 py-3">Último Ano</th>
+              <th className="text-left px-4 py-3">Detalhes</th>
             </tr>
           </thead>
           <tbody>
-            {filtered.map((row, index) => (
-              <tr key={`${row.servidor}-${row.conhecimento}-${index}`} className="border-t border-slate-100">
-                <td className="px-4 py-3 text-slate-800">{row.servidor}</td>
-                <td className="px-4 py-3 text-slate-700">{row.ano || '-'}</td>
-                <td className="px-4 py-3 text-slate-700">{row.natureza}</td>
-                <td className="px-4 py-3 text-slate-700">{row.conhecimento || '-'}</td>
-                <td className="px-4 py-3 text-slate-700">{row.capacitacao || '-'}</td>
-                <td className="px-4 py-3 text-slate-700">{row.cargaHoraria || '-'}</td>
+            {pagedGroups.map((group) => {
+              const expanded = !!expandedServidores[group.servidor];
+              return (
+                <React.Fragment key={group.servidor}>
+                  <tr
+                    onClick={() => toggleExpand(group.servidor)}
+                    className="border-t border-slate-100 cursor-pointer hover:bg-slate-50"
+                  >
+                    <td className="px-4 py-3 font-semibold text-slate-800">{group.servidor}</td>
+                    <td className="px-4 py-3 text-slate-700">{group.quantidade}</td>
+                    <td className="px-4 py-3 text-slate-700">{group.naturezas || '-'}</td>
+                    <td className="px-4 py-3 text-slate-700">{group.ultimoAno}</td>
+                    <td className="px-4 py-3 text-slate-700">{expanded ? 'Ocultar' : 'Expandir'}</td>
+                  </tr>
+
+                  {expanded && (
+                    <tr className="border-t border-slate-100 bg-slate-50/50">
+                      <td colSpan={5} className="px-4 py-4">
+                        <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
+                          <table className="w-full text-sm">
+                            <thead className="bg-slate-100 text-slate-700">
+                              <tr>
+                                <th className="text-left px-3 py-2">Ano</th>
+                                <th className="text-left px-3 py-2">Natureza</th>
+                                <th className="text-left px-3 py-2">Conhecimento</th>
+                                <th className="text-left px-3 py-2">Capacitação</th>
+                                <th className="text-left px-3 py-2">Carga Horária</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {group.items.map((row, index) => (
+                                <tr key={`${group.servidor}-${index}`} className="border-t border-slate-100">
+                                  <td className="px-3 py-2 text-slate-700">{row.ano || '-'}</td>
+                                  <td className="px-3 py-2 text-slate-700">{row.natureza}</td>
+                                  <td className="px-3 py-2 text-slate-700">{row.conhecimento || '-'}</td>
+                                  <td className="px-3 py-2 text-slate-700">{row.capacitacao || '-'}</td>
+                                  <td className="px-3 py-2 text-slate-700">{row.cargaHoraria || '-'}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
+              );
+            })}
+
+            {pagedGroups.length === 0 && (
+              <tr>
+                <td colSpan={5} className="px-4 py-6 text-center text-slate-500">
+                  Sem registros para os filtros atuais.
+                </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
+
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-4 py-3 border-t border-slate-200 bg-slate-50">
+          <div className="flex items-center gap-2 text-sm text-slate-600">
+            <span>Itens por página:</span>
+            <select
+              value={pageSize}
+              onChange={(e) => setPageSize(Number.parseInt(e.target.value, 10))}
+              className="px-2 py-1 rounded border border-slate-300 bg-white text-slate-700"
+            >
+              <option value={5}>5</option>
+              <option value={10}>10</option>
+              <option value={15}>15</option>
+              <option value={20}>20</option>
+            </select>
+          </div>
+
+          <div className="flex items-center gap-2 text-sm text-slate-600">
+            <span>{`Página ${page} de ${totalPages}`}</span>
+            <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1} className="px-3 py-1 rounded border border-slate-300 disabled:opacity-50">
+              Anterior
+            </button>
+            <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page >= totalPages} className="px-3 py-1 rounded border border-slate-300 disabled:opacity-50">
+              Próxima
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
