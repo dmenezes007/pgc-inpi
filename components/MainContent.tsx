@@ -33,7 +33,7 @@ const moduleIntroTexts: Record<string, string> = {
     'Liderança': 'Conhecimentos de liderança mobilizam equipes, promovem aprendizagem contínua e consolidam uma cultura de compartilhamento do conhecimento.',
     'Transversalidade': 'Conhecimentos transversais viabilizam colaboração, integração entre áreas e atuação orientada a resultados no serviço público.',
     'Técnica': 'Conhecimentos técnicos especializados, organizados por níveis e temas, apoiam a qualificação das atividades finalísticas e de suporte do Instituto.',
-    'Mapa': 'Mapa editável de conhecimentos de apoio, essenciais e críticos, com métricas rastreáveis e persistência simples para apoiar a gestão contínua.',
+    'Mapa': 'Mapeamento de conhecimentos de apoio, essenciais e críticos, com inserção de dados gerenciais e persistência simples para apoiar a gestão contínua.',
     'Detentores': 'Consulta estruturada aos detentores de conhecimento do INPI com base em capacitações e dados funcionais para apoiar alocação e sucessão.',
     'Planejamento': 'Necessidades de conhecimento convertem-se em ações de desenvolvimento com alinhamento ao planejamento institucional e à viabilidade orçamentária.',
     'Autodesenvolvimento': 'Protagonismo do servidor no desenvolvimento contínuo amplia competências estratégicas com incentivo institucional.',
@@ -156,6 +156,23 @@ const MainContent: React.FC<MainContentProps> = ({ activeModule, onModuleSelect 
                             </svg>
                             Acessar o Guia Metodológico
                         </a>
+                    </div>
+                )}
+                {activeModule === 'Mapa' && (
+                    <div className="bg-slate-800 p-6 rounded-lg shadow-lg mb-10 border border-slate-700">
+                        <p className="text-lg leading-relaxed text-gray-300">
+                            O Mapa de Conhecimentos organiza, por unidade, os conhecimentos de{' '}
+                            <span className="text-orange-400 font-serif-highlight">Liderança</span>,{' '}
+                            <span className="text-orange-400 font-serif-highlight">Transversal</span> e{' '}
+                            <span className="text-orange-400 font-serif-highlight">Técnico</span>, orientando o
+                            preenchimento gerencial em sequência para garantir consistência e rastreabilidade. Cada
+                            gestor deve iniciar pela sigla da unidade (conforme o módulo Estrutura), selecionar a
+                            natureza do conhecimento, definir o item correspondente, classificar o tipo como Apoio,
+                            Essencial ou Crítico, informar a relevância percentual e registrar o grau instalado
+                            (Inexistente, Iniciante, Intermediário ou Avançado). Esse fluxo padronizado apoia o
+                            diagnóstico de lacunas, a priorização de desenvolvimento e a tomada de decisão orientada
+                            por evidências.
+                        </p>
                     </div>
                 )}
                 {renderContent()}
