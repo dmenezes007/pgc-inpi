@@ -160,33 +160,33 @@ const MainContent: React.FC<MainContentProps> = ({ activeModule, onModuleSelect 
                 )}
                 {activeModule === 'Mapa' && (
                     <div className="bg-slate-800 p-6 rounded-lg shadow-lg mb-10 border border-slate-700">
-                        <p className="text-base leading-relaxed text-gray-300 mb-5">
+                        <p className="text-base leading-relaxed !text-[#334155] mb-5">
                             Preencha o Mapa de Conhecimentos em fluxo único por unidade para registrar prioridades,
                             lacunas e grau de domínio com rastreabilidade gerencial.
                         </p>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-6 gap-3">
-                            <div className="rounded-lg border border-slate-600 bg-slate-900/40 p-3 text-sm text-gray-200">
+                            <div className="rounded-lg border border-slate-600 bg-slate-900/40 p-3 text-sm text-gray-200 [border-color:var(--gov-blue)!important] [background-color:#ffffff!important] !text-slate-700">
                                 <p className="text-xs text-orange-400 font-semibold mb-1">PASSO 1</p>
                                 Unidade (sigla + nome)
                             </div>
-                            <div className="rounded-lg border border-slate-600 bg-slate-900/40 p-3 text-sm text-gray-200">
+                            <div className="rounded-lg border border-slate-600 bg-slate-900/40 p-3 text-sm text-gray-200 [border-color:var(--gov-blue)!important] [background-color:#ffffff!important] !text-slate-700">
                                 <p className="text-xs text-orange-400 font-semibold mb-1">PASSO 2</p>
                                 Natureza do conhecimento
                             </div>
-                            <div className="rounded-lg border border-slate-600 bg-slate-900/40 p-3 text-sm text-gray-200">
+                            <div className="rounded-lg border border-slate-600 bg-slate-900/40 p-3 text-sm text-gray-200 [border-color:var(--gov-blue)!important] [background-color:#ffffff!important] !text-slate-700">
                                 <p className="text-xs text-orange-400 font-semibold mb-1">PASSO 3</p>
                                 Conhecimento aplicável
                             </div>
-                            <div className="rounded-lg border border-slate-600 bg-slate-900/40 p-3 text-sm text-gray-200">
+                            <div className="rounded-lg border border-slate-600 bg-slate-900/40 p-3 text-sm text-gray-200 [border-color:var(--gov-blue)!important] [background-color:#ffffff!important] !text-slate-700">
                                 <p className="text-xs text-orange-400 font-semibold mb-1">PASSO 4</p>
                                 Tipo: Apoio, Essencial ou Crítico
                             </div>
-                            <div className="rounded-lg border border-slate-600 bg-slate-900/40 p-3 text-sm text-gray-200">
+                            <div className="rounded-lg border border-slate-600 bg-slate-900/40 p-3 text-sm text-gray-200 [border-color:var(--gov-blue)!important] [background-color:#ffffff!important] !text-slate-700">
                                 <p className="text-xs text-orange-400 font-semibold mb-1">PASSO 5</p>
                                 Relevância por faixa
                             </div>
-                            <div className="rounded-lg border border-slate-600 bg-slate-900/40 p-3 text-sm text-gray-200">
+                            <div className="rounded-lg border border-slate-600 bg-slate-900/40 p-3 text-sm text-gray-200 [border-color:var(--gov-blue)!important] [background-color:#ffffff!important] !text-slate-700">
                                 <p className="text-xs text-orange-400 font-semibold mb-1">PASSO 6</p>
                                 Grau instalado
                             </div>

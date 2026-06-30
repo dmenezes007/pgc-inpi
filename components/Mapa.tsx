@@ -1,5 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import Papa from 'papaparse';
+import Select, { SingleValue } from 'react-select';
+import CreatableSelect from 'react-select/creatable';
 import tecnicaCsvUrl from '../src/files/docs/tecnica.csv?url';
 import estruturaCsvUrl from '../src/files/docs/estrutura.csv?url';
 
@@ -35,10 +37,15 @@ interface MapaRow {
   tipo: TipoConhecimento;
   relevanciaFaixa: RelevanciaFaixa;
   grauInstalado: GrauInstalado;
+  origem: 'precruzada' | 'manual';
 }
 
-const STORAGE_KEY = 'pgc_mapa_conhecimento_v3';
-const PAGE_SIZE = 8;
+interface SelectOption {
+  value: string;
+  label: string;
+}
+
+const STORAGE_KEY = 'pgc_mapa_conhecimento_v4';
 
 const NATUREZA_OPTIONS: NaturezaConhecimento[] = ['Liderança', 'Transversal', 'Técnico'];
 const TIPO_OPTIONS: TipoConhecimento[] = ['Apoio', 'Essencial', 'Crítico'];
@@ -76,6 +83,59 @@ const tooltipByField: Record<string, string> = {
   grau: 'Informe o grau instalado do conhecimento na unidade.',
 };
 
+const customStyles = {
+  control: (provided: any, state: { isFocused: boolean }) => ({
+    ...provided,
+    backgroundColor: '#ffffff',
+    borderColor: state.isFocused ? 'var(--gov-blue)' : 'var(--gov-border)',
+    color: 'var(--gov-blue-dark)',
+    borderRadius: '0.5rem',
+    padding: '0.1rem',
+    border: '1px solid var(--gov-border)',
+    boxShadow: state.isFocused ? '0 0 0 1px var(--gov-blue)' : 'none',
+    '&:hover': {
+      borderColor: 'var(--gov-blue)',
+    },
+  }),
+  singleValue: (provided: any) => ({
+    ...provided,
+    color: 'var(--gov-blue-dark)',
+  }),
+  menu: (provided: any) => ({
+    ...provided,
+    backgroundColor: '#ffffff',
+    borderColor: 'var(--gov-border)',
+  }),
+  option: (provided: any, state: { isFocused: boolean; isSelected: boolean }) => ({
+    ...provided,
+    backgroundColor: state.isSelected ? 'var(--gov-blue)' : state.isFocused ? 'var(--gov-blue-soft)' : '#ffffff',
+    color: state.isSelected ? '#ffffff' : 'var(--gov-blue-dark)',
+    '&:active': {
+      backgroundColor: 'var(--gov-blue)',
+    },
+  }),
+  input: (provided: any) => ({
+    ...provided,
+    color: 'var(--gov-blue-dark)',
+  }),
+  placeholder: (provided: any) => ({
+    ...provided,
+    color: 'var(--gov-blue)',
+  }),
+  clearIndicator: (provided: any) => ({
+    ...provided,
+    color: 'var(--gov-blue)',
+    '&:hover': { color: 'var(--gov-blue-dark)' },
+  }),
+  dropdownIndicator: (provided: any) => ({
+    ...provided,
+    color: 'var(--gov-blue)',
+    '&:hover': { color: 'var(--gov-blue-dark)' },
+  }),
+  indicatorSeparator: () => ({ display: 'none' }),
+  menuPortal: (base: any) => ({ ...base, zIndex: 9999 }),
+};
+
 const getSheetEndpoint = (): string => {
   const value = (import.meta as any).env?.VITE_GSHEET_MAPA_ENDPOINT;
   return typeof value === 'string' ? value : '';
@@ -96,9 +156,10 @@ const parseCsvFromUrl = <T,>(url: string): Promise<T[]> => {
 
 const normalize = (value: string): string => value.trim().toLowerCase();
 
+const toOption = (value: string): SelectOption => ({ value, label: value });
+
 const Mapa: React.FC = () => {
   const [rows, setRows] = useState<MapaRow[]>([]);
-  const [suggestedRows, setSuggestedRows] = useState<MapaRow[]>([]);
   const [unidades, setUnidades] = useState<UnidadeOption[]>([]);
   const [tecnicaData, setTecnicaData] = useState<TecnicaRow[]>([]);
 
@@ -112,7 +173,9 @@ const Mapa: React.FC = () => {
   const [selectedRelevancia, setSelectedRelevancia] = useState<RelevanciaFaixa | ''>('');
   const [selectedGrau, setSelectedGrau] = useState<GrauInstalado | ''>('');
 
-  const [suggestedPage, setSuggestedPage] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
+  const [page, setPage] = useState(1);
+
   const [saveMessage, setSaveMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [isSaving, setIsSaving] = useState(false);
@@ -120,6 +183,11 @@ const Mapa: React.FC = () => {
   const findUnidade = (sigla: string): UnidadeOption | undefined => {
     const key = normalize(sigla);
     return unidades.find((u) => normalize(u.sigla) === key);
+  };
+
+  const replaceBaseWithPrecruzada = (baseRows: MapaRow[], precruzadaRows: MapaRow[]): MapaRow[] => {
+    const manuais = baseRows.filter((row) => row.origem !== 'precruzada');
+    return [...precruzadaRows, ...manuais];
   };
 
   useEffect(() => {
@@ -147,71 +215,75 @@ const Mapa: React.FC = () => {
       const tecnicaClean = tecnicaRows.filter((item) => item.Nivel1 && item.Nivel2 && item.Nivel3);
       setTecnicaData(tecnicaClean);
 
-      const localRaw = localStorage.getItem(STORAGE_KEY);
-      if (localRaw) {
-        try {
-          const localRows: MapaRow[] = JSON.parse(localRaw);
-          setRows(localRows);
-        } catch {
-          setRows([]);
-        }
-      }
-
       const nivel3Unicos = Array.from(
         new Set(tecnicaClean.map((row) => `${row.Nivel1}|${row.Nivel2}|${row.Nivel3}`))
-      )
-        .slice(0, 8)
-        .map((item) => {
-          const [nivel1, nivel2, conhecimento] = item.split('|');
-          return { nivel1, nivel2, conhecimento };
-        });
+      ).map((item) => {
+        const [nivel1, nivel2, conhecimento] = item.split('|');
+        return { nivel1, nivel2, conhecimento };
+      });
 
-      const baseUnidades = unidadesSorted.slice(0, 6);
       const cruzados: MapaRow[] = [];
+      unidadesSorted.forEach((unidade, idx) => {
+        const lideranca = LIDERANCA_OPTIONS[idx % LIDERANCA_OPTIONS.length];
+        const transversal = TRANSVERSAL_OPTIONS[idx % TRANSVERSAL_OPTIONS.length];
+        const tecnico = nivel3Unicos[idx % Math.max(1, nivel3Unicos.length)];
 
-      baseUnidades.forEach((unidade, unidadeIndex) => {
-        const lideranca = LIDERANCA_OPTIONS[unidadeIndex % LIDERANCA_OPTIONS.length];
-        const transversal = TRANSVERSAL_OPTIONS[unidadeIndex % TRANSVERSAL_OPTIONS.length];
         cruzados.push({
-          id: `sug-l-${unidade.sigla}-${unidadeIndex}`,
+          id: `pre-l-${unidade.sigla}`,
           unidadeSigla: unidade.sigla,
           unidadeNome: unidade.nome,
           natureza: 'Liderança',
           conhecimento: lideranca,
-          tipo: TIPO_OPTIONS[unidadeIndex % TIPO_OPTIONS.length],
-          relevanciaFaixa: RELEVANCIA_OPTIONS[unidadeIndex % RELEVANCIA_OPTIONS.length],
-          grauInstalado: GRAU_OPTIONS[unidadeIndex % GRAU_OPTIONS.length],
+          tipo: TIPO_OPTIONS[idx % TIPO_OPTIONS.length],
+          relevanciaFaixa: RELEVANCIA_OPTIONS[idx % RELEVANCIA_OPTIONS.length],
+          grauInstalado: GRAU_OPTIONS[idx % GRAU_OPTIONS.length],
+          origem: 'precruzada',
         });
+
         cruzados.push({
-          id: `sug-t-${unidade.sigla}-${unidadeIndex}`,
+          id: `pre-t-${unidade.sigla}`,
           unidadeSigla: unidade.sigla,
           unidadeNome: unidade.nome,
           natureza: 'Transversal',
           conhecimento: transversal,
-          tipo: TIPO_OPTIONS[(unidadeIndex + 1) % TIPO_OPTIONS.length],
-          relevanciaFaixa: RELEVANCIA_OPTIONS[(unidadeIndex + 1) % RELEVANCIA_OPTIONS.length],
-          grauInstalado: GRAU_OPTIONS[(unidadeIndex + 1) % GRAU_OPTIONS.length],
+          tipo: TIPO_OPTIONS[(idx + 1) % TIPO_OPTIONS.length],
+          relevanciaFaixa: RELEVANCIA_OPTIONS[(idx + 1) % RELEVANCIA_OPTIONS.length],
+          grauInstalado: GRAU_OPTIONS[(idx + 1) % GRAU_OPTIONS.length],
+          origem: 'precruzada',
         });
+
+        if (tecnico) {
+          cruzados.push({
+            id: `pre-k-${unidade.sigla}`,
+            unidadeSigla: unidade.sigla,
+            unidadeNome: unidade.nome,
+            natureza: 'Técnico',
+            nivel1: tecnico.nivel1,
+            nivel2: tecnico.nivel2,
+            conhecimento: tecnico.conhecimento,
+            tipo: TIPO_OPTIONS[(idx + 2) % TIPO_OPTIONS.length],
+            relevanciaFaixa: RELEVANCIA_OPTIONS[(idx + 2) % RELEVANCIA_OPTIONS.length],
+            grauInstalado: GRAU_OPTIONS[(idx + 2) % GRAU_OPTIONS.length],
+            origem: 'precruzada',
+          });
+        }
       });
 
-      nivel3Unicos.forEach((item, idx) => {
-        if (baseUnidades.length === 0) return;
-        const unidade = baseUnidades[idx % baseUnidades.length];
-        cruzados.push({
-          id: `sug-k-${unidade.sigla}-${idx}`,
-          unidadeSigla: unidade.sigla,
-          unidadeNome: unidade.nome,
-          natureza: 'Técnico',
-          nivel1: item.nivel1,
-          nivel2: item.nivel2,
-          conhecimento: item.conhecimento,
-          tipo: TIPO_OPTIONS[idx % TIPO_OPTIONS.length],
-          relevanciaFaixa: RELEVANCIA_OPTIONS[idx % RELEVANCIA_OPTIONS.length],
-          grauInstalado: GRAU_OPTIONS[idx % GRAU_OPTIONS.length],
-        });
-      });
+      const localRaw = localStorage.getItem(STORAGE_KEY);
+      if (localRaw) {
+        try {
+          const localRows: MapaRow[] = JSON.parse(localRaw);
+          const merged = replaceBaseWithPrecruzada(localRows, cruzados);
+          setRows(merged);
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+          return;
+        } catch {
+          // fallback to generated base
+        }
+      }
 
-      setSuggestedRows(cruzados);
+      setRows(cruzados);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(cruzados));
     };
 
     hydrate().catch(() => {
@@ -219,18 +291,25 @@ const Mapa: React.FC = () => {
     });
   }, []);
 
-  const selectedUnidadeInfo = useMemo(
-    () => findUnidade(selectedUnidade),
-    [selectedUnidade, unidades]
+  const selectedUnidadeInfo = useMemo(() => findUnidade(selectedUnidade), [selectedUnidade, unidades]);
+
+  const naturezaOptions = useMemo(() => NATUREZA_OPTIONS.map(toOption), []);
+  const tipoOptions = useMemo(() => TIPO_OPTIONS.map(toOption), []);
+  const relevanciaOptions = useMemo(() => RELEVANCIA_OPTIONS.map(toOption), []);
+  const grauOptions = useMemo(() => GRAU_OPTIONS.map(toOption), []);
+
+  const unidadeOptions = useMemo(
+    () => unidades.map((u) => ({ value: u.sigla, label: `${u.sigla} - ${u.nome}` })),
+    [unidades]
   );
 
   const nivel1Options = useMemo(() => {
     const unique = Array.from(new Set(tecnicaData.map((item) => item.Nivel1.trim())));
-    return unique.sort((a, b) => a.localeCompare(b, 'pt-BR'));
+    return unique.sort((a, b) => a.localeCompare(b, 'pt-BR')).map(toOption);
   }, [tecnicaData]);
 
   const nivel2Options = useMemo(() => {
-    if (!selectedNivel1) return [];
+    if (!selectedNivel1) return [] as SelectOption[];
     const unique = Array.from(
       new Set(
         tecnicaData
@@ -238,11 +317,11 @@ const Mapa: React.FC = () => {
           .map((item) => item.Nivel2.trim())
       )
     );
-    return unique.sort((a, b) => a.localeCompare(b, 'pt-BR'));
+    return unique.sort((a, b) => a.localeCompare(b, 'pt-BR')).map(toOption);
   }, [tecnicaData, selectedNivel1]);
 
   const nivel3Options = useMemo(() => {
-    if (!selectedNivel1 || !selectedNivel2) return [];
+    if (!selectedNivel1 || !selectedNivel2) return [] as SelectOption[];
     const unique = Array.from(
       new Set(
         tecnicaData
@@ -250,20 +329,18 @@ const Mapa: React.FC = () => {
           .map((item) => item.Nivel3.trim())
       )
     );
-    return unique.sort((a, b) => a.localeCompare(b, 'pt-BR'));
+    return unique.sort((a, b) => a.localeCompare(b, 'pt-BR')).map(toOption);
   }, [tecnicaData, selectedNivel1, selectedNivel2]);
 
   const knowledgeOptions = useMemo(() => {
-    if (selectedNatureza === 'Liderança') return LIDERANCA_OPTIONS;
-    if (selectedNatureza === 'Transversal') return TRANSVERSAL_OPTIONS;
+    if (selectedNatureza === 'Liderança') return LIDERANCA_OPTIONS.map(toOption);
+    if (selectedNatureza === 'Transversal') return TRANSVERSAL_OPTIONS.map(toOption);
     if (selectedNatureza === 'Técnico') return nivel3Options;
-    return [];
+    return [] as SelectOption[];
   }, [selectedNatureza, nivel3Options]);
 
   const finalConhecimento =
-    selectedNatureza === 'Técnico' && customNivel3.trim() !== ''
-      ? customNivel3.trim()
-      : selectedConhecimento;
+    selectedNatureza === 'Técnico' && customNivel3.trim() !== '' ? customNivel3.trim() : selectedConhecimento;
 
   const resetKnowledgeStep = () => {
     setSelectedConhecimento('');
@@ -273,7 +350,8 @@ const Mapa: React.FC = () => {
     setSelectedGrau('');
   };
 
-  const handleNaturezaChange = (value: string) => {
+  const handleNaturezaChange = (option: SingleValue<SelectOption>) => {
+    const value = option?.value || '';
     const parsed = NATUREZA_OPTIONS.find((opt) => opt === value);
     setSelectedNatureza(parsed || '');
     setSelectedNivel1('');
@@ -307,6 +385,7 @@ const Mapa: React.FC = () => {
       tipo: selectedTipo,
       relevanciaFaixa: selectedRelevancia,
       grauInstalado: selectedGrau,
+      origem: 'manual',
     };
 
     const next = [newRow, ...rows];
@@ -339,8 +418,8 @@ const Mapa: React.FC = () => {
   const canChooseRelevancia = canChooseTipo && selectedTipo !== '';
   const canChooseGrau = canChooseRelevancia && selectedRelevancia !== '';
 
-  const filteredSuggestedRows = useMemo(() => {
-    return suggestedRows.filter((row) => {
+  const filteredRows = useMemo(() => {
+    return rows.filter((row) => {
       const byUnidade = !selectedUnidade || normalize(row.unidadeSigla) === normalize(selectedUnidade);
       const byNatureza = !selectedNatureza || row.natureza === selectedNatureza;
       const byNivel1 = !selectedNivel1 || normalize(row.nivel1 || '') === normalize(selectedNivel1);
@@ -352,7 +431,7 @@ const Mapa: React.FC = () => {
       return byUnidade && byNatureza && byNivel1 && byNivel2 && byConhecimento && byTipo && byRelevancia && byGrau;
     });
   }, [
-    suggestedRows,
+    rows,
     selectedUnidade,
     selectedNatureza,
     selectedNivel1,
@@ -364,49 +443,27 @@ const Mapa: React.FC = () => {
   ]);
 
   useEffect(() => {
-    setSuggestedPage(1);
-  }, [
-    selectedUnidade,
-    selectedNatureza,
-    selectedNivel1,
-    selectedNivel2,
-    finalConhecimento,
-    selectedTipo,
-    selectedRelevancia,
-    selectedGrau,
-  ]);
+    setPage(1);
+  }, [filteredRows.length, pageSize]);
 
-  const totalPages = Math.max(1, Math.ceil(filteredSuggestedRows.length / PAGE_SIZE));
-  const pagedSuggestedRows = useMemo(() => {
-    const start = (suggestedPage - 1) * PAGE_SIZE;
-    return filteredSuggestedRows.slice(start, start + PAGE_SIZE);
-  }, [filteredSuggestedRows, suggestedPage]);
+  const totalPages = Math.max(1, Math.ceil(filteredRows.length / pageSize));
+  const pagedRows = useMemo(() => {
+    const start = (page - 1) * pageSize;
+    return filteredRows.slice(start, start + pageSize);
+  }, [filteredRows, page, pageSize]);
 
-  const updateSuggestedRow = (id: string, patch: Partial<MapaRow>) => {
-    setSuggestedRows((prev) =>
-      prev.map((row) => {
-        if (row.id !== id) return row;
-        const nextRow = { ...row, ...patch };
-        if (patch.unidadeSigla !== undefined) {
-          const unidadeInfo = findUnidade(patch.unidadeSigla);
-          nextRow.unidadeNome = unidadeInfo?.nome || row.unidadeNome;
-        }
-        return nextRow;
-      })
-    );
-  };
-
-  const addSuggestedToMapa = (id: string) => {
-    const found = suggestedRows.find((row) => row.id === id);
-    if (!found) return;
-    const newRow: MapaRow = {
-      ...found,
-      id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-    };
-    const next = [newRow, ...rows];
+  const updateRow = (id: string, patch: Partial<MapaRow>) => {
+    const next = rows.map((row) => {
+      if (row.id !== id) return row;
+      const updated = { ...row, ...patch };
+      if (patch.unidadeSigla !== undefined) {
+        const unidadeInfo = findUnidade(patch.unidadeSigla);
+        updated.unidadeNome = unidadeInfo?.nome || row.unidadeNome;
+      }
+      return updated;
+    });
     setRows(next);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-    setSaveMessage('Registro pré-cruzado adicionado ao mapa.');
   };
 
   const saveToSheet = async () => {
@@ -452,40 +509,40 @@ const Mapa: React.FC = () => {
             <label className="text-sm font-medium text-gray-200" title={tooltipByField.unidade}>
               1. Selecione a Unidade
             </label>
-            <input
-              list="mapa-unidades-list"
-              value={selectedUnidade}
-              onChange={(e) => setSelectedUnidade(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-700"
-              placeholder="Digite ou selecione a sigla"
+            <Select
+              instanceId="mapa-unidade"
+              classNamePrefix="tecnica-select"
+              value={selectedUnidade ? unidadeOptions.find((o) => o.value === selectedUnidade) || toOption(selectedUnidade) : null}
+              onChange={(option) => setSelectedUnidade(option?.value || '')}
+              options={unidadeOptions}
+              styles={customStyles}
+              placeholder="Busque por sigla ou unidade"
+              isClearable
+              isSearchable
+              menuPortalTarget={document.body}
             />
-            <datalist id="mapa-unidades-list">
-              {unidades.map((item) => (
-                <option key={item.sigla} value={item.sigla} label={`${item.sigla} - ${item.nome}`} />
-              ))}
-            </datalist>
-            <p className="text-xs text-gray-400">
-              {selectedUnidadeInfo ? `${selectedUnidadeInfo.sigla} - ${selectedUnidadeInfo.nome}` : 'Selecione uma sigla para exibir o nome completo da unidade.'}
-            </p>
+            {selectedUnidadeInfo && (
+              <p className="text-xs text-gray-300">{`${selectedUnidadeInfo.sigla} - ${selectedUnidadeInfo.nome}`}</p>
+            )}
           </div>
 
           <div className="space-y-2">
             <label className="text-sm font-medium text-gray-200" title={tooltipByField.natureza}>
               2. Selecione a Natureza do Conhecimento
             </label>
-            <input
-              list="mapa-natureza-list"
-              value={selectedNatureza}
-              onChange={(e) => handleNaturezaChange(e.target.value)}
-              disabled={!selectedUnidade}
-              className="w-full px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-700 disabled:opacity-60"
-              placeholder="Digite ou selecione a natureza"
+            <Select
+              instanceId="mapa-natureza"
+              classNamePrefix="tecnica-select"
+              value={selectedNatureza ? toOption(selectedNatureza) : null}
+              onChange={handleNaturezaChange}
+              options={naturezaOptions}
+              styles={customStyles}
+              isDisabled={!selectedUnidade}
+              placeholder="Selecione a natureza"
+              isClearable
+              isSearchable
+              menuPortalTarget={document.body}
             />
-            <datalist id="mapa-natureza-list">
-              {NATUREZA_OPTIONS.map((item) => (
-                <option key={item} value={item} />
-              ))}
-            </datalist>
           </div>
 
           {selectedNatureza === 'Técnico' && (
@@ -494,44 +551,44 @@ const Mapa: React.FC = () => {
                 <label className="text-sm font-medium text-gray-200" title="Primeira camada da trilha técnica.">
                   2.1 Nível 1 Técnico
                 </label>
-                <input
-                  list="mapa-nivel1-list"
-                  value={selectedNivel1}
-                  onChange={(e) => {
-                    setSelectedNivel1(e.target.value);
+                <Select
+                  instanceId="mapa-nivel1"
+                  classNamePrefix="tecnica-select"
+                  value={selectedNivel1 ? toOption(selectedNivel1) : null}
+                  onChange={(option) => {
+                    setSelectedNivel1(option?.value || '');
                     setSelectedNivel2('');
                     resetKnowledgeStep();
                   }}
-                  className="w-full px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-700"
-                  placeholder="Digite ou selecione"
+                  options={nivel1Options}
+                  styles={customStyles}
+                  placeholder="Busque pelo Nível 1"
+                  isClearable
+                  isSearchable
+                  menuPortalTarget={document.body}
                 />
-                <datalist id="mapa-nivel1-list">
-                  {nivel1Options.map((item) => (
-                    <option key={item} value={item} />
-                  ))}
-                </datalist>
               </div>
 
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-200" title="Segunda camada da trilha técnica.">
                   2.2 Nível 2 Técnico
                 </label>
-                <input
-                  list="mapa-nivel2-list"
-                  value={selectedNivel2}
-                  onChange={(e) => {
-                    setSelectedNivel2(e.target.value);
+                <Select
+                  instanceId="mapa-nivel2"
+                  classNamePrefix="tecnica-select"
+                  value={selectedNivel2 ? toOption(selectedNivel2) : null}
+                  onChange={(option) => {
+                    setSelectedNivel2(option?.value || '');
                     resetKnowledgeStep();
                   }}
-                  disabled={!selectedNivel1}
-                  className="w-full px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-700 disabled:opacity-60"
-                  placeholder="Digite ou selecione"
+                  options={nivel2Options}
+                  styles={customStyles}
+                  placeholder="Busque pelo Nível 2"
+                  isDisabled={!selectedNivel1}
+                  isClearable
+                  isSearchable
+                  menuPortalTarget={document.body}
                 />
-                <datalist id="mapa-nivel2-list">
-                  {nivel2Options.map((item) => (
-                    <option key={item} value={item} />
-                  ))}
-                </datalist>
               </div>
             </>
           )}
@@ -540,19 +597,20 @@ const Mapa: React.FC = () => {
             <label className="text-sm font-medium text-gray-200" title={tooltipByField.conhecimento}>
               3. Selecione o Conhecimento
             </label>
-            <input
-              list="mapa-conhecimento-list"
-              value={selectedConhecimento}
-              onChange={(e) => setSelectedConhecimento(e.target.value)}
-              disabled={!canChooseKnowledge}
-              className="w-full px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-700 disabled:opacity-60"
-              placeholder="Digite ou selecione o conhecimento"
+            <CreatableSelect
+              instanceId="mapa-conhecimento"
+              classNamePrefix="tecnica-select"
+              value={selectedConhecimento ? toOption(selectedConhecimento) : null}
+              onChange={(option) => setSelectedConhecimento(option?.value || '')}
+              options={knowledgeOptions}
+              styles={customStyles}
+              placeholder="Busque ou digite o conhecimento"
+              isDisabled={!canChooseKnowledge}
+              isClearable
+              isSearchable
+              menuPortalTarget={document.body}
+              formatCreateLabel={(input) => `Usar: ${input}`}
             />
-            <datalist id="mapa-conhecimento-list">
-              {knowledgeOptions.map((item) => (
-                <option key={item} value={item} />
-              ))}
-            </datalist>
           </div>
 
           {selectedNatureza === 'Técnico' && (
@@ -560,12 +618,19 @@ const Mapa: React.FC = () => {
               <label className="text-sm font-medium text-gray-200" title="Edite ou acrescente um Nível 3 para casos específicos.">
                 3.1 Nível 3 Editável
               </label>
-              <input
-                value={customNivel3}
-                onChange={(e) => setCustomNivel3(e.target.value)}
-                placeholder="Digite para editar/acrescentar"
-                disabled={!canChooseKnowledge}
-                className="w-full px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-700 disabled:opacity-60"
+              <CreatableSelect
+                instanceId="mapa-nivel3-editavel"
+                classNamePrefix="tecnica-select"
+                value={customNivel3 ? toOption(customNivel3) : null}
+                onChange={(option) => setCustomNivel3(option?.value || '')}
+                options={nivel3Options}
+                styles={customStyles}
+                placeholder="Busque ou digite um Nível 3"
+                isDisabled={!canChooseKnowledge}
+                isClearable
+                isSearchable
+                menuPortalTarget={document.body}
+                formatCreateLabel={(input) => `Adicionar Nível 3: ${input}`}
               />
             </div>
           )}
@@ -574,57 +639,69 @@ const Mapa: React.FC = () => {
             <label className="text-sm font-medium text-gray-200" title={tooltipByField.tipo}>
               4. Selecione o Tipo de Conhecimento
             </label>
-            <input
-              list="mapa-tipo-list"
-              value={selectedTipo}
-              onChange={(e) => setSelectedTipo((TIPO_OPTIONS.find((opt) => opt === e.target.value) || '') as TipoConhecimento | '')}
-              disabled={!canChooseTipo}
-              className="w-full px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-700 disabled:opacity-60"
-              placeholder="Digite ou selecione o tipo"
+            <CreatableSelect
+              instanceId="mapa-tipo"
+              classNamePrefix="tecnica-select"
+              value={selectedTipo ? toOption(selectedTipo) : null}
+              onChange={(option) => {
+                const value = option?.value || '';
+                const typed = TIPO_OPTIONS.find((o) => o === value);
+                setSelectedTipo((typed || '') as TipoConhecimento | '');
+              }}
+              options={tipoOptions}
+              styles={customStyles}
+              placeholder="Busque ou digite o tipo"
+              isDisabled={!canChooseTipo}
+              isClearable
+              isSearchable
+              menuPortalTarget={document.body}
             />
-            <datalist id="mapa-tipo-list">
-              {TIPO_OPTIONS.map((item) => (
-                <option key={item} value={item} />
-              ))}
-            </datalist>
           </div>
 
           <div className="space-y-2">
             <label className="text-sm font-medium text-gray-200" title={tooltipByField.relevancia}>
               5. Selecione a Relevância
             </label>
-            <input
-              list="mapa-relevancia-list"
-              value={selectedRelevancia}
-              onChange={(e) => setSelectedRelevancia((RELEVANCIA_OPTIONS.find((opt) => opt === e.target.value) || '') as RelevanciaFaixa | '')}
-              disabled={!canChooseRelevancia}
-              className="w-full px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-700 disabled:opacity-60"
-              placeholder="Digite ou selecione a faixa"
+            <Select
+              instanceId="mapa-relevancia"
+              classNamePrefix="tecnica-select"
+              value={selectedRelevancia ? toOption(selectedRelevancia) : null}
+              onChange={(option) => {
+                const value = option?.value || '';
+                const typed = RELEVANCIA_OPTIONS.find((o) => o === value);
+                setSelectedRelevancia((typed || '') as RelevanciaFaixa | '');
+              }}
+              options={relevanciaOptions}
+              styles={customStyles}
+              placeholder="Selecione a faixa"
+              isDisabled={!canChooseRelevancia}
+              isClearable
+              isSearchable
+              menuPortalTarget={document.body}
             />
-            <datalist id="mapa-relevancia-list">
-              {RELEVANCIA_OPTIONS.map((item) => (
-                <option key={item} value={item} />
-              ))}
-            </datalist>
           </div>
 
           <div className="space-y-2">
             <label className="text-sm font-medium text-gray-200" title={tooltipByField.grau}>
               6. Selecione o Grau Instalado
             </label>
-            <input
-              list="mapa-grau-list"
-              value={selectedGrau}
-              onChange={(e) => setSelectedGrau((GRAU_OPTIONS.find((opt) => opt === e.target.value) || '') as GrauInstalado | '')}
-              disabled={!canChooseGrau}
-              className="w-full px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-700 disabled:opacity-60"
-              placeholder="Digite ou selecione o grau"
+            <Select
+              instanceId="mapa-grau"
+              classNamePrefix="tecnica-select"
+              value={selectedGrau ? toOption(selectedGrau) : null}
+              onChange={(option) => {
+                const value = option?.value || '';
+                const typed = GRAU_OPTIONS.find((o) => o === value);
+                setSelectedGrau((typed || '') as GrauInstalado | '');
+              }}
+              options={grauOptions}
+              styles={customStyles}
+              placeholder="Selecione o grau"
+              isDisabled={!canChooseGrau}
+              isClearable
+              isSearchable
+              menuPortalTarget={document.body}
             />
-            <datalist id="mapa-grau-list">
-              {GRAU_OPTIONS.map((item) => (
-                <option key={item} value={item} />
-              ))}
-            </datalist>
           </div>
         </div>
 
@@ -639,14 +716,14 @@ const Mapa: React.FC = () => {
           <button
             onClick={saveToSheet}
             disabled={isSaving}
-            className="px-4 py-2 rounded-lg font-semibold text-white bg-slate-600 hover:bg-slate-700 disabled:opacity-60"
+            className="px-4 py-2 rounded-lg font-semibold border [border-color:var(--gov-blue)!important] [background-color:#ffffff!important] !text-[var(--gov-blue-dark)] hover:!bg-[var(--gov-blue-soft)] disabled:opacity-60"
           >
             {isSaving ? 'Salvando...' : 'Salvar Mapa'}
           </button>
         </div>
       </div>
 
-      {errorMessage && <p className="text-sm text-red-400">{errorMessage}</p>}
+      {errorMessage && <p className="text-sm text-red-500">{errorMessage}</p>}
       {saveMessage && <p className="text-sm text-slate-600">{saveMessage}</p>}
 
       <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
@@ -659,22 +736,85 @@ const Mapa: React.FC = () => {
               <th className="text-left px-4 py-3">Tipo</th>
               <th className="text-left px-4 py-3">Relevância</th>
               <th className="text-left px-4 py-3">Grau Instalado</th>
+              <th className="text-left px-4 py-3">Origem</th>
               <th className="text-left px-4 py-3">Ações</th>
             </tr>
           </thead>
           <tbody>
-            {rows.map((row) => (
+            {pagedRows.map((row) => (
               <tr key={row.id} className="border-t border-slate-100">
-                <td className="px-4 py-3 align-top text-slate-800">{`${row.unidadeSigla} - ${row.unidadeNome}`}</td>
-                <td className="px-4 py-3 align-top text-slate-700">{row.natureza}</td>
                 <td className="px-4 py-3 align-top text-slate-800">
-                  {row.natureza === 'Técnico' && row.nivel1 && row.nivel2
-                    ? `${row.nivel1} > ${row.nivel2} > ${row.conhecimento}`
-                    : row.conhecimento}
+                  <input
+                    value={row.unidadeSigla}
+                    onChange={(e) => updateRow(row.id, { unidadeSigla: e.target.value })}
+                    className="w-24 px-2 py-1 rounded border border-slate-300"
+                  />
+                  <div className="text-xs text-slate-500 mt-1">{row.unidadeNome}</div>
                 </td>
-                <td className="px-4 py-3 align-top text-slate-700">{row.tipo}</td>
-                <td className="px-4 py-3 align-top text-slate-700">{row.relevanciaFaixa}</td>
-                <td className="px-4 py-3 align-top text-slate-700">{row.grauInstalado}</td>
+                <td className="px-4 py-3 align-top">
+                  <select
+                    value={row.natureza}
+                    onChange={(e) => {
+                      const natureza = NATUREZA_OPTIONS.find((item) => item === e.target.value);
+                      if (natureza) updateRow(row.id, { natureza });
+                    }}
+                    className="px-2 py-1 rounded border border-slate-300"
+                  >
+                    {NATUREZA_OPTIONS.map((item) => (
+                      <option key={item} value={item}>{item}</option>
+                    ))}
+                  </select>
+                </td>
+                <td className="px-4 py-3 align-top text-slate-800">
+                  <input
+                    value={row.conhecimento}
+                    onChange={(e) => updateRow(row.id, { conhecimento: e.target.value })}
+                    className="w-72 px-2 py-1 rounded border border-slate-300"
+                  />
+                </td>
+                <td className="px-4 py-3 align-top">
+                  <select
+                    value={row.tipo}
+                    onChange={(e) => {
+                      const tipo = TIPO_OPTIONS.find((item) => item === e.target.value);
+                      if (tipo) updateRow(row.id, { tipo });
+                    }}
+                    className="px-2 py-1 rounded border border-slate-300"
+                  >
+                    {TIPO_OPTIONS.map((item) => (
+                      <option key={item} value={item}>{item}</option>
+                    ))}
+                  </select>
+                </td>
+                <td className="px-4 py-3 align-top">
+                  <select
+                    value={row.relevanciaFaixa}
+                    onChange={(e) => {
+                      const faixa = RELEVANCIA_OPTIONS.find((item) => item === e.target.value);
+                      if (faixa) updateRow(row.id, { relevanciaFaixa: faixa });
+                    }}
+                    className="px-2 py-1 rounded border border-slate-300"
+                  >
+                    {RELEVANCIA_OPTIONS.map((item) => (
+                      <option key={item} value={item}>{item}</option>
+                    ))}
+                  </select>
+                </td>
+                <td className="px-4 py-3 align-top">
+                  <select
+                    value={row.grauInstalado}
+                    onChange={(e) => {
+                      const grau = GRAU_OPTIONS.find((item) => item === e.target.value);
+                      if (grau) updateRow(row.id, { grauInstalado: grau });
+                    }}
+                    className="px-2 py-1 rounded border border-slate-300"
+                  >
+                    {GRAU_OPTIONS.map((item) => (
+                      <option key={item} value={item}>{item}</option>
+                    ))}
+                  </select>
+                </td>
+                <td className="px-4 py-3 align-top text-slate-600">{row.origem === 'precruzada' ? 'Pré-cruzada' : 'Manual'}</td>
                 <td className="px-4 py-3 align-top">
                   <button
                     onClick={() => removeRow(row.id)}
@@ -685,134 +825,44 @@ const Mapa: React.FC = () => {
                 </td>
               </tr>
             ))}
-            {rows.length === 0 && (
+            {pagedRows.length === 0 && (
               <tr>
-                <td colSpan={7} className="px-4 py-6 text-center text-slate-500">
-                  Nenhum registro no mapa. Preencha o fluxo acima para inserir dados.
+                <td colSpan={8} className="px-4 py-6 text-center text-slate-500">
+                  Sem registros para os filtros atuais.
                 </td>
               </tr>
             )}
           </tbody>
         </table>
-      </div>
 
-      <div className="bg-slate-800 p-6 rounded-lg border border-slate-700">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-          <h3 className="text-lg font-semibold text-white">Atualização por Base Pré-cruzada</h3>
-          <p className="text-xs text-slate-300">Tabela paginada, editável e filtrada automaticamente conforme os campos preenchidos acima.</p>
-        </div>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-4 py-3 border-t border-slate-200 bg-slate-50">
+          <div className="flex items-center gap-2 text-sm text-slate-600">
+            <span>Itens por página:</span>
+            <select
+              value={pageSize}
+              onChange={(e) => setPageSize(Number.parseInt(e.target.value, 10))}
+              className="px-2 py-1 rounded border border-slate-300 bg-white text-slate-700"
+            >
+              <option value={5}>5</option>
+              <option value={10}>10</option>
+              <option value={15}>15</option>
+              <option value={20}>20</option>
+            </select>
+          </div>
 
-        <div className="overflow-x-auto rounded-lg border border-slate-700 bg-slate-900/40">
-          <table className="w-full text-sm">
-            <thead className="bg-slate-900 text-slate-200">
-              <tr>
-                <th className="text-left px-3 py-2">Unidade</th>
-                <th className="text-left px-3 py-2">Natureza</th>
-                <th className="text-left px-3 py-2">Conhecimento</th>
-                <th className="text-left px-3 py-2">Tipo</th>
-                <th className="text-left px-3 py-2">Relevância</th>
-                <th className="text-left px-3 py-2">Grau</th>
-                <th className="text-left px-3 py-2">Ação</th>
-              </tr>
-            </thead>
-            <tbody>
-              {pagedSuggestedRows.map((row) => (
-                <tr key={row.id} className="border-t border-slate-700/70">
-                  <td className="px-3 py-2 align-top">
-                    <input
-                      list="mapa-unidades-list"
-                      value={row.unidadeSigla}
-                      onChange={(e) => updateSuggestedRow(row.id, { unidadeSigla: e.target.value })}
-                      className="w-40 px-2 py-1 rounded border border-slate-500 bg-white text-slate-700"
-                    />
-                    <div className="text-[11px] text-slate-300 mt-1">{row.unidadeNome}</div>
-                  </td>
-                  <td className="px-3 py-2 align-top">
-                    <input
-                      list="mapa-natureza-list"
-                      value={row.natureza}
-                      onChange={(e) => {
-                        const natureza = NATUREZA_OPTIONS.find((opt) => opt === e.target.value);
-                        if (natureza) updateSuggestedRow(row.id, { natureza });
-                      }}
-                      className="w-36 px-2 py-1 rounded border border-slate-500 bg-white text-slate-700"
-                    />
-                  </td>
-                  <td className="px-3 py-2 align-top">
-                    <input
-                      value={row.conhecimento}
-                      onChange={(e) => updateSuggestedRow(row.id, { conhecimento: e.target.value })}
-                      className="w-64 px-2 py-1 rounded border border-slate-500 bg-white text-slate-700"
-                    />
-                  </td>
-                  <td className="px-3 py-2 align-top">
-                    <input
-                      list="mapa-tipo-list"
-                      value={row.tipo}
-                      onChange={(e) => {
-                        const tipo = TIPO_OPTIONS.find((opt) => opt === e.target.value);
-                        if (tipo) updateSuggestedRow(row.id, { tipo });
-                      }}
-                      className="w-28 px-2 py-1 rounded border border-slate-500 bg-white text-slate-700"
-                    />
-                  </td>
-                  <td className="px-3 py-2 align-top">
-                    <input
-                      list="mapa-relevancia-list"
-                      value={row.relevanciaFaixa}
-                      onChange={(e) => {
-                        const faixa = RELEVANCIA_OPTIONS.find((opt) => opt === e.target.value);
-                        if (faixa) updateSuggestedRow(row.id, { relevanciaFaixa: faixa });
-                      }}
-                      className="w-36 px-2 py-1 rounded border border-slate-500 bg-white text-slate-700"
-                    />
-                  </td>
-                  <td className="px-3 py-2 align-top">
-                    <input
-                      list="mapa-grau-list"
-                      value={row.grauInstalado}
-                      onChange={(e) => {
-                        const grau = GRAU_OPTIONS.find((opt) => opt === e.target.value);
-                        if (grau) updateSuggestedRow(row.id, { grauInstalado: grau });
-                      }}
-                      className="w-36 px-2 py-1 rounded border border-slate-500 bg-white text-slate-700"
-                    />
-                  </td>
-                  <td className="px-3 py-2 align-top">
-                    <button
-                      onClick={() => addSuggestedToMapa(row.id)}
-                      className="px-3 py-1 rounded-md text-xs font-semibold text-white bg-orange-600 hover:bg-orange-700"
-                    >
-                      Inserir
-                    </button>
-                  </td>
-                </tr>
-              ))}
-              {pagedSuggestedRows.length === 0 && (
-                <tr>
-                  <td colSpan={7} className="px-4 py-6 text-center text-slate-300">
-                    Sem registros na base pré-cruzada para os filtros atuais.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        <div className="mt-4 flex items-center justify-between text-sm text-slate-300">
-          <span>{`Página ${suggestedPage} de ${totalPages}`}</span>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 text-sm text-slate-600">
+            <span>{`Página ${page} de ${totalPages}`}</span>
             <button
-              onClick={() => setSuggestedPage((p) => Math.max(1, p - 1))}
-              disabled={suggestedPage <= 1}
-              className="px-3 py-1 rounded border border-slate-500 disabled:opacity-50"
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page <= 1}
+              className="px-3 py-1 rounded border border-slate-300 disabled:opacity-50"
             >
               Anterior
             </button>
             <button
-              onClick={() => setSuggestedPage((p) => Math.min(totalPages, p + 1))}
-              disabled={suggestedPage >= totalPages}
-              className="px-3 py-1 rounded border border-slate-500 disabled:opacity-50"
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={page >= totalPages}
+              className="px-3 py-1 rounded border border-slate-300 disabled:opacity-50"
             >
               Próxima
             </button>
