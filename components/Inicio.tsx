@@ -17,9 +17,17 @@ const Inicio: React.FC<InicioProps> = ({ onModuleSelect }) => {
           O <span className="text-orange-400 font-serif-highlight font-medium">Portal da Gestão do Conhecimento</span> consolida as diretrizes, processos e instrumentos institucionais propostas pela Gerência Executiva de Projetos da Presidência do INPI para transformar conhecimento em capacidade organizacional, fortalecendo a <span className="text-orange-400 font-serif-highlight font-medium">aprendizagem contínua</span>, a <span className="text-orange-400 font-serif-highlight font-medium">eficiência dos serviços</span> e a geração de valor público no INPI.
         </p>
       </div>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-5 mb-8 rounded-xl border border-orange-200 bg-orange-50">
+        <div className="flex-1">
+          <p className="text-sm font-semibold text-orange-800 mb-1">Sobre o Portal</p>
+          <p className="text-sm text-orange-700">
+            O Portal da Gestão do Conhecimento foi desenvolvido pela Gerência Executiva de Projetos da Presidência do INPI e publicado no GitLab, em consonância com práticas de governança, rastreabilidade, colaboração aberta, segurança da informação e observância ao Padrão Digital de Governo, sem backend transacional de coleta ou armazenamento de dados persistentes.
+          </p>
+        </div>
+      </div>
       <div className="flex items-end justify-between gap-4">
         <div>
-          <p className="text-sm font-bold uppercase tracking-[0.16em] text-blue-700">Arquitetura do portal</p>
+          <p className="text-sm font-bold uppercase tracking-[0.16em] text-orange-700">Arquitetura do portal</p>
           <h2 className="mt-2 text-2xl font-semibold text-slate-900">Navegação por Módulos</h2>
         </div>
       </div>
