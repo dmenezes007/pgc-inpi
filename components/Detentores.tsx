@@ -169,6 +169,7 @@ const classifyNatureza = (row: Record<string, any>): NaturezaConhecimento => {
 };
 
 const Detentores: React.FC = () => {
+  const DETAIL_PAGE_SIZE = 8;
   const [rows, setRows] = useState<JoinedRow[]>([]);
   const [queryConhecimento, setQueryConhecimento] = useState('');
   const [queryServidor, setQueryServidor] = useState('');
@@ -176,6 +177,7 @@ const Detentores: React.FC = () => {
   const [pageSize, setPageSize] = useState(5);
   const [page, setPage] = useState(1);
   const [expandedServidores, setExpandedServidores] = useState<Record<string, boolean>>({});
+  const [detailVisibleRows, setDetailVisibleRows] = useState<Record<string, number>>({});
 
   useEffect(() => {
     const load = async () => {
@@ -338,7 +340,16 @@ const Detentores: React.FC = () => {
   }, [grouped, page, pageSize]);
 
   const toggleExpand = (servidor: string) => {
-    setExpandedServidores((prev) => ({ ...prev, [servidor]: !prev[servidor] }));
+    setExpandedServidores((prev) => {
+      const nextExpanded = !prev[servidor];
+      if (nextExpanded) {
+        setDetailVisibleRows((countPrev) => ({
+          ...countPrev,
+          [servidor]: countPrev[servidor] || DETAIL_PAGE_SIZE,
+        }));
+      }
+      return { ...prev, [servidor]: nextExpanded };
+    });
   };
 
   return (
@@ -385,6 +396,9 @@ const Detentores: React.FC = () => {
           <tbody>
             {pagedGroups.map((group) => {
               const expanded = !!expandedServidores[group.servidor];
+              const visibleCount = detailVisibleRows[group.servidor] || DETAIL_PAGE_SIZE;
+              const visibleItems = group.items.slice(0, visibleCount);
+              const hasMore = group.items.length > visibleCount;
               return (
                 <React.Fragment key={group.servidor}>
                   <tr
@@ -413,7 +427,7 @@ const Detentores: React.FC = () => {
                               </tr>
                             </thead>
                             <tbody>
-                              {group.items.map((row, index) => (
+                              {visibleItems.map((row, index) => (
                                 <tr key={`${group.servidor}-${index}`} className="border-t border-slate-100">
                                   <td className="px-3 py-2 text-slate-700">{row.ano || '-'}</td>
                                   <td className="px-3 py-2 text-slate-700">{row.natureza}</td>
@@ -424,6 +438,41 @@ const Detentores: React.FC = () => {
                               ))}
                             </tbody>
                           </table>
+
+                          <div className="flex items-center justify-between gap-3 px-3 py-2 border-t border-slate-200 bg-slate-50 text-xs text-slate-600">
+                            <span>{`Exibindo ${Math.min(visibleCount, group.items.length)} de ${group.items.length} registros`}</span>
+                            <div className="flex gap-2">
+                              {hasMore && (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setDetailVisibleRows((prev) => ({
+                                      ...prev,
+                                      [group.servidor]: Math.min(group.items.length, (prev[group.servidor] || DETAIL_PAGE_SIZE) + DETAIL_PAGE_SIZE),
+                                    }));
+                                  }}
+                                  className="px-2 py-1 rounded border border-slate-300 bg-white text-slate-700 hover:bg-slate-100"
+                                >
+                                  Ver mais
+                                </button>
+                              )}
+
+                              {visibleCount > DETAIL_PAGE_SIZE && (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setDetailVisibleRows((prev) => ({
+                                      ...prev,
+                                      [group.servidor]: DETAIL_PAGE_SIZE,
+                                    }));
+                                  }}
+                                  className="px-2 py-1 rounded border border-slate-300 bg-white text-slate-700 hover:bg-slate-100"
+                                >
+                                  Reduzir
+                                </button>
+                              )}
+                            </div>
+                          </div>
                         </div>
                       </td>
                     </tr>

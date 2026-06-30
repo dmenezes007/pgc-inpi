@@ -15,6 +15,14 @@ const instrumentData = [
     { name: "SISCAP (Sistema de Cadastramento de Produção)", url: "https://siscap/adm/login.php", conversao: true, retencao: true, utilizacao: true, compartilhamento: true, ensino: false, publicidade: false },
 ].sort((a, b) => a.name.localeCompare(b.name));
 
+const RESTRICTED_INSTRUMENTS = new Set([
+    'Docmost e Redmine',
+    'Intranet do INPI',
+    'MarcasDoc',
+    'Rede Institucional',
+    'SISCAP (Sistema de Cadastramento de Produção)',
+]);
+
 const categoryConfig = {
     conversao: { 
         title: "Conversão", 
@@ -98,6 +106,17 @@ const Instrumentos: React.FC = () => {
                     </thead>
                     <tbody className="bg-white/90">
                         {instrumentData.map((item, index) => (
+                            (() => {
+                                const isRestricted = RESTRICTED_INSTRUMENTS.has(item.name);
+                                const restrictedTitle = isRestricted ? 'Acesso Restrito' : undefined;
+                                const linkClasses = isRestricted
+                                    ? 'group inline-flex h-11 w-full items-center gap-2 overflow-hidden rounded-xl border border-red-300 bg-red-50 px-3 text-red-900 shadow-sm transition-colors duration-200 hover:border-red-500 hover:bg-red-100'
+                                    : 'group inline-flex h-11 w-full items-center gap-2 overflow-hidden rounded-xl border border-blue-200 bg-white px-3 text-blue-900 shadow-sm transition-colors duration-200 hover:border-blue-400 hover:bg-blue-50';
+                                const iconClasses = isRestricted
+                                    ? 'inline-flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full border border-red-300 bg-red-100 text-red-700 transition-colors duration-200 group-hover:border-red-500 group-hover:bg-red-200 group-hover:text-red-900'
+                                    : 'inline-flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full border border-blue-200 bg-blue-100/70 text-blue-700 transition-colors duration-200 group-hover:border-blue-400 group-hover:bg-blue-200/70 group-hover:text-blue-900';
+
+                                return (
                             <tr key={index} className="border-t border-blue-100 hover:bg-blue-50/80">
                                 <td className="px-4 py-2 align-middle">
                                     {item.url ? (
@@ -105,10 +124,16 @@ const Instrumentos: React.FC = () => {
                                             href={item.url}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="group inline-flex h-11 w-full items-center gap-2 overflow-hidden rounded-xl border border-blue-200 bg-white px-3 text-blue-900 shadow-sm transition-colors duration-200 hover:border-blue-400 hover:bg-blue-50"
+                                            className={linkClasses}
+                                            title={restrictedTitle}
                                         >
                                             <span className="truncate whitespace-nowrap text-sm font-semibold sm:text-base">{item.name}</span>
-                                            <span className="inline-flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full border border-blue-200 bg-blue-100/70 text-blue-700 transition-colors duration-200 group-hover:border-blue-400 group-hover:bg-blue-200/70 group-hover:text-blue-900">
+                                            {isRestricted && (
+                                                <span className="rounded-full border border-red-300 bg-red-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-red-700">
+                                                    Restrito
+                                                </span>
+                                            )}
+                                            <span className={iconClasses}>
                                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                                     <path strokeLinecap="round" strokeLinejoin="round" d="M14 3h7m0 0v7m0-7L10 14" />
                                                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 5v14h14" />
@@ -130,6 +155,8 @@ const Instrumentos: React.FC = () => {
                                     </td>
                                 ))}
                             </tr>
+                                );
+                            })()
                         ))}
                     </tbody>
                 </table>

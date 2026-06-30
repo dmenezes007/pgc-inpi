@@ -459,7 +459,7 @@ const Mapa: React.FC = () => {
         active: finalConhecimento !== '' && normalize(finalConhecimento) === normalize(label),
       }))
       .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label, 'pt-BR'))
-      .slice(0, 10);
+      .slice(0, 5);
   }, [rows, selectedUnidade, selectedNatureza, selectedNivel1, selectedNivel2, finalConhecimento, selectedTipo, selectedRelevancia, selectedGrau]);
 
   const tipoStats = useMemo(() => {
@@ -503,7 +503,7 @@ const Mapa: React.FC = () => {
     let acc = 0;
 
     return (
-      <div className="min-w-[240px] rounded-xl border border-slate-200 bg-white p-4">
+      <div className="w-[240px] shrink-0 rounded-xl border border-slate-200 bg-white p-4">
         <h4 className="text-sm font-semibold text-slate-800 mb-3 truncate" title={title}>{title}</h4>
         <div className="flex items-center justify-center mb-3">
           <svg width="120" height="120" viewBox="0 0 120 120" role="img" aria-label={title}>
@@ -868,7 +868,7 @@ const Mapa: React.FC = () => {
 
       <div className="bg-slate-800 p-6 rounded-lg border border-slate-700">
         <div className="flex items-center justify-between gap-3 mb-4">
-          <h3 className="text-lg font-semibold [color:var(--gov-blue)!important]">Painel Interativo de Filtros</h3>
+          <h3 className="text-lg font-semibold [color:var(--gov-blue)!important]">Painel Interativo</h3>
           <button
             onClick={() => {
               setSelectedNatureza('');
@@ -903,7 +903,7 @@ const Mapa: React.FC = () => {
             setCustomNivel3('');
           })}
 
-          {renderDonutFacet('Conhecimento (Top 10)', conhecimentoStats, (value) => {
+          {renderDonutFacet('Conhecimento (Top 5)', conhecimentoStats, (value) => {
             if (normalize(finalConhecimento) === normalize(value)) {
               setSelectedConhecimento('');
               setCustomNivel3('');
