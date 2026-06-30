@@ -1,6 +1,7 @@
 
 import React from 'react';
 import Inicio from './Inicio';
+import Metodologia from './MetodologiaGC';
 import Integracao from './Integracao';
 import Identidade from './Identidade';
 import Estrutura from './Estrutura';
@@ -8,6 +9,8 @@ import Gestao from './Gestao';
 import Lideranca from './Lideranca';
 import Transversalidade from './Transversalidade';
 import Tecnica from './Tecnica';
+import Mapa from './Mapa';
+import Detentores from './Detentores';
 import Planejamento from './Planejamento';
 import Autodesenvolvimento from './Autodesenvolvimento';
 import Rastreamento from './Rastreamento';
@@ -22,6 +25,7 @@ interface MainContentProps {
 
 const moduleIntroTexts: Record<string, string> = {
     'Início': 'Diretrizes, métodos e instrumentos da Gestão do Conhecimento no INPI conectam pessoas, processos e decisões estratégicas em uma visão integrada.',
+    'Metodologia': 'Abordagem metodológica aplicada ao desenvolvimento e à consolidação da Gestão do Conhecimento no INPI, com foco em evidências, melhoria contínua e governança.',
     'Integração': 'A articulação entre gestão do conhecimento, sucessão, formação, inovação e desenvolvimento de competências fortalece resultados institucionais.',
     'Identidade': 'Missão, visão, valores e objetivos estratégicos do INPI orientam as práticas de Gestão do Conhecimento com alinhamento institucional e foco em valor público.',
     'Estrutura': 'Competências regimentais e estrutura organizacional sustentam o mapeamento de conhecimentos essenciais e críticos por unidade.',
@@ -29,6 +33,8 @@ const moduleIntroTexts: Record<string, string> = {
     'Liderança': 'Conhecimentos de liderança mobilizam equipes, promovem aprendizagem contínua e consolidam uma cultura de compartilhamento do conhecimento.',
     'Transversalidade': 'Conhecimentos transversais viabilizam colaboração, integração entre áreas e atuação orientada a resultados no serviço público.',
     'Técnica': 'Conhecimentos técnicos especializados, organizados por níveis e temas, apoiam a qualificação das atividades finalísticas e de suporte do Instituto.',
+    'Mapa': 'Mapa editável de conhecimentos de apoio, essenciais e críticos, com métricas rastreáveis e persistência simples para apoiar a gestão contínua.',
+    'Detentores': 'Consulta estruturada aos detentores de conhecimento do INPI com base em capacitações e dados funcionais para apoiar alocação e sucessão.',
     'Planejamento': 'Necessidades de conhecimento convertem-se em ações de desenvolvimento com alinhamento ao planejamento institucional e à viabilidade orçamentária.',
     'Autodesenvolvimento': 'Protagonismo do servidor no desenvolvimento contínuo amplia competências estratégicas com incentivo institucional.',
     'Rastreamento': 'Levantamento e análise de conhecimentos essenciais e críticos identificam lacunas e subsidiam decisões de desenvolvimento.',
@@ -39,6 +45,7 @@ const moduleIntroTexts: Record<string, string> = {
 
 const moduleKickerTexts: Record<string, string> = {
     'Início': 'VISÃO GERAL DO PORTAL',
+    'Metodologia': 'DESENVOLVIMENTO METODOLÓGICO',
     'Integração': 'ARTICULAÇÃO INSTITUCIONAL',
     'Identidade': 'DIRECIONAMENTO ESTRATÉGICO',
     'Estrutura': 'COMPETÊNCIAS REGIMENTAIS',
@@ -46,6 +53,8 @@ const moduleKickerTexts: Record<string, string> = {
     'Liderança': 'CONHECIMENTO PARA LIDERANÇA',
     'Transversalidade': 'CONHECIMENTO TRANSVERSAL',
     'Técnica': 'CONHECIMENTO ESPECIALIZADO',
+    'Mapa': 'MÉTRICAS E REFINAMENTO',
+    'Detentores': 'CAPITAL INTELECTUAL INSTALADO',
     'Planejamento': 'PLANO DE DESENVOLVIMENTO',
     'Autodesenvolvimento': 'PROTAGONISMO DO SERVIDOR',
     'Rastreamento': 'MAPEAMENTO DE CONHECIMENTO',
@@ -72,6 +81,8 @@ const MainContent: React.FC<MainContentProps> = ({ activeModule, onModuleSelect 
         switch (activeModule) {
             case 'Início':
                 return <Inicio onModuleSelect={onModuleSelect} />;
+            case 'Metodologia':
+                return <Metodologia />;
             case 'Integração':
                 return <Integracao />;
             case 'Identidade':
@@ -86,6 +97,10 @@ const MainContent: React.FC<MainContentProps> = ({ activeModule, onModuleSelect 
                  return <Transversalidade />;
             case 'Técnica':
                 return <Tecnica />;
+            case 'Mapa':
+                return <Mapa />;
+            case 'Detentores':
+                return <Detentores />;
             case 'Planejamento':
                 return <Planejamento />;
             case 'Autodesenvolvimento':

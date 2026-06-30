@@ -26,6 +26,7 @@ interface ModuleIconProps {
 const ModuleIcon: React.FC<ModuleIconProps> = ({ moduleName, className = "h-6 w-6" }) => {
   const iconByModule: Record<string, IconDefinition> = {
     'Início': faHouse,
+    'Metodologia': faBookOpen,
     'Integração': faCircleNodes,
     'Identidade': faUser,
     'Estrutura': faBuilding,
@@ -33,6 +34,8 @@ const ModuleIcon: React.FC<ModuleIconProps> = ({ moduleName, className = "h-6 w-
     'Liderança': faUsers,
     'Transversalidade': faGlobe,
     'Técnica': faScrewdriverWrench,
+    'Mapa': faWaveSquare,
+    'Detentores': faUsers,
     'Planejamento': faListCheck,
     'Autodesenvolvimento': faFlask,
     'Rastreamento': faWaveSquare,
