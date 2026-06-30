@@ -122,6 +122,33 @@ const normalizeText = (value: string): string =>
     .toUpperCase()
     .trim();
 
+const tokenize = (value: string): string[] =>
+  normalizeText(value)
+    .split(/[^A-Z0-9]+/)
+    .filter((token) => token.length > 2);
+
+const bestAreaMatch = (source: string, options: string[]): string | '' => {
+  const sourceTokens = tokenize(source);
+  if (sourceTokens.length === 0) return '';
+
+  let best = '';
+  let bestScore = -1;
+
+  options.forEach((option) => {
+    const optionTokens = tokenize(option);
+    const tokenHits = optionTokens.filter((token) => sourceTokens.includes(token)).length;
+    const directBoost = normalizeText(source).includes(normalizeText(option)) ? 2 : 0;
+    const score = tokenHits + directBoost;
+
+    if (score > bestScore) {
+      best = option;
+      bestScore = score;
+    }
+  });
+
+  return bestScore > 0 ? best : '';
+};
+
 const classifyNatureza = (row: Record<string, any>): NaturezaConhecimento => {
   const eventText = normalizeText(getCell(row, ['evento', 'curso', 'acao', 'capacita']));
   const lineText = normalizeText(getCell(row, ['linha de capacitacao', 'programa', 'uorg']));
@@ -170,11 +197,15 @@ const Detentores: React.FC = () => {
         });
 
         const tecnicaSet = new Set<string>();
+        const tecnicaAreasSet = new Set<string>();
         tecnicaParsed.data.forEach((row) => {
           if (row.Nivel1) tecnicaSet.add(normalizeKey(row.Nivel1));
           if (row.Nivel2) tecnicaSet.add(normalizeKey(row.Nivel2));
           if (row.Nivel3) tecnicaSet.add(normalizeKey(row.Nivel3));
+          if (row.Nivel3) tecnicaAreasSet.add(normalize(row.Nivel3));
         });
+
+        const tecnicaAreas = Array.from(tecnicaAreasSet).sort((a, b) => a.localeCompare(b, 'pt-BR'));
 
         const liderancaSet = new Set(LIDERANCA_OPTIONS.map(normalizeKey));
         const transversalSet = new Set(TRANSVERSAL_OPTIONS.map(normalizeKey));
@@ -200,6 +231,7 @@ const Detentores: React.FC = () => {
           const knowledgeKey = normalizeKey(c.conhecimento);
           const capacitacaoKey = normalizeKey(c.capacitacao);
           const combinedText = normalizeText([c.conhecimento, c.capacitacao, c.linhaCapacitacao, c.programa, c.uorg].filter(Boolean).join(' '));
+          const sourceText = [c.conhecimento, c.capacitacao, c.linhaCapacitacao, c.programa, c.uorg].filter(Boolean).join(' ');
           let natureza = classifyNatureza({
             conhecimento: combinedText,
             evento: capacitacaoKey,
@@ -216,9 +248,26 @@ const Detentores: React.FC = () => {
             natureza = 'Técnico';
           }
 
+          let conhecimentoMapeado = c.conhecimento || c.capacitacao;
+
+          if (natureza === 'Liderança') {
+            conhecimentoMapeado =
+              bestAreaMatch(sourceText, LIDERANCA_OPTIONS) ||
+              LIDERANCA_OPTIONS[0];
+          } else if (natureza === 'Transversal') {
+            conhecimentoMapeado =
+              bestAreaMatch(sourceText, TRANSVERSAL_OPTIONS) ||
+              TRANSVERSAL_OPTIONS[0];
+          } else {
+            conhecimentoMapeado =
+              bestAreaMatch(sourceText, tecnicaAreas) ||
+              tecnicaAreas[0] ||
+              conhecimentoMapeado;
+          }
+
           return {
             servidor: c.servidor,
-            conhecimento: c.conhecimento || c.capacitacao,
+            conhecimento: conhecimentoMapeado,
             capacitacao: c.capacitacao.toUpperCase(),
             ano: detectAno(c.ano, [c.capacitacao, c.conhecimento, c.programa].filter(Boolean).join(' ')),
             cargaHoraria: c.cargaHoraria || '-',
@@ -294,30 +343,32 @@ const Detentores: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <input
-          value={queryConhecimento}
-          onChange={(e) => setQueryConhecimento(e.target.value)}
-          placeholder="Buscar por conhecimento/capacitação"
-          className="px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-700"
-        />
-        <input
-          value={queryServidor}
-          onChange={(e) => setQueryServidor(e.target.value)}
-          placeholder="Buscar por servidor"
-          className="px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-700"
-        />
-        <select
-          value={queryNatureza}
-          onChange={(e) => setQueryNatureza(e.target.value as 'Todos' | NaturezaConhecimento)}
-          className="px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-700"
-        >
-          <option value="Todos">Filtrar por natureza do conhecimento</option>
-          <option value="Liderança">Liderança</option>
-          <option value="Transversal">Transversal</option>
-          <option value="Técnico">Técnico</option>
-          <option value="Não classificado">Não classificado</option>
-        </select>
+      <div className="detentores-filters-container rounded-xl border border-slate-200 bg-slate-50/70 p-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <input
+            value={queryConhecimento}
+            onChange={(e) => setQueryConhecimento(e.target.value)}
+            placeholder="Buscar por conhecimento/capacitação"
+            className="px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-700"
+          />
+          <input
+            value={queryServidor}
+            onChange={(e) => setQueryServidor(e.target.value)}
+            placeholder="Buscar por servidor"
+            className="px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-700"
+          />
+          <select
+            value={queryNatureza}
+            onChange={(e) => setQueryNatureza(e.target.value as 'Todos' | NaturezaConhecimento)}
+            className="px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-700"
+          >
+            <option value="Todos">Filtrar por natureza do conhecimento</option>
+            <option value="Liderança">Liderança</option>
+            <option value="Transversal">Transversal</option>
+            <option value="Técnico">Técnico</option>
+            <option value="Não classificado">Não classificado</option>
+          </select>
+        </div>
       </div>
 
       <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
@@ -326,9 +377,9 @@ const Detentores: React.FC = () => {
             <tr>
               <th className="text-left px-4 py-3">Servidor</th>
               <th className="text-left px-4 py-3">Qtd. Registros</th>
-              <th className="text-left px-4 py-3">Naturezas</th>
+              <th className="text-left px-4 py-3">Desenolvimento</th>
               <th className="text-left px-4 py-3">Último Ano</th>
-              <th className="text-left px-4 py-3">Detalhes</th>
+              <th className="text-left px-4 py-3"><span className="sr-only">Detalhes</span></th>
             </tr>
           </thead>
           <tbody>
@@ -344,7 +395,7 @@ const Detentores: React.FC = () => {
                     <td className="px-4 py-3 text-slate-700">{group.quantidade}</td>
                     <td className="px-4 py-3 text-slate-700">{group.naturezas || '-'}</td>
                     <td className="px-4 py-3 text-slate-700">{group.ultimoAno}</td>
-                    <td className="px-4 py-3 text-slate-700">{expanded ? 'Ocultar' : 'Expandir'}</td>
+                    <td className="px-4 py-3 text-lg text-slate-700" aria-label={expanded ? 'Ocultar' : 'Expandir'}>{expanded ? '▴' : '▾'}</td>
                   </tr>
 
                   {expanded && (

@@ -76,6 +76,8 @@ const TRANSVERSAL_OPTIONS = [
   'Visão Sistêmica',
 ];
 
+const DONUT_COLORS = ['#1351b4', '#0c326f', '#2670e8', '#00bde3', '#1d4ed8', '#3b82f6', '#60a5fa', '#93c5fd', '#a5f3fc', '#bfdbfe'];
+
 const customStyles = {
   control: (provided: any, state: { isFocused: boolean; isDisabled: boolean }) => ({
     ...provided,
@@ -490,19 +492,53 @@ const Mapa: React.FC = () => {
     }));
   }, [rows, selectedUnidade, selectedNatureza, selectedNivel1, selectedNivel2, finalConhecimento, selectedTipo, selectedRelevancia, selectedGrau]);
 
-  const renderFacet = (
+  const renderDonutFacet = (
     title: string,
     items: Array<{ label: string; value: string; count: number; active: boolean }>,
     onSelect: (value: string) => void
   ) => {
-    const max = Math.max(1, ...items.map((item) => item.count));
+    const total = items.reduce((acc, item) => acc + item.count, 0);
+    const radius = 44;
+    const circumference = 2 * Math.PI * radius;
+    let acc = 0;
+
     return (
-      <div className="rounded-xl border border-slate-200 bg-white p-4">
-        <h4 className="text-sm font-semibold text-slate-800 mb-3">{title}</h4>
-        <div className="space-y-2">
+      <div className="min-w-[240px] rounded-xl border border-slate-200 bg-white p-4">
+        <h4 className="text-sm font-semibold text-slate-800 mb-3 truncate" title={title}>{title}</h4>
+        <div className="flex items-center justify-center mb-3">
+          <svg width="120" height="120" viewBox="0 0 120 120" role="img" aria-label={title}>
+            <circle cx="60" cy="60" r={radius} stroke="#e2e8f0" strokeWidth="14" fill="none" />
+            {items.map((item, index) => {
+              const part = total > 0 ? item.count / total : 0;
+              const len = Math.max(0, part * circumference);
+              const offset = circumference - acc * circumference;
+              acc += part;
+              return (
+                <circle
+                  key={`${title}-${item.value}`}
+                  cx="60"
+                  cy="60"
+                  r={radius}
+                  fill="none"
+                  stroke={DONUT_COLORS[index % DONUT_COLORS.length]}
+                  strokeWidth={item.active ? 16 : 14}
+                  strokeLinecap="round"
+                  strokeDasharray={`${len} ${circumference - len}`}
+                  strokeDashoffset={offset}
+                  transform="rotate(-90 60 60)"
+                  className="cursor-pointer transition-all"
+                  onClick={() => onSelect(item.value)}
+                />
+              );
+            })}
+            <text x="60" y="58" textAnchor="middle" className="fill-slate-700 text-[10px] font-semibold">Total</text>
+            <text x="60" y="74" textAnchor="middle" className="fill-slate-900 text-[14px] font-bold">{total}</text>
+          </svg>
+        </div>
+
+        <div className="space-y-2 max-h-52 overflow-y-auto pr-1">
           {items.length === 0 && <p className="text-xs text-slate-500">Sem dados para o recorte atual.</p>}
-          {items.map((item) => {
-            const width = `${Math.max(8, Math.round((item.count / max) * 100))}%`;
+          {items.map((item, index) => {
             return (
               <button
                 key={item.value}
@@ -511,11 +547,14 @@ const Mapa: React.FC = () => {
                 title={item.label}
               >
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-xs font-medium text-slate-700 truncate">{item.label}</span>
+                  <span className="inline-flex items-center gap-2 min-w-0">
+                    <span
+                      className="inline-block h-2.5 w-2.5 rounded-full shrink-0"
+                      style={{ backgroundColor: DONUT_COLORS[index % DONUT_COLORS.length] }}
+                    />
+                    <span className="text-xs font-medium text-slate-700 truncate">{item.label}</span>
+                  </span>
                   <span className="text-xs font-semibold text-slate-900">{item.count}</span>
-                </div>
-                <div className="mt-2 h-1.5 rounded-full bg-slate-100">
-                  <div className="h-1.5 rounded-full bg-[var(--gov-blue)]" style={{ width }} />
                 </div>
               </button>
             );
@@ -609,7 +648,8 @@ const Mapa: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="bg-slate-800 p-6 rounded-lg border border-slate-700">
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        <div className="mapa-filters-container rounded-xl border border-slate-200/70 bg-white/70 p-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           <div className={fieldClass(true, selectedUnidade !== '')}>
             <label className="text-sm font-medium text-slate-900">1. Selecione a Unidade</label>
             <Select
@@ -787,6 +827,7 @@ const Mapa: React.FC = () => {
               menuPortalTarget={document.body}
             />
           </div>
+          </div>
         </div>
 
         <div className="mt-6 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
@@ -827,7 +868,7 @@ const Mapa: React.FC = () => {
 
       <div className="bg-slate-800 p-6 rounded-lg border border-slate-700">
         <div className="flex items-center justify-between gap-3 mb-4">
-          <h3 className="text-lg font-semibold !text-white">Painel Interativo de Filtros</h3>
+          <h3 className="text-lg font-semibold [color:var(--gov-blue)!important]">Painel Interativo de Filtros</h3>
           <button
             onClick={() => {
               setSelectedNatureza('');
@@ -846,11 +887,11 @@ const Mapa: React.FC = () => {
         </div>
 
         <p className="text-sm text-slate-100 mb-4">
-          Clique nas barras para filtrar a tabela e sincronizar os campos de Natureza, Conhecimento, Tipo, Relevância e Grau Instalado.
+          Clique nos gráficos para aplicar filtros e sincronizar os campos.
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {renderFacet('Natureza', naturezaStats, (value) => {
+        <div className="flex flex-nowrap gap-4 overflow-x-auto pb-1">
+          {renderDonutFacet('Natureza', naturezaStats, (value) => {
             const parsed = NATUREZA_OPTIONS.find((item) => item === value);
             const next = parsed && selectedNatureza === parsed ? '' : (parsed || '');
             setSelectedNatureza(next as NaturezaConhecimento | '');
@@ -862,7 +903,7 @@ const Mapa: React.FC = () => {
             setCustomNivel3('');
           })}
 
-          {renderFacet('Conhecimento (Top 10)', conhecimentoStats, (value) => {
+          {renderDonutFacet('Conhecimento (Top 10)', conhecimentoStats, (value) => {
             if (normalize(finalConhecimento) === normalize(value)) {
               setSelectedConhecimento('');
               setCustomNivel3('');
@@ -872,19 +913,19 @@ const Mapa: React.FC = () => {
             setCustomNivel3('');
           })}
 
-          {renderFacet('Tipo', tipoStats, (value) => {
+          {renderDonutFacet('Tipo', tipoStats, (value) => {
             const parsed = TIPO_OPTIONS.find((item) => item === value);
             const next = parsed && selectedTipo === parsed ? '' : (parsed || '');
             setSelectedTipo(next as TipoConhecimento | '');
           })}
 
-          {renderFacet('Relevância', relevanciaStats, (value) => {
+          {renderDonutFacet('Relevância', relevanciaStats, (value) => {
             const parsed = RELEVANCIA_OPTIONS.find((item) => item === value);
             const next = parsed && selectedRelevancia === parsed ? '' : (parsed || '');
             setSelectedRelevancia(next as RelevanciaFaixa | '');
           })}
 
-          {renderFacet('Grau Instalado', grauStats, (value) => {
+          {renderDonutFacet('Grau Instalado', grauStats, (value) => {
             const parsed = GRAU_OPTIONS.find((item) => item === value);
             const next = parsed && selectedGrau === parsed ? '' : (parsed || '');
             setSelectedGrau(next as GrauInstalado | '');

@@ -161,7 +161,7 @@ const MainContent: React.FC<MainContentProps> = ({ activeModule, onModuleSelect 
                 {activeModule === 'Mapa' && (
                     <div className="bg-slate-800 p-6 rounded-lg shadow-lg mb-10 border border-slate-700">
                         <p className="text-base leading-relaxed !text-[#334155] mb-5">
-                            Preencha o Mapa de Conhecimentos em fluxo único por unidade para registrar prioridades,
+                            O Mapa de Conhecimentos é preenchido em fluxo único por unidade para registrar prioridades,
                             lacunas e grau de domínio com rastreabilidade gerencial.
                         </p>
 
