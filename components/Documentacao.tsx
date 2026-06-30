@@ -10,7 +10,7 @@ const Documentacao: React.FC = () => {
             <div className="module-intro">
                 <div className="module-kicker">REPOSITÓRIO INSTITUCIONAL</div>
                 <p className="module-lead">
-                    Registro institucional dos resultados do <span className="font-semibold text-slate-900">Design Sprint Institucional</span>, com disponibilização das minutas elaboradas para apreciação técnica e recebimento de contribuições complementares.
+                    Registro institucional dos documentos de referência ou de suporte ao desenvolvimento do processo de gestão do conhecimento no âmbito institucional.
                 </p>
             </div>
 
@@ -26,25 +26,25 @@ const Documentacao: React.FC = () => {
                 </div>
 
                 <div className="space-y-4">
-                    <a href="https://dmenezes007.github.io/pgi-inpi/files/docs/Minuta%20da%20Pol%C3%ADtica%20de%20Gest%C3%A3o%20da%20Inova%C3%A7%C3%A3o%20do%20INPI.docx" target="_blank" rel="noopener noreferrer" className="group flex items-center rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md">
+                    <a href="https://dmenezes007.github.io/pgi-inpi/files/docs/Minuta%20da%20Pol%C3%ADtica%20de%20Direitos%20Autorais%20da%20Academia.docx" target="_blank" rel="noopener noreferrer" className="group flex items-center rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md">
                         <DocIcon />
                         <div>
-                            <span className="block text-sm font-semibold text-slate-900 group-hover:text-blue-700">Minuta: Política de Gestão da Inovação do INPI</span>
-                            <span className="mt-1 block text-sm text-slate-500">Documento base para diretrizes, princípios e governança da inovação.</span>
+                            <span className="block text-sm font-semibold text-slate-900 group-hover:text-blue-700">Minuta da Política de Direitos Autorais da Academia</span>
+                            <span className="mt-1 block text-sm text-slate-500">Documento de referência para proteção, uso e compartilhamento de conteúdos acadêmicos.</span>
                         </div>
                     </a>
-                    <a href="https://dmenezes007.github.io/pgi-inpi/files/docs/Minuta%20da%20Pol%C3%ADtica%20de%20Inova%C3%A7%C3%A3o%20da%20Academia%20do%20INPI.docx" target="_blank" rel="noopener noreferrer" className="group flex items-center rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md">
+                    <a href="https://dmenezes007.github.io/pgi-inpi/files/docs/Minuta%20da%20Pol%C3%ADtica%20Editorial%20da%20Academia.docx" target="_blank" rel="noopener noreferrer" className="group flex items-center rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md">
                         <DocIcon />
                         <div>
-                            <span className="block text-sm font-semibold text-slate-900 group-hover:text-blue-700">Minuta: Política de Inovação da Academia do INPI</span>
-                            <span className="mt-1 block text-sm text-slate-500">Diretrizes para articulação acadêmica, capacitação e inovação aplicada.</span>
+                            <span className="block text-sm font-semibold text-slate-900 group-hover:text-blue-700">Minuta da Política Editorial da Academia</span>
+                            <span className="mt-1 block text-sm text-slate-500">Documento de referência para critérios editoriais, qualidade e curadoria institucional.</span>
                         </div>
                     </a>
-                    <a href="https://dmenezes007.github.io/pgi-inpi/files/docs/Minuta%20da%20Pol%C3%ADtica%20de%20Relacionamento%20da%20Academia%20do%20INPI%20com%20Funda%C3%A7%C3%B5es%20de%20Apoio.docx" target="_blank" rel="noopener noreferrer" className="group flex items-center rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md">
+                    <a href="https://dmenezes007.github.io/pgi-inpi/files/docs/Minuta%20do%20Regulamento%20da%20Revista%20Interfaces%20da%20PI.docx" target="_blank" rel="noopener noreferrer" className="group flex items-center rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md">
                         <DocIcon />
                         <div>
-                            <span className="block text-sm font-semibold text-slate-900 group-hover:text-blue-700">Minuta: Política de Relacionamento da Academia do INPI com Fundações de Apoio</span>
-                            <span className="mt-1 block text-sm text-slate-500">Regras de relacionamento institucional e apoio à execução das iniciativas.</span>
+                            <span className="block text-sm font-semibold text-slate-900 group-hover:text-blue-700">Minuta do Regulamento da Revista Interfaces da PI</span>
+                            <span className="mt-1 block text-sm text-slate-500">Documento de referência para governança editorial e publicação científica.</span>
                         </div>
                     </a>
                 </div>

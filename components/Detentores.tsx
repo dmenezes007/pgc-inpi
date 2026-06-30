@@ -9,15 +9,20 @@ type NaturezaConhecimento = 'Liderança' | 'Transversal' | 'Técnico' | 'Não cl
 interface CapacitacaoRow {
   servidor: string;
   conhecimento: string;
-  curso: string;
+  capacitacao: string;
   ano: string;
+  cargaHoraria: string;
+  linhaCapacitacao: string;
+  programa: string;
+  uorg: string;
 }
 
 interface JoinedRow {
   servidor: string;
   conhecimento: string;
-  curso: string;
+  capacitacao: string;
   ano: string;
+  cargaHoraria: string;
   natureza: NaturezaConhecimento;
 }
 
@@ -49,6 +54,48 @@ const TRANSVERSAL_OPTIONS = [
   'Visão Sistêmica',
 ];
 
+const LIDERANCA_KEYWORDS = [
+  'LIDERAN',
+  'GESTAO POR OBJETIVOS',
+  'GESTAO POR OBJETIVOS/RESULTADOS',
+  'GESTAO DE EQUIPES',
+  'MOTIVA',
+  'LIDERANCA E MOTIVACAO',
+  'DESENVOLVIMENTO DE EQUIPES',
+  'MELHORIA CONTINUA',
+  'QUALIDADE TOTAL',
+  'GESTAO',
+];
+
+const TRANSVERSAL_KEYWORDS = [
+  'COMUNICAC',
+  'TRABALHO EM EQUIPE',
+  'VISAO SISTEMICA',
+  'RESULTADOS PARA OS CIDADAOS',
+  'ORIENTACAO POR VALORES ETICOS',
+  'MENTALIDADE DIGITAL',
+  'RESOLUCAO DE PROBLEMAS',
+  'COLABORAC',
+  'INSTRU',
+  'FACILITA',
+];
+
+const TECNICA_KEYWORDS = [
+  'TECNICA',
+  'TECNOLOG',
+  'PROPRIEDADE INTELECTUAL',
+  'MARCAS',
+  'PATENTE',
+  'DESENHO INDUSTRIAL',
+  'NOME DE DOMINIO',
+  'ENGENHARIA',
+  'AVALIAC',
+  'PERIC',
+  'DIREITO AUTORAL',
+  'PUBLICAC',
+  'REVISTA',
+];
+
 const normalize = (value: unknown): string => String(value ?? '').trim();
 const normalizeKey = (value: unknown): string => normalize(value).toLowerCase();
 
@@ -66,6 +113,32 @@ const detectAno = (anoValue: string, cursoValue: string): string => {
   if (anoValue) return anoValue;
   const match = cursoValue.match(/(19|20)\d{2}/);
   return match ? match[0] : '-';
+};
+
+const normalizeText = (value: string): string =>
+  value
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .toUpperCase()
+    .trim();
+
+const classifyNatureza = (row: Record<string, any>): NaturezaConhecimento => {
+  const eventText = normalizeText(getCell(row, ['evento', 'curso', 'acao', 'capacita']));
+  const lineText = normalizeText(getCell(row, ['linha de capacitacao', 'programa', 'uorg']));
+
+  if (LIDERANCA_KEYWORDS.some((keyword) => eventText.includes(keyword) || lineText.includes(keyword))) {
+    return 'Liderança';
+  }
+
+  if (TRANSVERSAL_KEYWORDS.some((keyword) => eventText.includes(keyword) || lineText.includes(keyword))) {
+    return 'Transversal';
+  }
+
+  if (TECNICA_KEYWORDS.some((keyword) => eventText.includes(keyword) || lineText.includes(keyword))) {
+    return 'Técnico';
+  }
+
+  return 'Técnico';
 };
 
 const Detentores: React.FC = () => {
@@ -110,28 +183,41 @@ const Detentores: React.FC = () => {
         .map((row) => ({
           servidor: getCell(row, ['servidor', 'nome']),
           conhecimento: getCell(row, ['conhecimento', 'tema', 'assunto', 'capacita']),
-          curso: getCell(row, ['curso', 'acao', 'capacita']),
+          capacitacao: getCell(row, ['evento']),
           ano: getCell(row, ['ano', 'year']),
+          cargaHoraria: getCell(row, ['carga horaria', 'carga']),
+          linhaCapacitacao: getCell(row, ['linha de capacitacao']),
+          programa: getCell(row, ['programa']),
+          uorg: getCell(row, ['uorg']),
         }))
-        .filter((r) => r.servidor && (r.conhecimento || r.curso));
+        .filter((r) => r.servidor && (r.conhecimento || r.capacitacao));
 
       const joined: JoinedRow[] = capacitacoes.map((c) => {
         const knowledgeKey = normalizeKey(c.conhecimento);
-        let natureza: NaturezaConhecimento = 'Não classificado';
+        const capacitacaoKey = normalizeKey(c.capacitacao);
+        const combinedText = normalizeText([c.conhecimento, c.capacitacao, c.linhaCapacitacao, c.programa, c.uorg].filter(Boolean).join(' '));
+        let natureza = classifyNatureza({
+          conhecimento: combinedText,
+          evento: capacitacaoKey,
+          'linha de capacitacao': c.linhaCapacitacao,
+          programa: c.programa,
+          uorg: c.uorg,
+        });
 
-        if (liderancaSet.has(knowledgeKey)) {
+        if (liderancaSet.has(knowledgeKey) || liderancaSet.has(capacitacaoKey)) {
           natureza = 'Liderança';
-        } else if (transversalSet.has(knowledgeKey)) {
+        } else if (transversalSet.has(knowledgeKey) || transversalSet.has(capacitacaoKey)) {
           natureza = 'Transversal';
-        } else if (tecnicaSet.has(knowledgeKey)) {
+        } else if (tecnicaSet.has(knowledgeKey) || tecnicaSet.has(capacitacaoKey)) {
           natureza = 'Técnico';
         }
 
         return {
           servidor: c.servidor,
-          conhecimento: c.conhecimento,
-          curso: c.curso.toUpperCase(),
+          conhecimento: c.conhecimento || c.capacitacao,
+          capacitacao: c.capacitacao.toUpperCase(),
           ano: detectAno(c.ano, c.curso),
+          cargaHoraria: c.cargaHoraria || '-',
           natureza,
         };
       });
@@ -148,7 +234,7 @@ const Detentores: React.FC = () => {
         const byConhecimento =
           !queryConhecimento ||
           r.conhecimento.toLowerCase().includes(queryConhecimento.toLowerCase()) ||
-          r.curso.toLowerCase().includes(queryConhecimento.toLowerCase());
+          r.capacitacao.toLowerCase().includes(queryConhecimento.toLowerCase());
 
         const byServidor = !queryServidor || r.servidor.toLowerCase().includes(queryServidor.toLowerCase());
         const byNatureza = queryNatureza === 'Todos' || r.natureza === queryNatureza;
@@ -195,6 +281,7 @@ const Detentores: React.FC = () => {
               <th className="text-left px-4 py-3">Natureza do Conhecimento</th>
               <th className="text-left px-4 py-3">Conhecimento</th>
               <th className="text-left px-4 py-3">Capacitação</th>
+              <th className="text-left px-4 py-3">Carga Horária</th>
             </tr>
           </thead>
           <tbody>
@@ -204,7 +291,8 @@ const Detentores: React.FC = () => {
                 <td className="px-4 py-3 text-slate-700">{row.ano || '-'}</td>
                 <td className="px-4 py-3 text-slate-700">{row.natureza}</td>
                 <td className="px-4 py-3 text-slate-700">{row.conhecimento || '-'}</td>
-                <td className="px-4 py-3 text-slate-700">{row.curso || '-'}</td>
+                <td className="px-4 py-3 text-slate-700">{row.capacitacao || '-'}</td>
+                <td className="px-4 py-3 text-slate-700">{row.cargaHoraria || '-'}</td>
               </tr>
             ))}
           </tbody>
