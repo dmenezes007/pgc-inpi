@@ -20,6 +20,7 @@ interface CapacitacaoRow {
 
 interface JoinedRow {
   servidor: string;
+  unidade: string;
   conhecimento: string;
   capacitacao: string;
   ano: string;
@@ -108,7 +109,12 @@ const TECNICA_KEYWORDS = [
 ];
 
 const normalize = (value: unknown): string => String(value ?? '').trim();
-const normalizeKey = (value: unknown): string => normalize(value).toLowerCase();
+const normalizeKey = (value: unknown): string =>
+  String(value ?? '')
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .trim()
+    .toUpperCase();
 
 const getCell = (obj: Record<string, any>, candidates: string[]): string => {
   for (const key of Object.keys(obj)) {
@@ -293,8 +299,21 @@ const Detentores: React.FC = () => {
         const transversalSet = new Set(TRANSVERSAL_OPTIONS.map(normalizeKey));
 
         const wb = XLSX.read(buffer, { type: 'array' });
-        const capacitacoesSheet = wb.Sheets[wb.SheetNames[0]];
+        const capacitacoesSheet = wb.Sheets['BASE CETEC'] || wb.Sheets[wb.SheetNames[0]];
+        const pessoalSheet = wb.Sheets['ESTAT.PESSOAL 11-25'] || wb.Sheets[wb.SheetNames[1]];
         const capRaw = XLSX.utils.sheet_to_json<Record<string, any>>(capacitacoesSheet, { defval: '' });
+        const pessoalRaw = XLSX.utils.sheet_to_json<Record<string, any>>(pessoalSheet, { defval: '' });
+
+        const unidadeByServidor = new Map<string, string>();
+        pessoalRaw.forEach((row) => {
+          const servidor = getCell(row, ['nome servidor']);
+          const unidade = getCell(row, ['unidade']);
+          if (!servidor || !unidade) return;
+          const key = normalizeKey(servidor);
+          if (!unidadeByServidor.has(key)) {
+            unidadeByServidor.set(key, unidade);
+          }
+        });
 
         const capacitacoes: CapacitacaoRow[] = capRaw
           .map((row) => ({
@@ -314,6 +333,7 @@ const Detentores: React.FC = () => {
           const capacitacaoKey = normalizeKey(c.capacitacao);
           const combinedText = normalizeText([c.conhecimento, c.capacitacao, c.linhaCapacitacao, c.programa, c.uorg].filter(Boolean).join(' '));
           const sourceText = [c.conhecimento, c.capacitacao, c.linhaCapacitacao, c.programa, c.uorg].filter(Boolean).join(' ');
+          const unidade = unidadeByServidor.get(normalizeKey(c.servidor)) || '-';
           let natureza = classifyNatureza({
             conhecimento: combinedText,
             evento: capacitacaoKey,
@@ -359,6 +379,7 @@ const Detentores: React.FC = () => {
 
           return {
             servidor: c.servidor,
+            unidade,
             conhecimento: conhecimentoMapeado,
             capacitacao: c.capacitacao.toUpperCase(),
             ano: detectAno(c.ano, [c.capacitacao, c.conhecimento, c.programa].filter(Boolean).join(' ')),
@@ -425,6 +446,7 @@ const Detentores: React.FC = () => {
     return Array.from(groups.entries())
       .map(([servidor, items]) => {
         const naturezas = Array.from(new Set(items.map((item) => item.natureza))).join(', ');
+        const unidades = Array.from(new Set(items.map((item) => item.unidade).filter(Boolean))).join(', ');
         const latestAno = items
           .map((item) => Number.parseInt(item.ano, 10))
           .filter((value) => Number.isFinite(value))
@@ -432,6 +454,7 @@ const Detentores: React.FC = () => {
         return {
           servidor,
           items,
+          unidade: unidades || '-',
           quantidade: items.length,
           naturezas,
           ultimoAno: Number.isFinite(latestAno) ? String(latestAno) : '-',
@@ -529,6 +552,7 @@ const Detentores: React.FC = () => {
           <thead className="bg-slate-50 text-slate-700">
             <tr>
               <th className="text-left px-4 py-3">Servidor</th>
+              <th className="text-left px-4 py-3">Unidade</th>
               <th className="text-left px-4 py-3">Qtd. Registros</th>
               <th className="text-left px-4 py-3">Desenolvimento</th>
               <th className="text-left px-4 py-3">Último Ano</th>
@@ -548,6 +572,7 @@ const Detentores: React.FC = () => {
                     className="border-t border-slate-100 cursor-pointer hover:bg-slate-50"
                   >
                     <td className="px-4 py-3 font-semibold text-slate-800">{group.servidor}</td>
+                    <td className="px-4 py-3 text-slate-700">{group.unidade}</td>
                     <td className="px-4 py-3 text-slate-700">{group.quantidade}</td>
                     <td className="px-4 py-3 text-slate-700">{group.naturezas || '-'}</td>
                     <td className="px-4 py-3 text-slate-700">{group.ultimoAno}</td>
@@ -627,7 +652,7 @@ const Detentores: React.FC = () => {
 
             {pagedGroups.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-6 text-center text-slate-500">
+                <td colSpan={6} className="px-4 py-6 text-center text-slate-500">
                   Sem registros para os filtros atuais.
                 </td>
               </tr>

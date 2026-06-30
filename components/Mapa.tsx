@@ -20,11 +20,13 @@ interface TecnicaRow {
 interface EstruturaRow {
   Unidade: string;
   Sigla: string;
+  Competencia: string;
 }
 
 interface UnidadeOption {
   sigla: string;
   nome: string;
+  competencia: string;
 }
 
 interface MapaRow {
@@ -150,7 +152,89 @@ const parseCsvFromUrl = <T,>(url: string): Promise<T[]> => {
 };
 
 const normalize = (value: string): string => value.trim().toLowerCase();
+const normalizeText = (value: string): string =>
+  value
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .toUpperCase()
+    .trim();
 const toOption = (value: string): SelectOption => ({ value, label: value });
+
+const tokenize = (value: string): string[] =>
+  normalizeText(value)
+    .split(/[^A-Z0-9]+/)
+    .filter((token) => token.length > 2);
+
+const bestAreaMatch = (source: string, options: string[]): string | '' => {
+  const sourceTokens = tokenize(source);
+  if (sourceTokens.length === 0) return '';
+
+  let best = '';
+  let bestScore = -1;
+
+  options.forEach((option) => {
+    const optionTokens = tokenize(option);
+    const tokenHits = optionTokens.filter((token) => sourceTokens.includes(token)).length;
+    const directBoost = normalizeText(source).includes(normalizeText(option)) ? 2 : 0;
+    const score = tokenHits + directBoost;
+
+    if (score > bestScore) {
+      best = option;
+      bestScore = score;
+    }
+  });
+
+  return bestScore > 1 ? best : '';
+};
+
+const TECHNICAL_TOPIC_HINTS = [
+  {
+    keywords: ['COMUN', 'IMAGEM', 'EVENT', 'RELA', 'REDA', 'DOC'],
+    hints: ['Comunicação', 'Comunicação Estratégica', 'Comunicação Visual', 'Comunicação com Partes Interessadas', 'Técnicas de Redação', 'Gestão da Informação e Documentação'],
+  },
+  {
+    keywords: ['JUR', 'LEG', 'CONTRAT', 'LICIT', 'NORM', 'PARECER', 'DIREITO'],
+    hints: ['Regime Jurídico dos Servidores Federais', 'Legislação de Pessoal', 'Legislação Previdenciária', 'Redação de Atos Normativos', 'Redação de Pareceres', 'Linguagem Jurídica e Propriedade Industrial'],
+  },
+  {
+    keywords: ['PESSO', 'RECURSOS HUMAN', 'CAPACIT', 'CARREIRA', 'SAUDE', 'CLIMA', 'CULTURA', 'DESENVOLV'],
+    hints: ['Gestão de Pessoas', 'Gestão do Conhecimento', 'Gestão por Resultados', 'Engajamento de Pessoas e Equipes', 'Autoconhecimento e Desenvolvimento Pessoal'],
+  },
+  {
+    keywords: ['DADOS', 'SISTEM', 'TECNO', 'INFORMA', 'REDE', 'CLOUD', 'SEGURAN', 'SOFTWARE', 'INFRA'],
+    hints: ['Tecnologia Digital e Governança de Dados', 'Arquitetura Cloud com Referência nas Tecnologias AWS', 'Sistemas Internos', 'Segurança da Informação', 'Visualização de Dados', 'Tratamento de Dados'],
+  },
+  {
+    keywords: ['INOVA', 'PATENT', 'MARCA', 'PROPRIEDADE INDUSTRIAL', 'TRANSFER', 'PESQUISA', 'DESENVOLV'],
+    hints: ['Gestão da Inovação', 'Transferência de Tecnologia', 'Direito de Marcas', 'Marcas', 'Patentes', 'Desenho Industrial'],
+  },
+];
+
+const pickTechnicalKnowledge = (competencia: string, options: string[]): string => {
+  const exact = bestAreaMatch(competencia, options);
+  if (exact) return exact;
+
+  const source = normalizeText(competencia);
+  for (const topic of TECHNICAL_TOPIC_HINTS) {
+    if (topic.keywords.some((keyword) => source.includes(keyword))) {
+      const topicMatch = bestAreaMatch(competencia, topic.hints) || topic.hints.find((hint) => options.includes(hint));
+      if (topicMatch) return topicMatch;
+    }
+  }
+
+  return options[0] || '';
+};
+
+const pickByNature = (competencia: string, nature: NaturezaConhecimento, options: string[]): string => {
+  const exact = bestAreaMatch(competencia, options);
+  if (exact) return exact;
+
+  if (nature === 'Técnico') {
+    return pickTechnicalKnowledge(competencia, options);
+  }
+
+  return options[0] || '';
+};
 
 const Mapa: React.FC = () => {
   const [rows, setRows] = useState<MapaRow[]>([]);
@@ -203,7 +287,7 @@ const Mapa: React.FC = () => {
         .forEach((item) => {
           const sigla = String(item.Sigla).trim();
           if (!unidadeMap.has(sigla)) {
-            unidadeMap.set(sigla, { sigla, nome: String(item.Unidade).trim() });
+            unidadeMap.set(sigla, { sigla, nome: String(item.Unidade).trim(), competencia: String(item.Competencia || '').trim() });
           }
         });
 
@@ -222,9 +306,11 @@ const Mapa: React.FC = () => {
 
       const basePre: MapaRow[] = [];
       unidadesSorted.forEach((unidade, idx) => {
-        const lideranca = LIDERANCA_OPTIONS[idx % LIDERANCA_OPTIONS.length];
-        const transversal = TRANSVERSAL_OPTIONS[idx % TRANSVERSAL_OPTIONS.length];
-        const tecnico = nivel3Unicos[idx % Math.max(1, nivel3Unicos.length)];
+        const competencia = unidade.competencia || unidade.nome;
+        const technicalOptions = nivel3Unicos.map((item) => item.conhecimento);
+        const lideranca = pickByNature(competencia, 'Liderança', LIDERANCA_OPTIONS) || LIDERANCA_OPTIONS[idx % LIDERANCA_OPTIONS.length];
+        const transversal = pickByNature(competencia, 'Transversal', TRANSVERSAL_OPTIONS) || TRANSVERSAL_OPTIONS[idx % TRANSVERSAL_OPTIONS.length];
+        const tecnicoConhecimento = pickTechnicalKnowledge(competencia, technicalOptions);
 
         basePre.push({
           id: `pre-l-${unidade.sigla}`,
@@ -256,9 +342,9 @@ const Mapa: React.FC = () => {
             unidadeSigla: unidade.sigla,
             unidadeNome: unidade.nome,
             natureza: 'Técnico',
-            nivel1: tecnico.nivel1,
-            nivel2: tecnico.nivel2,
-            conhecimento: tecnico.conhecimento,
+            nivel1: nivel3Unicos.find((item) => item.conhecimento === tecnicoConhecimento)?.nivel1,
+            nivel2: nivel3Unicos.find((item) => item.conhecimento === tecnicoConhecimento)?.nivel2,
+            conhecimento: tecnicoConhecimento,
             tipo: TIPO_OPTIONS[(idx + 2) % TIPO_OPTIONS.length],
             relevanciaFaixa: RELEVANCIA_OPTIONS[(idx + 2) % RELEVANCIA_OPTIONS.length],
             grauInstalado: GRAU_PRECRUZADO_OPTIONS[(idx + 2) % GRAU_PRECRUZADO_OPTIONS.length],
@@ -504,10 +590,10 @@ const Mapa: React.FC = () => {
 
     return (
       <div className="w-full min-w-0 rounded-xl border border-slate-200 bg-white p-4">
-        <h4 className="mb-3 truncate rounded-lg border border-blue-200 bg-white px-3 py-2 text-sm font-semibold text-blue-700" title={title}>{title}</h4>
-        <div className="flex items-center justify-center mb-3">
-          <svg width="120" height="120" viewBox="0 0 120 120" role="img" aria-label={title}>
-            <circle cx="60" cy="60" r={radius} stroke="#e2e8f0" strokeWidth="14" fill="none" />
+        <h4 className="mb-3 flex h-12 items-center justify-center truncate rounded-lg border border-blue-200 bg-white px-3 py-2 text-center text-sm font-semibold text-blue-700" title={title}>{title}</h4>
+        <div className="mb-3 flex items-center justify-center">
+          <svg width="144" height="144" viewBox="0 0 144 144" role="img" aria-label={title}>
+            <circle cx="72" cy="72" r={56} stroke="#e2e8f0" strokeWidth="16" fill="none" />
             {items.map((item, index) => {
               const part = total > 0 ? item.count / total : 0;
               const len = Math.max(0, part * circumference);
@@ -516,23 +602,23 @@ const Mapa: React.FC = () => {
               return (
                 <circle
                   key={`${title}-${item.value}`}
-                  cx="60"
-                  cy="60"
-                  r={radius}
+                  cx="72"
+                  cy="72"
+                  r={56}
                   fill="none"
                   stroke={DONUT_COLORS[index % DONUT_COLORS.length]}
-                  strokeWidth={item.active ? 16 : 14}
+                  strokeWidth={item.active ? 18 : 16}
                   strokeLinecap="round"
                   strokeDasharray={`${len} ${circumference - len}`}
                   strokeDashoffset={offset}
-                  transform="rotate(-90 60 60)"
+                  transform="rotate(-90 72 72)"
                   className="cursor-pointer transition-all"
                   onClick={() => onSelect(item.value)}
                 />
               );
             })}
-            <text x="60" y="58" textAnchor="middle" className="fill-slate-700 text-[10px] font-semibold">Total</text>
-            <text x="60" y="74" textAnchor="middle" className="fill-slate-900 text-[14px] font-bold">{total}</text>
+            <text x="72" y="70" textAnchor="middle" className="fill-slate-700 text-[11px] font-semibold">Total</text>
+            <text x="72" y="88" textAnchor="middle" className="fill-slate-900 text-[16px] font-bold">{total}</text>
           </svg>
         </div>
 
