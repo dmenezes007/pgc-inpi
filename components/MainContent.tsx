@@ -66,7 +66,7 @@ const moduleKickerTexts: Record<string, string> = {
 const MainContent: React.FC<MainContentProps> = ({ activeModule, onModuleSelect }) => {
     const introText = moduleIntroTexts[activeModule] || moduleIntroTexts['Início'];
     const kickerText = moduleKickerTexts[activeModule] || moduleKickerTexts['Início'];
-    const shouldRenderSharedIntro = activeModule !== 'Início' && activeModule !== 'Documentação' && activeModule !== 'Detentores';
+    const shouldRenderSharedIntro = activeModule !== 'Início' && activeModule !== 'Documentação';
 
     const sharedIntro = (
         <div className="module-intro mb-8">
@@ -167,27 +167,27 @@ const MainContent: React.FC<MainContentProps> = ({ activeModule, onModuleSelect 
 
                         <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-6 gap-3">
                             <div className="rounded-lg border border-slate-600 bg-slate-900/40 p-3 text-sm text-gray-200 [border-color:var(--gov-blue)!important] [background-color:#ffffff!important] !text-slate-700 !border-0 !text-white [background-color:var(--gov-blue)!important]">
-                                <p className="text-xs text-orange-400 font-semibold mb-1">PASSO 1</p>
+                                <p className="text-xs !text-white font-semibold mb-1">PASSO 1</p>
                                 Unidade
                             </div>
                             <div className="rounded-lg border border-slate-600 bg-slate-900/40 p-3 text-sm text-gray-200 [border-color:var(--gov-blue)!important] [background-color:#ffffff!important] !text-slate-700 !border-0 !text-white [background-color:var(--gov-blue)!important]">
-                                <p className="text-xs text-orange-400 font-semibold mb-1">PASSO 2</p>
+                                <p className="text-xs !text-white font-semibold mb-1">PASSO 2</p>
                                 Natureza do Conhecimento
                             </div>
                             <div className="rounded-lg border border-slate-600 bg-slate-900/40 p-3 text-sm text-gray-200 [border-color:var(--gov-blue)!important] [background-color:#ffffff!important] !text-slate-700 !border-0 !text-white [background-color:var(--gov-blue)!important]">
-                                <p className="text-xs text-orange-400 font-semibold mb-1">PASSO 3</p>
+                                <p className="text-xs !text-white font-semibold mb-1">PASSO 3</p>
                                 Conhecimento Aplicável
                             </div>
                             <div className="rounded-lg border border-slate-600 bg-slate-900/40 p-3 text-sm text-gray-200 [border-color:var(--gov-blue)!important] [background-color:#ffffff!important] !text-slate-700 !border-0 !text-white [background-color:var(--gov-blue)!important]">
-                                <p className="text-xs text-orange-400 font-semibold mb-1">PASSO 4</p>
+                                <p className="text-xs !text-white font-semibold mb-1">PASSO 4</p>
                                 Tipo de Conhecimento
                             </div>
                             <div className="rounded-lg border border-slate-600 bg-slate-900/40 p-3 text-sm text-gray-200 [border-color:var(--gov-blue)!important] [background-color:#ffffff!important] !text-slate-700 !border-0 !text-white [background-color:var(--gov-blue)!important]">
-                                <p className="text-xs text-orange-400 font-semibold mb-1">PASSO 5</p>
+                                <p className="text-xs !text-white font-semibold mb-1">PASSO 5</p>
                                 Relevância do Conhecimento
                             </div>
                             <div className="rounded-lg border border-slate-600 bg-slate-900/40 p-3 text-sm text-gray-200 [border-color:var(--gov-blue)!important] [background-color:#ffffff!important] !text-slate-700 !border-0 !text-white [background-color:var(--gov-blue)!important]">
-                                <p className="text-xs text-orange-400 font-semibold mb-1">PASSO 6</p>
+                                <p className="text-xs !text-white font-semibold mb-1">PASSO 6</p>
                                 Grau de Conhecimento Instalado
                             </div>
                         </div>
