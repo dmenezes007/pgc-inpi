@@ -178,7 +178,7 @@ const Detentores: React.FC = () => {
           onChange={(e) => setQueryNatureza(e.target.value as 'Todos' | NaturezaConhecimento)}
           className="px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-700"
         >
-          <option value="Todos">Filtrarr por natureza do conhecimento</option>
+          <option value="Todos">Filtrar por natureza do conhecimento</option>
           <option value="Liderança">Liderança</option>
           <option value="Transversal">Transversal</option>
           <option value="Técnico">Técnico</option>
