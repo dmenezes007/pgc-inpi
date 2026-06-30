@@ -1,32 +1,56 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import * as XLSX from 'xlsx';
+import Papa from 'papaparse';
 import baseCapacitacoesUrl from '../base-capacitacoes.xlsx?url';
+import tecnicaCsvUrl from '../src/files/docs/tecnica.csv?url';
+
+type NaturezaConhecimento = 'Liderança' | 'Transversal' | 'Técnico' | 'Não classificado';
 
 interface CapacitacaoRow {
   servidor: string;
   conhecimento: string;
   curso: string;
-  cargaHoraria: string;
-}
-
-interface ServidorRow {
-  servidor: string;
-  matricula: string;
-  unidade: string;
-  cargo: string;
+  ano: string;
 }
 
 interface JoinedRow {
   servidor: string;
   conhecimento: string;
   curso: string;
-  cargaHoraria: string;
-  matricula: string;
-  unidade: string;
-  cargo: string;
+  ano: string;
+  natureza: NaturezaConhecimento;
 }
 
+interface TecnicaRow {
+  Nivel1: string;
+  Nivel2: string;
+  Nivel3: string;
+}
+
+const LIDERANCA_OPTIONS = [
+  'Visão de Futuro',
+  'Inovação e Mudança',
+  'Comunicação Estratégica',
+  'Geração de Valor para o Usuário',
+  'Gestão para Resultados',
+  'Gestão de Crises',
+  'Autoconhecimento e Desenvolvimento Pessoal',
+  'Engajamento de Pessoas e Equipes',
+  'Coordenação e Colaboração em Rede',
+];
+
+const TRANSVERSAL_OPTIONS = [
+  'Resolução de Problemas com Base em Dados',
+  'Foco nos Resultados para os Cidadãos',
+  'Mentalidade Digital',
+  'Comunicação',
+  'Trabalho em Equipe',
+  'Orientação por Valores Éticos',
+  'Visão Sistêmica',
+];
+
 const normalize = (value: unknown): string => String(value ?? '').trim();
+const normalizeKey = (value: unknown): string => normalize(value).toLowerCase();
 
 const getCell = (obj: Record<string, any>, candidates: string[]): string => {
   for (const key of Object.keys(obj)) {
@@ -38,51 +62,77 @@ const getCell = (obj: Record<string, any>, candidates: string[]): string => {
   return '';
 };
 
+const detectAno = (anoValue: string, cursoValue: string): string => {
+  if (anoValue) return anoValue;
+  const match = cursoValue.match(/(19|20)\d{2}/);
+  return match ? match[0] : '-';
+};
+
 const Detentores: React.FC = () => {
   const [rows, setRows] = useState<JoinedRow[]>([]);
   const [queryConhecimento, setQueryConhecimento] = useState('');
   const [queryServidor, setQueryServidor] = useState('');
-  const [queryUnidade, setQueryUnidade] = useState('');
+  const [queryNatureza, setQueryNatureza] = useState<'Todos' | NaturezaConhecimento>('Todos');
 
   useEffect(() => {
     const load = async () => {
-      const resp = await fetch(baseCapacitacoesUrl);
-      const buffer = await resp.arrayBuffer();
+      const [excelResp, tecnicaResp] = await Promise.all([
+        fetch(baseCapacitacoesUrl),
+        fetch(tecnicaCsvUrl),
+      ]);
+
+      const [buffer, tecnicaCsv] = await Promise.all([
+        excelResp.arrayBuffer(),
+        tecnicaResp.text(),
+      ]);
+
+      const tecnicaParsed = Papa.parse<TecnicaRow>(tecnicaCsv, {
+        header: true,
+        skipEmptyLines: true,
+        delimiter: ';',
+      });
+
+      const tecnicaSet = new Set<string>();
+      tecnicaParsed.data.forEach((row) => {
+        if (row.Nivel1) tecnicaSet.add(normalizeKey(row.Nivel1));
+        if (row.Nivel2) tecnicaSet.add(normalizeKey(row.Nivel2));
+        if (row.Nivel3) tecnicaSet.add(normalizeKey(row.Nivel3));
+      });
+
+      const liderancaSet = new Set(LIDERANCA_OPTIONS.map(normalizeKey));
+      const transversalSet = new Set(TRANSVERSAL_OPTIONS.map(normalizeKey));
+
       const wb = XLSX.read(buffer, { type: 'array' });
-
       const capacitacoesSheet = wb.Sheets[wb.SheetNames[0]];
-      const servidoresSheet = wb.Sheets[wb.SheetNames[1]];
-
       const capRaw = XLSX.utils.sheet_to_json<Record<string, any>>(capacitacoesSheet, { defval: '' });
-      const srvRaw = XLSX.utils.sheet_to_json<Record<string, any>>(servidoresSheet, { defval: '' });
 
-      const capacitacoes: CapacitacaoRow[] = capRaw.map((row) => ({
-        servidor: getCell(row, ['servidor', 'nome']),
-        conhecimento: getCell(row, ['conhecimento', 'tema', 'assunto', 'capacita']),
-        curso: getCell(row, ['curso', 'acao', 'capacita']),
-        cargaHoraria: getCell(row, ['carga', 'hor']),
-      })).filter((r) => r.servidor && (r.conhecimento || r.curso));
-
-      const servidores: ServidorRow[] = srvRaw.map((row) => ({
-        servidor: getCell(row, ['servidor', 'nome']),
-        matricula: getCell(row, ['matricula', 'siape']),
-        unidade: getCell(row, ['unidade', 'lotacao', 'lotação']),
-        cargo: getCell(row, ['cargo', 'funcao', 'função']),
-      })).filter((r) => r.servidor);
-
-      const srvMap = new Map<string, ServidorRow>();
-      servidores.forEach((s) => srvMap.set(s.servidor.toLowerCase(), s));
+      const capacitacoes: CapacitacaoRow[] = capRaw
+        .map((row) => ({
+          servidor: getCell(row, ['servidor', 'nome']),
+          conhecimento: getCell(row, ['conhecimento', 'tema', 'assunto', 'capacita']),
+          curso: getCell(row, ['curso', 'acao', 'capacita']),
+          ano: getCell(row, ['ano', 'year']),
+        }))
+        .filter((r) => r.servidor && (r.conhecimento || r.curso));
 
       const joined: JoinedRow[] = capacitacoes.map((c) => {
-        const srv = srvMap.get(c.servidor.toLowerCase());
+        const knowledgeKey = normalizeKey(c.conhecimento);
+        let natureza: NaturezaConhecimento = 'Não classificado';
+
+        if (liderancaSet.has(knowledgeKey)) {
+          natureza = 'Liderança';
+        } else if (transversalSet.has(knowledgeKey)) {
+          natureza = 'Transversal';
+        } else if (tecnicaSet.has(knowledgeKey)) {
+          natureza = 'Técnico';
+        }
+
         return {
           servidor: c.servidor,
           conhecimento: c.conhecimento,
-          curso: c.curso,
-          cargaHoraria: c.cargaHoraria,
-          matricula: srv?.matricula || '',
-          unidade: srv?.unidade || '',
-          cargo: srv?.cargo || '',
+          curso: c.curso.toUpperCase(),
+          ano: detectAno(c.ano, c.curso),
+          natureza,
         };
       });
 
@@ -93,29 +143,28 @@ const Detentores: React.FC = () => {
   }, []);
 
   const filtered = useMemo(() => {
-    return rows.filter((r) => {
-      const byConhecimento = !queryConhecimento || r.conhecimento.toLowerCase().includes(queryConhecimento.toLowerCase()) || r.curso.toLowerCase().includes(queryConhecimento.toLowerCase());
-      const byServidor = !queryServidor || r.servidor.toLowerCase().includes(queryServidor.toLowerCase());
-      const byUnidade = !queryUnidade || r.unidade.toLowerCase().includes(queryUnidade.toLowerCase());
-      return byConhecimento && byServidor && byUnidade;
-    });
-  }, [rows, queryConhecimento, queryServidor, queryUnidade]);
+    return rows
+      .filter((r) => {
+        const byConhecimento =
+          !queryConhecimento ||
+          r.conhecimento.toLowerCase().includes(queryConhecimento.toLowerCase()) ||
+          r.curso.toLowerCase().includes(queryConhecimento.toLowerCase());
+
+        const byServidor = !queryServidor || r.servidor.toLowerCase().includes(queryServidor.toLowerCase());
+        const byNatureza = queryNatureza === 'Todos' || r.natureza === queryNatureza;
+
+        return byConhecimento && byServidor && byNatureza;
+      })
+      .sort((a, b) => a.servidor.localeCompare(b.servidor, 'pt-BR'));
+  }, [rows, queryConhecimento, queryServidor, queryNatureza]);
 
   return (
     <div className="space-y-6">
-      <div className="module-intro">
-        <div className="module-kicker">BANCO DE DETENTORES</div>
-        <p className="module-lead">
-          Pesquisa estruturada de detentores de conhecimento instalada no INPI, combinando registros de
-          capacitações e dados funcionais para apoiar consulta, mobilização e sucessão.
-        </p>
-      </div>
-
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <input
           value={queryConhecimento}
           onChange={(e) => setQueryConhecimento(e.target.value)}
-          placeholder="Buscar por conhecimento/curso"
+          placeholder="Buscar por conhecimento/capacitação"
           className="px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-700"
         />
         <input
@@ -124,12 +173,17 @@ const Detentores: React.FC = () => {
           placeholder="Buscar por servidor"
           className="px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-700"
         />
-        <input
-          value={queryUnidade}
-          onChange={(e) => setQueryUnidade(e.target.value)}
-          placeholder="Buscar por unidade"
+        <select
+          value={queryNatureza}
+          onChange={(e) => setQueryNatureza(e.target.value as 'Todos' | NaturezaConhecimento)}
           className="px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-700"
-        />
+        >
+          <option value="Todos">Filtrarr por natureza do conhecimento</option>
+          <option value="Liderança">Liderança</option>
+          <option value="Transversal">Transversal</option>
+          <option value="Técnico">Técnico</option>
+          <option value="Não classificado">Não classificado</option>
+        </select>
       </div>
 
       <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
@@ -137,24 +191,20 @@ const Detentores: React.FC = () => {
           <thead className="bg-slate-50 text-slate-700">
             <tr>
               <th className="text-left px-4 py-3">Servidor</th>
-              <th className="text-left px-4 py-3">Matrícula</th>
-              <th className="text-left px-4 py-3">Unidade</th>
-              <th className="text-left px-4 py-3">Cargo</th>
+              <th className="text-left px-4 py-3">Ano</th>
+              <th className="text-left px-4 py-3">Natureza do Conhecimento</th>
               <th className="text-left px-4 py-3">Conhecimento</th>
               <th className="text-left px-4 py-3">Capacitação</th>
-              <th className="text-left px-4 py-3">Carga Horária</th>
             </tr>
           </thead>
           <tbody>
             {filtered.map((row, index) => (
               <tr key={`${row.servidor}-${row.conhecimento}-${index}`} className="border-t border-slate-100">
                 <td className="px-4 py-3 text-slate-800">{row.servidor}</td>
-                <td className="px-4 py-3 text-slate-700">{row.matricula || '-'}</td>
-                <td className="px-4 py-3 text-slate-700">{row.unidade || '-'}</td>
-                <td className="px-4 py-3 text-slate-700">{row.cargo || '-'}</td>
+                <td className="px-4 py-3 text-slate-700">{row.ano || '-'}</td>
+                <td className="px-4 py-3 text-slate-700">{row.natureza}</td>
                 <td className="px-4 py-3 text-slate-700">{row.conhecimento || '-'}</td>
                 <td className="px-4 py-3 text-slate-700">{row.curso || '-'}</td>
-                <td className="px-4 py-3 text-slate-700">{row.cargaHoraria || '-'}</td>
               </tr>
             ))}
           </tbody>

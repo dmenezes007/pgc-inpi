@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import Papa from 'papaparse';
 import Select, { SingleValue } from 'react-select';
 import CreatableSelect from 'react-select/creatable';
+import * as XLSX from 'xlsx';
 import tecnicaCsvUrl from '../src/files/docs/tecnica.csv?url';
 import estruturaCsvUrl from '../src/files/docs/estrutura.csv?url';
 
@@ -45,7 +46,7 @@ interface SelectOption {
   label: string;
 }
 
-const STORAGE_KEY = 'pgc_mapa_conhecimento_v4';
+const STORAGE_KEY = 'pgc_mapa_conhecimento_v5';
 
 const NATUREZA_OPTIONS: NaturezaConhecimento[] = ['Liderança', 'Transversal', 'Técnico'];
 const TIPO_OPTIONS: TipoConhecimento[] = ['Apoio', 'Essencial', 'Crítico'];
@@ -74,19 +75,10 @@ const TRANSVERSAL_OPTIONS = [
   'Visão Sistêmica',
 ];
 
-const tooltipByField: Record<string, string> = {
-  unidade: 'Escolha a sigla e confirme o nome da unidade.',
-  natureza: 'Selecione a natureza: Liderança, Transversal ou Técnico.',
-  conhecimento: 'Selecione ou digite o conhecimento aplicável.',
-  tipo: 'Classifique em Apoio, Essencial ou Crítico.',
-  relevancia: 'Selecione a faixa de relevância gerencial.',
-  grau: 'Informe o grau instalado do conhecimento na unidade.',
-};
-
 const customStyles = {
-  control: (provided: any, state: { isFocused: boolean }) => ({
+  control: (provided: any, state: { isFocused: boolean; isDisabled: boolean }) => ({
     ...provided,
-    backgroundColor: '#ffffff',
+    backgroundColor: state.isDisabled ? '#e5e7eb' : '#ffffff',
     borderColor: state.isFocused ? 'var(--gov-blue)' : 'var(--gov-border)',
     color: 'var(--gov-blue-dark)',
     borderRadius: '0.5rem',
@@ -155,7 +147,6 @@ const parseCsvFromUrl = <T,>(url: string): Promise<T[]> => {
 };
 
 const normalize = (value: string): string => value.trim().toLowerCase();
-
 const toOption = (value: string): SelectOption => ({ value, label: value });
 
 const Mapa: React.FC = () => {
@@ -175,19 +166,25 @@ const Mapa: React.FC = () => {
 
   const [pageSize, setPageSize] = useState(5);
   const [page, setPage] = useState(1);
-
   const [saveMessage, setSaveMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+
+  const fieldClass = (enabled: boolean, filled: boolean): string => {
+    if (enabled || filled) {
+      return 'rounded-lg border border-blue-300 bg-blue-50 p-3';
+    }
+    return 'rounded-lg border border-slate-300 bg-slate-200 p-3';
+  };
 
   const findUnidade = (sigla: string): UnidadeOption | undefined => {
     const key = normalize(sigla);
     return unidades.find((u) => normalize(u.sigla) === key);
   };
 
-  const replaceBaseWithPrecruzada = (baseRows: MapaRow[], precruzadaRows: MapaRow[]): MapaRow[] => {
-    const manuais = baseRows.filter((row) => row.origem !== 'precruzada');
-    return [...precruzadaRows, ...manuais];
+  const saveLocal = (next: MapaRow[]) => {
+    setRows(next);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
   };
 
   useEffect(() => {
@@ -207,9 +204,7 @@ const Mapa: React.FC = () => {
           }
         });
 
-      const unidadesSorted = Array.from(unidadeMap.values()).sort((a, b) =>
-        a.sigla.localeCompare(b.sigla, 'pt-BR')
-      );
+      const unidadesSorted = Array.from(unidadeMap.values()).sort((a, b) => a.sigla.localeCompare(b.sigla, 'pt-BR'));
       setUnidades(unidadesSorted);
 
       const tecnicaClean = tecnicaRows.filter((item) => item.Nivel1 && item.Nivel2 && item.Nivel3);
@@ -222,13 +217,13 @@ const Mapa: React.FC = () => {
         return { nivel1, nivel2, conhecimento };
       });
 
-      const cruzados: MapaRow[] = [];
+      const basePre: MapaRow[] = [];
       unidadesSorted.forEach((unidade, idx) => {
         const lideranca = LIDERANCA_OPTIONS[idx % LIDERANCA_OPTIONS.length];
         const transversal = TRANSVERSAL_OPTIONS[idx % TRANSVERSAL_OPTIONS.length];
         const tecnico = nivel3Unicos[idx % Math.max(1, nivel3Unicos.length)];
 
-        cruzados.push({
+        basePre.push({
           id: `pre-l-${unidade.sigla}`,
           unidadeSigla: unidade.sigla,
           unidadeNome: unidade.nome,
@@ -240,7 +235,7 @@ const Mapa: React.FC = () => {
           origem: 'precruzada',
         });
 
-        cruzados.push({
+        basePre.push({
           id: `pre-t-${unidade.sigla}`,
           unidadeSigla: unidade.sigla,
           unidadeNome: unidade.nome,
@@ -253,7 +248,7 @@ const Mapa: React.FC = () => {
         });
 
         if (tecnico) {
-          cruzados.push({
+          basePre.push({
             id: `pre-k-${unidade.sigla}`,
             unidadeSigla: unidade.sigla,
             unidadeNome: unidade.nome,
@@ -273,35 +268,28 @@ const Mapa: React.FC = () => {
       if (localRaw) {
         try {
           const localRows: MapaRow[] = JSON.parse(localRaw);
-          const merged = replaceBaseWithPrecruzada(localRows, cruzados);
-          setRows(merged);
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+          const manuais = localRows.filter((row) => row.origem === 'manual');
+          const merged = [...basePre, ...manuais];
+          saveLocal(merged);
           return;
         } catch {
-          // fallback to generated base
+          // fall back
         }
       }
 
-      setRows(cruzados);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(cruzados));
+      saveLocal(basePre);
     };
 
-    hydrate().catch(() => {
-      setErrorMessage('Não foi possível carregar todas as referências do mapa.');
-    });
+    hydrate().catch(() => setErrorMessage('Não foi possível carregar as referências do mapa.'));
   }, []);
 
   const selectedUnidadeInfo = useMemo(() => findUnidade(selectedUnidade), [selectedUnidade, unidades]);
 
+  const unidadeOptions = useMemo(() => unidades.map((u) => ({ value: u.sigla, label: `${u.sigla} - ${u.nome}` })), [unidades]);
   const naturezaOptions = useMemo(() => NATUREZA_OPTIONS.map(toOption), []);
   const tipoOptions = useMemo(() => TIPO_OPTIONS.map(toOption), []);
   const relevanciaOptions = useMemo(() => RELEVANCIA_OPTIONS.map(toOption), []);
   const grauOptions = useMemo(() => GRAU_OPTIONS.map(toOption), []);
-
-  const unidadeOptions = useMemo(
-    () => unidades.map((u) => ({ value: u.sigla, label: `${u.sigla} - ${u.nome}` })),
-    [unidades]
-  );
 
   const nivel1Options = useMemo(() => {
     const unique = Array.from(new Set(tecnicaData.map((item) => item.Nivel1.trim())));
@@ -310,25 +298,13 @@ const Mapa: React.FC = () => {
 
   const nivel2Options = useMemo(() => {
     if (!selectedNivel1) return [] as SelectOption[];
-    const unique = Array.from(
-      new Set(
-        tecnicaData
-          .filter((item) => item.Nivel1 === selectedNivel1)
-          .map((item) => item.Nivel2.trim())
-      )
-    );
+    const unique = Array.from(new Set(tecnicaData.filter((item) => item.Nivel1 === selectedNivel1).map((item) => item.Nivel2.trim())));
     return unique.sort((a, b) => a.localeCompare(b, 'pt-BR')).map(toOption);
   }, [tecnicaData, selectedNivel1]);
 
   const nivel3Options = useMemo(() => {
     if (!selectedNivel1 || !selectedNivel2) return [] as SelectOption[];
-    const unique = Array.from(
-      new Set(
-        tecnicaData
-          .filter((item) => item.Nivel1 === selectedNivel1 && item.Nivel2 === selectedNivel2)
-          .map((item) => item.Nivel3.trim())
-      )
-    );
+    const unique = Array.from(new Set(tecnicaData.filter((item) => item.Nivel1 === selectedNivel1 && item.Nivel2 === selectedNivel2).map((item) => item.Nivel3.trim())));
     return unique.sort((a, b) => a.localeCompare(b, 'pt-BR')).map(toOption);
   }, [tecnicaData, selectedNivel1, selectedNivel2]);
 
@@ -339,8 +315,7 @@ const Mapa: React.FC = () => {
     return [] as SelectOption[];
   }, [selectedNatureza, nivel3Options]);
 
-  const finalConhecimento =
-    selectedNatureza === 'Técnico' && customNivel3.trim() !== '' ? customNivel3.trim() : selectedConhecimento;
+  const finalConhecimento = selectedNatureza === 'Técnico' && customNivel3.trim() !== '' ? customNivel3.trim() : selectedConhecimento;
 
   const resetKnowledgeStep = () => {
     setSelectedConhecimento('');
@@ -388,9 +363,7 @@ const Mapa: React.FC = () => {
       origem: 'manual',
     };
 
-    const next = [newRow, ...rows];
-    setRows(next);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    saveLocal([newRow, ...rows]);
 
     setSelectedNatureza('');
     setSelectedNivel1('');
@@ -403,17 +376,30 @@ const Mapa: React.FC = () => {
     setSaveMessage('Registro incluído no mapa com sucesso.');
   };
 
-  const removeRow = (id: string) => {
-    const next = rows.filter((row) => row.id !== id);
-    setRows(next);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+  const updateRow = (id: string, patch: Partial<MapaRow>) => {
+    const next = rows.map((row) => {
+      if (row.id !== id) return row;
+      const updated = { ...row, ...patch };
+      if (patch.unidadeSigla !== undefined) {
+        const unidadeInfo = findUnidade(patch.unidadeSigla);
+        updated.unidadeNome = unidadeInfo?.nome || row.unidadeNome;
+      }
+      return updated;
+    });
+    saveLocal(next);
   };
 
-  const canChooseKnowledge =
-    selectedNatureza === 'Liderança' ||
-    selectedNatureza === 'Transversal' ||
-    (selectedNatureza === 'Técnico' && selectedNivel1 !== '' && selectedNivel2 !== '');
+  const removeRow = (id: string) => {
+    saveLocal(rows.filter((row) => row.id !== id));
+  };
 
+  const handleAlterRow = (id: string) => {
+    const row = rows.find((item) => item.id === id);
+    if (!row) return;
+    setSaveMessage(`Registro ${row.unidadeSigla} alterado com sucesso.`);
+  };
+
+  const canChooseKnowledge = selectedNatureza === 'Liderança' || selectedNatureza === 'Transversal' || (selectedNatureza === 'Técnico' && selectedNivel1 !== '' && selectedNivel2 !== '');
   const canChooseTipo = finalConhecimento.trim() !== '';
   const canChooseRelevancia = canChooseTipo && selectedTipo !== '';
   const canChooseGrau = canChooseRelevancia && selectedRelevancia !== '';
@@ -430,17 +416,7 @@ const Mapa: React.FC = () => {
       const byGrau = !selectedGrau || row.grauInstalado === selectedGrau;
       return byUnidade && byNatureza && byNivel1 && byNivel2 && byConhecimento && byTipo && byRelevancia && byGrau;
     });
-  }, [
-    rows,
-    selectedUnidade,
-    selectedNatureza,
-    selectedNivel1,
-    selectedNivel2,
-    finalConhecimento,
-    selectedTipo,
-    selectedRelevancia,
-    selectedGrau,
-  ]);
+  }, [rows, selectedUnidade, selectedNatureza, selectedNivel1, selectedNivel2, finalConhecimento, selectedTipo, selectedRelevancia, selectedGrau]);
 
   useEffect(() => {
     setPage(1);
@@ -452,18 +428,40 @@ const Mapa: React.FC = () => {
     return filteredRows.slice(start, start + pageSize);
   }, [filteredRows, page, pageSize]);
 
-  const updateRow = (id: string, patch: Partial<MapaRow>) => {
-    const next = rows.map((row) => {
-      if (row.id !== id) return row;
-      const updated = { ...row, ...patch };
-      if (patch.unidadeSigla !== undefined) {
-        const unidadeInfo = findUnidade(patch.unidadeSigla);
-        updated.unidadeNome = unidadeInfo?.nome || row.unidadeNome;
-      }
-      return updated;
-    });
-    setRows(next);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+  const downloadCsv = () => {
+    const exportRows = filteredRows.map((row) => ({
+      unidade: `${row.unidadeSigla} - ${row.unidadeNome}`,
+      natureza: row.natureza,
+      conhecimento: row.conhecimento,
+      tipo: row.tipo,
+      relevancia: row.relevanciaFaixa,
+      grau_instalado: row.grauInstalado,
+      origem: row.origem,
+    }));
+    const csv = Papa.unparse(exportRows);
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'mapa-conhecimentos.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const downloadXlsx = () => {
+    const exportRows = filteredRows.map((row) => ({
+      Unidade: `${row.unidadeSigla} - ${row.unidadeNome}`,
+      Natureza: row.natureza,
+      Conhecimento: row.conhecimento,
+      Tipo: row.tipo,
+      Relevancia: row.relevanciaFaixa,
+      GrauInstalado: row.grauInstalado,
+      Origem: row.origem,
+    }));
+    const ws = XLSX.utils.json_to_sheet(exportRows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Mapa');
+    XLSX.writeFile(wb, 'mapa-conhecimentos.xlsx');
   };
 
   const saveToSheet = async () => {
@@ -505,14 +503,12 @@ const Mapa: React.FC = () => {
     <div className="space-y-6">
       <div className="bg-slate-800 p-6 rounded-lg border border-slate-700">
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-200" title={tooltipByField.unidade}>
-              1. Selecione a Unidade
-            </label>
+          <div className={fieldClass(true, selectedUnidade !== '')}>
+            <label className="text-sm font-medium text-slate-900">1. Selecione a Unidade</label>
             <Select
               instanceId="mapa-unidade"
               classNamePrefix="tecnica-select"
-              value={selectedUnidade ? unidadeOptions.find((o) => o.value === selectedUnidade) || toOption(selectedUnidade) : null}
+              value={selectedUnidade ? unidadeOptions.find((o) => o.value === selectedUnidade) || null : null}
               onChange={(option) => setSelectedUnidade(option?.value || '')}
               options={unidadeOptions}
               styles={customStyles}
@@ -521,15 +517,11 @@ const Mapa: React.FC = () => {
               isSearchable
               menuPortalTarget={document.body}
             />
-            {selectedUnidadeInfo && (
-              <p className="text-xs text-gray-300">{`${selectedUnidadeInfo.sigla} - ${selectedUnidadeInfo.nome}`}</p>
-            )}
+            {selectedUnidadeInfo && <p className="text-xs text-slate-700 mt-1">{`${selectedUnidadeInfo.sigla} - ${selectedUnidadeInfo.nome}`}</p>}
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-200" title={tooltipByField.natureza}>
-              2. Selecione a Natureza do Conhecimento
-            </label>
+          <div className={fieldClass(!!selectedUnidade, selectedNatureza !== '')}>
+            <label className="text-sm font-medium text-slate-900">2. Selecione a Natureza do Conhecimento</label>
             <Select
               instanceId="mapa-natureza"
               classNamePrefix="tecnica-select"
@@ -547,10 +539,8 @@ const Mapa: React.FC = () => {
 
           {selectedNatureza === 'Técnico' && (
             <>
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-200" title="Primeira camada da trilha técnica.">
-                  2.1 Nível 1 Técnico
-                </label>
+              <div className={fieldClass(true, selectedNivel1 !== '')}>
+                <label className="text-sm font-medium text-slate-900">2.1 Nível 1 Técnico</label>
                 <Select
                   instanceId="mapa-nivel1"
                   classNamePrefix="tecnica-select"
@@ -569,10 +559,8 @@ const Mapa: React.FC = () => {
                 />
               </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-200" title="Segunda camada da trilha técnica.">
-                  2.2 Nível 2 Técnico
-                </label>
+              <div className={fieldClass(selectedNivel1 !== '', selectedNivel2 !== '')}>
+                <label className="text-sm font-medium text-slate-900">2.2 Nível 2 Técnico</label>
                 <Select
                   instanceId="mapa-nivel2"
                   classNamePrefix="tecnica-select"
@@ -593,10 +581,8 @@ const Mapa: React.FC = () => {
             </>
           )}
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-200" title={tooltipByField.conhecimento}>
-              3. Selecione o Conhecimento
-            </label>
+          <div className={fieldClass(canChooseKnowledge, selectedConhecimento !== '' || customNivel3 !== '')}>
+            <label className="text-sm font-medium text-slate-900">3. Selecione o Conhecimento</label>
             <CreatableSelect
               instanceId="mapa-conhecimento"
               classNamePrefix="tecnica-select"
@@ -614,43 +600,38 @@ const Mapa: React.FC = () => {
           </div>
 
           {selectedNatureza === 'Técnico' && (
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-200" title="Edite ou acrescente um Nível 3 para casos específicos.">
-                3.1 Nível 3 Editável
-              </label>
+            <div className={fieldClass(canChooseKnowledge, customNivel3 !== '')}>
+              <label className="text-sm font-medium text-slate-900">3.1 Nível 3 Editável</label>
               <CreatableSelect
-                instanceId="mapa-nivel3-editavel"
+                instanceId="mapa-nivel3"
                 classNamePrefix="tecnica-select"
                 value={customNivel3 ? toOption(customNivel3) : null}
                 onChange={(option) => setCustomNivel3(option?.value || '')}
                 options={nivel3Options}
                 styles={customStyles}
-                placeholder="Busque ou digite um Nível 3"
+                placeholder="Busque ou digite Nível 3"
                 isDisabled={!canChooseKnowledge}
                 isClearable
                 isSearchable
                 menuPortalTarget={document.body}
-                formatCreateLabel={(input) => `Adicionar Nível 3: ${input}`}
               />
             </div>
           )}
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-200" title={tooltipByField.tipo}>
-              4. Selecione o Tipo de Conhecimento
-            </label>
-            <CreatableSelect
+          <div className={fieldClass(canChooseTipo, selectedTipo !== '')}>
+            <label className="text-sm font-medium text-slate-900">4. Selecione o Tipo de Conhecimento</label>
+            <Select
               instanceId="mapa-tipo"
               classNamePrefix="tecnica-select"
               value={selectedTipo ? toOption(selectedTipo) : null}
               onChange={(option) => {
                 const value = option?.value || '';
-                const typed = TIPO_OPTIONS.find((o) => o === value);
-                setSelectedTipo((typed || '') as TipoConhecimento | '');
+                const parsed = TIPO_OPTIONS.find((o) => o === value);
+                setSelectedTipo((parsed || '') as TipoConhecimento | '');
               }}
               options={tipoOptions}
               styles={customStyles}
-              placeholder="Busque ou digite o tipo"
+              placeholder="Selecione o tipo"
               isDisabled={!canChooseTipo}
               isClearable
               isSearchable
@@ -658,18 +639,16 @@ const Mapa: React.FC = () => {
             />
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-200" title={tooltipByField.relevancia}>
-              5. Selecione a Relevância
-            </label>
+          <div className={fieldClass(canChooseRelevancia, selectedRelevancia !== '')}>
+            <label className="text-sm font-medium text-slate-900">5. Selecione a Relevância</label>
             <Select
               instanceId="mapa-relevancia"
               classNamePrefix="tecnica-select"
               value={selectedRelevancia ? toOption(selectedRelevancia) : null}
               onChange={(option) => {
                 const value = option?.value || '';
-                const typed = RELEVANCIA_OPTIONS.find((o) => o === value);
-                setSelectedRelevancia((typed || '') as RelevanciaFaixa | '');
+                const parsed = RELEVANCIA_OPTIONS.find((o) => o === value);
+                setSelectedRelevancia((parsed || '') as RelevanciaFaixa | '');
               }}
               options={relevanciaOptions}
               styles={customStyles}
@@ -681,18 +660,16 @@ const Mapa: React.FC = () => {
             />
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-200" title={tooltipByField.grau}>
-              6. Selecione o Grau Instalado
-            </label>
+          <div className={fieldClass(canChooseGrau, selectedGrau !== '')}>
+            <label className="text-sm font-medium text-slate-900">6. Selecione o Grau Instalado</label>
             <Select
               instanceId="mapa-grau"
               classNamePrefix="tecnica-select"
               value={selectedGrau ? toOption(selectedGrau) : null}
               onChange={(option) => {
                 const value = option?.value || '';
-                const typed = GRAU_OPTIONS.find((o) => o === value);
-                setSelectedGrau((typed || '') as GrauInstalado | '');
+                const parsed = GRAU_OPTIONS.find((o) => o === value);
+                setSelectedGrau((parsed || '') as GrauInstalado | '');
               }}
               options={grauOptions}
               styles={customStyles}
@@ -706,10 +683,7 @@ const Mapa: React.FC = () => {
         </div>
 
         <div className="mt-6 flex flex-col sm:flex-row gap-3">
-          <button
-            onClick={handleAddRegistro}
-            className="px-4 py-2 rounded-lg font-semibold text-white bg-orange-600 hover:bg-orange-700"
-          >
+          <button onClick={handleAddRegistro} className="px-4 py-2 rounded-lg font-semibold text-white bg-orange-600 hover:bg-orange-700">
             Adicionar ao Mapa
           </button>
 
@@ -719,6 +693,14 @@ const Mapa: React.FC = () => {
             className="px-4 py-2 rounded-lg font-semibold border [border-color:var(--gov-blue)!important] [background-color:#ffffff!important] !text-[var(--gov-blue-dark)] hover:!bg-[var(--gov-blue-soft)] disabled:opacity-60"
           >
             {isSaving ? 'Salvando...' : 'Salvar Mapa'}
+          </button>
+
+          <button onClick={downloadCsv} className="px-4 py-2 rounded-lg font-semibold text-white bg-slate-700 hover:bg-slate-800">
+            Download CSV
+          </button>
+
+          <button onClick={downloadXlsx} className="px-4 py-2 rounded-lg font-semibold text-white bg-slate-700 hover:bg-slate-800">
+            Download XLSX
           </button>
         </div>
       </div>
@@ -743,36 +725,16 @@ const Mapa: React.FC = () => {
           <tbody>
             {pagedRows.map((row) => (
               <tr key={row.id} className="border-t border-slate-100">
-                <td className="px-4 py-3 align-top text-slate-800">
-                  <input
-                    value={row.unidadeSigla}
-                    onChange={(e) => updateRow(row.id, { unidadeSigla: e.target.value })}
-                    className="w-24 px-2 py-1 rounded border border-slate-300"
-                  />
-                  <div className="text-xs text-slate-500 mt-1">{row.unidadeNome}</div>
-                </td>
-                <td className="px-4 py-3 align-top">
-                  <select
-                    value={row.natureza}
-                    onChange={(e) => {
-                      const natureza = NATUREZA_OPTIONS.find((item) => item === e.target.value);
-                      if (natureza) updateRow(row.id, { natureza });
-                    }}
-                    className="px-2 py-1 rounded border border-slate-300"
-                  >
-                    {NATUREZA_OPTIONS.map((item) => (
-                      <option key={item} value={item}>{item}</option>
-                    ))}
-                  </select>
-                </td>
-                <td className="px-4 py-3 align-top text-slate-800">
+                <td className="px-4 py-3 align-top text-slate-800">{`${row.unidadeSigla} - ${row.unidadeNome}`}</td>
+                <td className="px-4 py-3 align-top text-slate-700">{row.natureza}</td>
+                <td className="px-4 py-3 align-top text-slate-700">
                   <input
                     value={row.conhecimento}
                     onChange={(e) => updateRow(row.id, { conhecimento: e.target.value })}
                     className="w-72 px-2 py-1 rounded border border-slate-300"
                   />
                 </td>
-                <td className="px-4 py-3 align-top">
+                <td className="px-4 py-3 align-top text-slate-700">
                   <select
                     value={row.tipo}
                     onChange={(e) => {
@@ -786,7 +748,7 @@ const Mapa: React.FC = () => {
                     ))}
                   </select>
                 </td>
-                <td className="px-4 py-3 align-top">
+                <td className="px-4 py-3 align-top text-slate-700">
                   <select
                     value={row.relevanciaFaixa}
                     onChange={(e) => {
@@ -800,7 +762,7 @@ const Mapa: React.FC = () => {
                     ))}
                   </select>
                 </td>
-                <td className="px-4 py-3 align-top">
+                <td className="px-4 py-3 align-top text-slate-700">
                   <select
                     value={row.grauInstalado}
                     onChange={(e) => {
@@ -816,12 +778,20 @@ const Mapa: React.FC = () => {
                 </td>
                 <td className="px-4 py-3 align-top text-slate-600">{row.origem === 'precruzada' ? 'Pré-cruzada' : 'Manual'}</td>
                 <td className="px-4 py-3 align-top">
-                  <button
-                    onClick={() => removeRow(row.id)}
-                    className="px-3 py-1 rounded-md text-xs font-medium text-red-700 bg-red-50 hover:bg-red-100"
-                  >
-                    Remover
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleAlterRow(row.id)}
+                      className="px-3 py-1 rounded-md text-xs font-medium text-white bg-green-600 hover:bg-green-700"
+                    >
+                      Alterar
+                    </button>
+                    <button
+                      onClick={() => removeRow(row.id)}
+                      className="px-3 py-1 rounded-md text-xs font-medium text-white bg-red-600 hover:bg-red-700"
+                    >
+                      Remover
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -852,18 +822,10 @@ const Mapa: React.FC = () => {
 
           <div className="flex items-center gap-2 text-sm text-slate-600">
             <span>{`Página ${page} de ${totalPages}`}</span>
-            <button
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={page <= 1}
-              className="px-3 py-1 rounded border border-slate-300 disabled:opacity-50"
-            >
+            <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1} className="px-3 py-1 rounded border border-slate-300 disabled:opacity-50">
               Anterior
             </button>
-            <button
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              disabled={page >= totalPages}
-              className="px-3 py-1 rounded border border-slate-300 disabled:opacity-50"
-            >
+            <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page >= totalPages} className="px-3 py-1 rounded border border-slate-300 disabled:opacity-50">
               Próxima
             </button>
           </div>

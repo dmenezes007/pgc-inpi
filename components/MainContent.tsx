@@ -34,7 +34,7 @@ const moduleIntroTexts: Record<string, string> = {
     'Transversalidade': 'Conhecimentos transversais viabilizam colaboração, integração entre áreas e atuação orientada a resultados no serviço público.',
     'Técnica': 'Conhecimentos técnicos especializados, organizados por níveis e temas, apoiam a qualificação das atividades finalísticas e de suporte do Instituto.',
     'Mapa': 'Mapeamento de conhecimentos de apoio, essenciais e críticos, com inserção de dados gerenciais e persistência simples para apoiar a gestão contínua.',
-    'Detentores': 'Consulta estruturada aos detentores de conhecimento do INPI com base em capacitações e dados funcionais para apoiar alocação e sucessão.',
+    'Detentores': 'Pesquisa estruturada de detentores de conhecimento no âmbito institucional, combinando registros de capacitações e dados funcionais para apoiar consulta, mobilização e sucessão.',
     'Planejamento': 'Necessidades de conhecimento convertem-se em ações de desenvolvimento com alinhamento ao planejamento institucional e à viabilidade orçamentária.',
     'Autodesenvolvimento': 'Protagonismo do servidor no desenvolvimento contínuo amplia competências estratégicas com incentivo institucional.',
     'Rastreamento': 'Levantamento e análise de conhecimentos essenciais e críticos identificam lacunas e subsidiam decisões de desenvolvimento.',
@@ -54,7 +54,7 @@ const moduleKickerTexts: Record<string, string> = {
     'Transversalidade': 'CONHECIMENTO TRANSVERSAL',
     'Técnica': 'CONHECIMENTO ESPECIALIZADO',
     'Mapa': 'MÉTRICAS E REFINAMENTO',
-    'Detentores': 'CAPITAL INTELECTUAL INSTALADO',
+    'Detentores': 'DETENTORES DE CONHECIMENTO',
     'Planejamento': 'PLANO DE DESENVOLVIMENTO',
     'Autodesenvolvimento': 'PROTAGONISMO DO SERVIDOR',
     'Rastreamento': 'MAPEAMENTO DE CONHECIMENTO',
@@ -66,7 +66,7 @@ const moduleKickerTexts: Record<string, string> = {
 const MainContent: React.FC<MainContentProps> = ({ activeModule, onModuleSelect }) => {
     const introText = moduleIntroTexts[activeModule] || moduleIntroTexts['Início'];
     const kickerText = moduleKickerTexts[activeModule] || moduleKickerTexts['Início'];
-    const shouldRenderSharedIntro = activeModule !== 'Início' && activeModule !== 'Documentação';
+    const shouldRenderSharedIntro = activeModule !== 'Início' && activeModule !== 'Documentação' && activeModule !== 'Detentores';
 
     const sharedIntro = (
         <div className="module-intro mb-8">
@@ -166,29 +166,29 @@ const MainContent: React.FC<MainContentProps> = ({ activeModule, onModuleSelect 
                         </p>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-6 gap-3">
-                            <div className="rounded-lg border border-slate-600 bg-slate-900/40 p-3 text-sm text-gray-200 [border-color:var(--gov-blue)!important] [background-color:#ffffff!important] !text-slate-700">
+                            <div className="rounded-lg border border-slate-600 bg-slate-900/40 p-3 text-sm text-gray-200 [border-color:var(--gov-blue)!important] [background-color:#ffffff!important] !text-slate-700 !border-0 !text-white [background-color:var(--gov-blue)!important]">
                                 <p className="text-xs text-orange-400 font-semibold mb-1">PASSO 1</p>
-                                Unidade (sigla + nome)
+                                Unidade
                             </div>
-                            <div className="rounded-lg border border-slate-600 bg-slate-900/40 p-3 text-sm text-gray-200 [border-color:var(--gov-blue)!important] [background-color:#ffffff!important] !text-slate-700">
+                            <div className="rounded-lg border border-slate-600 bg-slate-900/40 p-3 text-sm text-gray-200 [border-color:var(--gov-blue)!important] [background-color:#ffffff!important] !text-slate-700 !border-0 !text-white [background-color:var(--gov-blue)!important]">
                                 <p className="text-xs text-orange-400 font-semibold mb-1">PASSO 2</p>
-                                Natureza do conhecimento
+                                Natureza do Conhecimento
                             </div>
-                            <div className="rounded-lg border border-slate-600 bg-slate-900/40 p-3 text-sm text-gray-200 [border-color:var(--gov-blue)!important] [background-color:#ffffff!important] !text-slate-700">
+                            <div className="rounded-lg border border-slate-600 bg-slate-900/40 p-3 text-sm text-gray-200 [border-color:var(--gov-blue)!important] [background-color:#ffffff!important] !text-slate-700 !border-0 !text-white [background-color:var(--gov-blue)!important]">
                                 <p className="text-xs text-orange-400 font-semibold mb-1">PASSO 3</p>
-                                Conhecimento aplicável
+                                Conhecimento Aplicável
                             </div>
-                            <div className="rounded-lg border border-slate-600 bg-slate-900/40 p-3 text-sm text-gray-200 [border-color:var(--gov-blue)!important] [background-color:#ffffff!important] !text-slate-700">
+                            <div className="rounded-lg border border-slate-600 bg-slate-900/40 p-3 text-sm text-gray-200 [border-color:var(--gov-blue)!important] [background-color:#ffffff!important] !text-slate-700 !border-0 !text-white [background-color:var(--gov-blue)!important]">
                                 <p className="text-xs text-orange-400 font-semibold mb-1">PASSO 4</p>
-                                Tipo: Apoio, Essencial ou Crítico
+                                Tipo de Conhecimento
                             </div>
-                            <div className="rounded-lg border border-slate-600 bg-slate-900/40 p-3 text-sm text-gray-200 [border-color:var(--gov-blue)!important] [background-color:#ffffff!important] !text-slate-700">
+                            <div className="rounded-lg border border-slate-600 bg-slate-900/40 p-3 text-sm text-gray-200 [border-color:var(--gov-blue)!important] [background-color:#ffffff!important] !text-slate-700 !border-0 !text-white [background-color:var(--gov-blue)!important]">
                                 <p className="text-xs text-orange-400 font-semibold mb-1">PASSO 5</p>
-                                Relevância por faixa
+                                Relevância do Conhecimento
                             </div>
-                            <div className="rounded-lg border border-slate-600 bg-slate-900/40 p-3 text-sm text-gray-200 [border-color:var(--gov-blue)!important] [background-color:#ffffff!important] !text-slate-700">
+                            <div className="rounded-lg border border-slate-600 bg-slate-900/40 p-3 text-sm text-gray-200 [border-color:var(--gov-blue)!important] [background-color:#ffffff!important] !text-slate-700 !border-0 !text-white [background-color:var(--gov-blue)!important]">
                                 <p className="text-xs text-orange-400 font-semibold mb-1">PASSO 6</p>
-                                Grau instalado
+                                Grau de Conhecimento Instalado
                             </div>
                         </div>
                     </div>
