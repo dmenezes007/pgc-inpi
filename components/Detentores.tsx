@@ -176,6 +176,24 @@ const scoreAreaMatch = (source: string, option: string): number => {
   return tokenHits + directBoost;
 };
 
+const pickTechnicalKnowledge = (competencia: string, options: string[]): string => {
+  const exact = bestAreaMatch(competencia, options);
+  if (exact) return exact;
+  return options[0] || 'Não classificado';
+};
+
+const resolveKnowledgeByNature = (competencia: string, natureza: NaturezaConhecimento, options: string[]): string => {
+  const exact = bestAreaMatch(competencia, options);
+  if (exact) return exact;
+
+  if (natureza === 'Técnico') {
+    const technicalMatch = pickTechnicalKnowledge(competencia, options);
+    if (technicalMatch) return technicalMatch;
+  }
+
+  return options[0] || 'Não classificado';
+};
+
 const toOption = (value: string): SelectOption => ({ value, label: value });
 
 const selectStyles = {
@@ -350,32 +368,12 @@ const Detentores: React.FC = () => {
             natureza = 'Técnico';
           }
 
-          let conhecimentoMapeado = c.conhecimento || c.capacitacao;
-          let confidence = 0;
-
-          if (natureza === 'Liderança') {
-            const match = bestAreaMatch(sourceText, LIDERANCA_OPTIONS);
-            if (match) {
-              conhecimentoMapeado = match;
-              confidence = scoreAreaMatch(sourceText, match);
-            }
-          } else if (natureza === 'Transversal') {
-            const match = bestAreaMatch(sourceText, TRANSVERSAL_OPTIONS);
-            if (match) {
-              conhecimentoMapeado = match;
-              confidence = scoreAreaMatch(sourceText, match);
-            }
-          } else {
-            const match = bestAreaMatch(sourceText, tecnicaAreas);
-            if (match) {
-              conhecimentoMapeado = match;
-              confidence = scoreAreaMatch(sourceText, match);
-            }
-          }
-
-          if (confidence < 2) {
-            conhecimentoMapeado = c.conhecimento || c.capacitacao || 'Não classificado';
-          }
+          const conhecimentoMapeado =
+            natureza === 'Liderança'
+              ? resolveKnowledgeByNature(sourceText, natureza, LIDERANCA_OPTIONS)
+              : natureza === 'Transversal'
+                ? resolveKnowledgeByNature(sourceText, natureza, TRANSVERSAL_OPTIONS)
+                : resolveKnowledgeByNature(sourceText, natureza, tecnicaAreas);
 
           return {
             servidor: c.servidor,
@@ -571,14 +569,26 @@ const Detentores: React.FC = () => {
                     onClick={() => toggleExpand(group.servidor)}
                     className="border-t border-slate-100 cursor-pointer hover:bg-slate-50"
                   >
-                    <td className="px-4 py-3 font-semibold text-slate-800">{group.servidor}</td>
+                        <td className="px-4 py-3 font-semibold text-slate-800">
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleExpand(group.servidor);
+                              }}
+                              className="inline-flex h-6 w-6 items-center justify-center text-blue-700 hover:text-blue-900"
+                              aria-label={expanded ? 'Recolher linha' : 'Expandir linha'}
+                            >
+                              <i className={expanded ? 'fa fa-chevron-up' : 'fa fa-chevron-down'} aria-hidden="true" />
+                            </button>
+                            <span>{group.servidor}</span>
+                          </div>
+                        </td>
                     <td className="px-4 py-3 text-slate-700">{group.unidade}</td>
                     <td className="px-4 py-3 text-slate-700">{group.quantidade}</td>
                     <td className="px-4 py-3 text-slate-700">{group.naturezas || '-'}</td>
                     <td className="px-4 py-3 text-slate-700">{group.ultimoAno}</td>
-                    <td className="px-4 py-3 text-lg text-slate-700" aria-label={expanded ? 'Ocultar' : 'Expandir'}>
-                      <i className={expanded ? 'fa fa-chevron-up' : 'fa fa-chevron-down'} aria-hidden="true" />
-                    </td>
                   </tr>
 
                   {expanded && (

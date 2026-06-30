@@ -336,7 +336,7 @@ const Mapa: React.FC = () => {
           origem: 'precruzada',
         });
 
-        if (tecnico) {
+        if (tecnicoConhecimento) {
           basePre.push({
             id: `pre-k-${unidade.sigla}`,
             unidadeSigla: unidade.sigla,
