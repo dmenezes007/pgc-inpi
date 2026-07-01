@@ -296,5 +296,3 @@ A aplicação consistente deste Guia permitirá ao INPI:
 - SBGC. Modelo de Referência em Gestão do Conhecimento e discussões de maturidade em GC.
 - ISO 30401:2018. Knowledge management systems - Requirements.
 - INPI. Conteúdo técnico do projeto pgc-inpi e sua arquitetura metodológica por módulos.
-- Documento de apoio: apresentacao_sbgc_andre_saito.md.
-- Documento de apoio: governanca_ferramentas_gestao_do_conhecimento.md.
