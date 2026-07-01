@@ -34,6 +34,8 @@ interface SelectOption {
 
 const STORAGE_KEY = 'pgc_detentores_v1';
 const NATUREZA_OPTIONS: NaturezaConhecimento[] = ['Liderança', 'Transversal', 'Técnico'];
+const DETENTORES_SOURCE = 'pgc-inpi-detentores';
+const REMOTE_POLL_MS = 20000;
 
 const normalize = (value: unknown): string => String(value ?? '').trim();
 const normalizeKey = (value: unknown): string =>
@@ -69,6 +71,94 @@ const formatNatureza = (value: unknown): NaturezaConhecimento => {
   if (key === 'LIDERANCA') return 'Liderança';
   if (key === 'TRANSVERSAL') return 'Transversal';
   return 'Técnico';
+};
+
+const getDetentoresSheetEndpoint = (): string => {
+  const env = (import.meta as any).env;
+  const specific = env?.VITE_GSHEET_DETENTORES_ENDPOINT;
+  if (typeof specific === 'string' && specific.trim() !== '') return specific;
+  const fallback = env?.VITE_GSHEET_MAPA_ENDPOINT;
+  return typeof fallback === 'string' ? fallback : '';
+};
+
+const getDetentoresSheetReadEndpoint = (): string => {
+  const env = (import.meta as any).env;
+  const specificRead = env?.VITE_GSHEET_DETENTORES_READ_ENDPOINT;
+  if (typeof specificRead === 'string' && specificRead.trim() !== '') return specificRead;
+  const specificWrite = env?.VITE_GSHEET_DETENTORES_ENDPOINT;
+  if (typeof specificWrite === 'string' && specificWrite.trim() !== '') return specificWrite;
+  const mapaRead = env?.VITE_GSHEET_MAPA_READ_ENDPOINT;
+  if (typeof mapaRead === 'string' && mapaRead.trim() !== '') return mapaRead;
+  const mapaWrite = env?.VITE_GSHEET_MAPA_ENDPOINT;
+  return typeof mapaWrite === 'string' ? mapaWrite : '';
+};
+
+const appendQuery = (url: string, params: Record<string, string>): string => {
+  try {
+    const parsed = new URL(url);
+    Object.entries(params).forEach(([key, value]) => parsed.searchParams.set(key, value));
+    return parsed.toString();
+  } catch {
+    return url;
+  }
+};
+
+const getRawValue = (source: Record<string, unknown>, keys: string[]): string => {
+  for (const key of keys) {
+    const value = source[key];
+    if (value === undefined || value === null) continue;
+    const text = String(value).trim();
+    if (text !== '') return text;
+  }
+  return '';
+};
+
+const extractRowsFromPayload = (payload: any, source: string): Array<Record<string, unknown>> => {
+  if (Array.isArray(payload)) return payload as Array<Record<string, unknown>>;
+  if (Array.isArray(payload?.rows)) return payload.rows as Array<Record<string, unknown>>;
+  if (Array.isArray(payload?.data)) return payload.data as Array<Record<string, unknown>>;
+  if (Array.isArray(payload?.items)) return payload.items as Array<Record<string, unknown>>;
+  if (payload && typeof payload === 'object' && Array.isArray(payload[source])) {
+    return payload[source] as Array<Record<string, unknown>>;
+  }
+  return [];
+};
+
+const toDetentorRow = (item: Record<string, unknown>, index: number): JoinedRow | null => {
+  const servidor = normalize(getRawValue(item, ['servidor', 'Servidor']));
+  const conhecimento = formatConhecimento(getRawValue(item, ['conhecimento', 'Conhecimento']));
+
+  if (!servidor || !conhecimento) return null;
+
+  return {
+    id: normalize(getRawValue(item, ['id', 'ID'])) || `remote-${index + 1}`,
+    servidor,
+    conhecimento,
+    capacitacao: normalize(getRawValue(item, ['capacitacao', 'Capacitacao', 'capacitação', 'Capacitação'])),
+    ano: normalize(getRawValue(item, ['ano', 'Ano'])) || '-',
+    cargaHoraria: normalize(getRawValue(item, ['cargaHoraria', 'carga_horaria', 'CargaHoraria', 'Carga Horária'])) || '-',
+    natureza: formatNatureza(getRawValue(item, ['natureza', 'Natureza'])),
+  };
+};
+
+const fetchDetentoresRowsFromSheet = async (): Promise<JoinedRow[]> => {
+  const endpoint = getDetentoresSheetReadEndpoint();
+  if (!endpoint) return [];
+
+  try {
+    const readUrl = appendQuery(endpoint, { source: DETENTORES_SOURCE });
+    const resp = await fetch(readUrl, { method: 'GET' });
+    if (!resp.ok) return [];
+
+    const payload = await resp.json();
+    const rows = extractRowsFromPayload(payload, DETENTORES_SOURCE)
+      .map((item, index) => toDetentorRow(item, index))
+      .filter((row): row is JoinedRow => !!row);
+
+    return rows;
+  } catch {
+    return [];
+  }
 };
 
 const toOption = (value: string): SelectOption => ({ value, label: value });
@@ -137,6 +227,7 @@ const Detentores: React.FC = () => {
   const [expandedServidores, setExpandedServidores] = useState<Record<string, boolean>>({});
   const [detailVisibleRows, setDetailVisibleRows] = useState<Record<string, number>>({});
   const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const deferredQueryConhecimento = useDeferredValue(queryConhecimento);
@@ -192,6 +283,12 @@ const Detentores: React.FC = () => {
           }))
           .filter((r) => r.servidor && (r.conhecimento || r.capacitacao));
 
+        const remoteRows = await fetchDetentoresRowsFromSheet();
+        if (remoteRows.length > 0) {
+          saveLocal(remoteRows);
+          return;
+        }
+
         const localRaw = localStorage.getItem(STORAGE_KEY);
         if (localRaw) {
           try {
@@ -229,6 +326,72 @@ const Detentores: React.FC = () => {
 
     load();
   }, []);
+
+  useEffect(() => {
+    const endpoint = getDetentoresSheetReadEndpoint();
+    if (!endpoint) return;
+
+    let active = true;
+
+    const sync = async () => {
+      const remoteRows = await fetchDetentoresRowsFromSheet();
+      if (!active || remoteRows.length === 0) return;
+
+      setRows((prev) => {
+        if (JSON.stringify(prev) === JSON.stringify(remoteRows)) return prev;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(remoteRows));
+        return remoteRows;
+      });
+    };
+
+    const timerId = window.setInterval(sync, REMOTE_POLL_MS);
+    return () => {
+      active = false;
+      window.clearInterval(timerId);
+    };
+  }, []);
+
+  const saveToSheet = async () => {
+    const endpoint = getDetentoresSheetEndpoint();
+    setIsSaving(true);
+    setErrorMessage('');
+
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(rows));
+
+      if (!endpoint) {
+        setSaveMessage('Dados salvos localmente. Defina VITE_GSHEET_DETENTORES_ENDPOINT para envio à planilha.');
+        return;
+      }
+
+      const payload = {
+        source: DETENTORES_SOURCE,
+        timestamp: new Date().toISOString(),
+        rows,
+      };
+
+      const resp = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!resp.ok) {
+        throw new Error(`Falha no endpoint (${resp.status})`);
+      }
+
+      const remoteRows = await fetchDetentoresRowsFromSheet();
+      if (remoteRows.length > 0) {
+        saveLocal(remoteRows);
+      }
+
+      setSaveMessage('Dados salvos na planilha com sucesso.');
+    } catch {
+      setSaveMessage('Falha ao salvar na planilha. Os dados permanecem salvos localmente.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const conhecimentoOptions = useMemo(() => {
     const unique = new Set<string>();
@@ -370,6 +533,17 @@ const Detentores: React.FC = () => {
             <option value="Transversal">Transversal</option>
             <option value="Técnico">Técnico</option>
           </select>
+        </div>
+
+        <div className="mt-4 flex justify-end">
+          <button
+            type="button"
+            onClick={saveToSheet}
+            disabled={isSaving}
+            className="px-4 py-2 rounded-lg font-semibold border [border-color:var(--gov-blue)!important] [background-color:#ffffff!important] !text-[var(--gov-blue-dark)] hover:!bg-[var(--gov-blue-soft)] disabled:opacity-60"
+          >
+            {isSaving ? 'Salvando...' : 'Salvar Detentores'}
+          </button>
         </div>
       </div>
 

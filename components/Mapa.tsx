@@ -79,6 +79,8 @@ const TRANSVERSAL_OPTIONS = [
 ];
 
 const DONUT_COLORS = ['#1351b4', '#0c326f', '#2670e8', '#00bde3', '#1d4ed8', '#3b82f6', '#60a5fa', '#93c5fd', '#a5f3fc', '#bfdbfe'];
+const MAPA_SOURCE = 'pgc-inpi-mapa';
+const REMOTE_POLL_MS = 20000;
 
 const customStyles = {
   control: (provided: any, state: { isFocused: boolean; isDisabled: boolean }) => ({
@@ -136,6 +138,129 @@ const customStyles = {
 const getSheetEndpoint = (): string => {
   const value = (import.meta as any).env?.VITE_GSHEET_MAPA_ENDPOINT;
   return typeof value === 'string' ? value : '';
+};
+
+const getSheetReadEndpoint = (): string => {
+  const env = (import.meta as any).env;
+  const readValue = env?.VITE_GSHEET_MAPA_READ_ENDPOINT;
+  if (typeof readValue === 'string' && readValue.trim() !== '') return readValue;
+  const writeValue = env?.VITE_GSHEET_MAPA_ENDPOINT;
+  return typeof writeValue === 'string' ? writeValue : '';
+};
+
+const appendQuery = (url: string, params: Record<string, string>): string => {
+  try {
+    const parsed = new URL(url);
+    Object.entries(params).forEach(([key, value]) => parsed.searchParams.set(key, value));
+    return parsed.toString();
+  } catch {
+    return url;
+  }
+};
+
+const getRawValue = (source: Record<string, unknown>, keys: string[]): string => {
+  for (const key of keys) {
+    const value = source[key];
+    if (value === undefined || value === null) continue;
+    const text = String(value).trim();
+    if (text !== '') return text;
+  }
+  return '';
+};
+
+const parseNatureza = (value: string): NaturezaConhecimento => {
+  const key = value
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .trim()
+    .toUpperCase();
+  if (key === 'LIDERANCA') return 'Liderança';
+  if (key === 'TRANSVERSAL') return 'Transversal';
+  return 'Técnico';
+};
+
+const parseTipo = (value: string): TipoConhecimento => {
+  const found = TIPO_OPTIONS.find((item) => item.toUpperCase() === value.trim().toUpperCase());
+  return found || 'Apoio';
+};
+
+const parseRelevancia = (value: string): RelevanciaFaixa => {
+  const found = RELEVANCIA_OPTIONS.find((item) => item.toUpperCase() === value.trim().toUpperCase());
+  return found || 'De 1 a 25%';
+};
+
+const parseGrau = (value: string): GrauInstalado => {
+  const found = GRAU_OPTIONS.find((item) => item.toUpperCase() === value.trim().toUpperCase());
+  return found || 'Inexistente';
+};
+
+const splitUnidade = (text: string): { sigla: string; nome: string } => {
+  const parts = text.split(' - ').map((item) => item.trim()).filter(Boolean);
+  if (parts.length >= 2) {
+    return { sigla: parts[0], nome: parts.slice(1).join(' - ') };
+  }
+  return { sigla: '', nome: text.trim() };
+};
+
+const extractRowsFromPayload = (payload: any, source: string): Array<Record<string, unknown>> => {
+  if (Array.isArray(payload)) return payload as Array<Record<string, unknown>>;
+  if (Array.isArray(payload?.rows)) return payload.rows as Array<Record<string, unknown>>;
+  if (Array.isArray(payload?.data)) return payload.data as Array<Record<string, unknown>>;
+  if (Array.isArray(payload?.items)) return payload.items as Array<Record<string, unknown>>;
+  if (payload && typeof payload === 'object' && Array.isArray(payload[source])) {
+    return payload[source] as Array<Record<string, unknown>>;
+  }
+  return [];
+};
+
+const toMapaRow = (item: Record<string, unknown>, index: number): MapaRow | null => {
+  const compositeUnidade = getRawValue(item, ['unidade', 'Unidade']);
+  const unidadeSplit = splitUnidade(compositeUnidade);
+  const unidadeSigla = getRawValue(item, ['unidadeSigla', 'unidade_sigla', 'sigla', 'Sigla']) || unidadeSplit.sigla;
+  const unidadeNome = getRawValue(item, ['unidadeNome', 'unidade_nome', 'nome', 'Nome']) || unidadeSplit.nome;
+  const conhecimento = getRawValue(item, ['conhecimento', 'Conhecimento']);
+
+  if (!unidadeSigla || !conhecimento) return null;
+
+  const naturezaText = getRawValue(item, ['natureza', 'Natureza']);
+  const tipoText = getRawValue(item, ['tipo', 'Tipo']);
+  const relevanciaText = getRawValue(item, ['relevanciaFaixa', 'relevancia_faixa', 'relevancia', 'Relevancia']);
+  const grauText = getRawValue(item, ['grauInstalado', 'grau_instalado', 'grau', 'GrauInstalado']);
+  const origemText = getRawValue(item, ['origem', 'Origem']).toLowerCase();
+
+  return {
+    id: getRawValue(item, ['id', 'ID']) || `remote-${index + 1}`,
+    unidadeSigla,
+    unidadeNome: unidadeNome || 'Unidade não identificada',
+    natureza: parseNatureza(naturezaText),
+    nivel1: getRawValue(item, ['nivel1', 'Nivel1']) || undefined,
+    nivel2: getRawValue(item, ['nivel2', 'Nivel2']) || undefined,
+    conhecimento,
+    tipo: parseTipo(tipoText),
+    relevanciaFaixa: parseRelevancia(relevanciaText),
+    grauInstalado: parseGrau(grauText),
+    origem: origemText === 'precruzada' ? 'precruzada' : 'manual',
+  };
+};
+
+const fetchMapaRowsFromSheet = async (): Promise<MapaRow[]> => {
+  const endpoint = getSheetReadEndpoint();
+  if (!endpoint) return [];
+
+  try {
+    const readUrl = appendQuery(endpoint, { source: MAPA_SOURCE });
+    const resp = await fetch(readUrl, { method: 'GET' });
+    if (!resp.ok) return [];
+
+    const payload = await resp.json();
+    const rows = extractRowsFromPayload(payload, MAPA_SOURCE)
+      .map((item, index) => toMapaRow(item, index))
+      .filter((row): row is MapaRow => !!row);
+
+    return rows;
+  } catch {
+    return [];
+  }
 };
 
 const parseCsvFromUrl = <T,>(url: string): Promise<T[]> => {
@@ -355,6 +480,12 @@ const Mapa: React.FC = () => {
         }
       });
 
+      const remoteRows = await fetchMapaRowsFromSheet();
+      if (remoteRows.length > 0) {
+        saveLocal(remoteRows);
+        return;
+      }
+
       const localRaw = localStorage.getItem(STORAGE_KEY);
       if (localRaw) {
         try {
@@ -374,6 +505,30 @@ const Mapa: React.FC = () => {
     hydrate()
       .catch(() => setErrorMessage('Não foi possível carregar as referências do mapa.'))
       .finally(() => setIsLoading(false));
+  }, []);
+
+  useEffect(() => {
+    const endpoint = getSheetReadEndpoint();
+    if (!endpoint) return;
+
+    let active = true;
+
+    const sync = async () => {
+      const remoteRows = await fetchMapaRowsFromSheet();
+      if (!active || remoteRows.length === 0) return;
+
+      setRows((prev) => {
+        if (JSON.stringify(prev) === JSON.stringify(remoteRows)) return prev;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(remoteRows));
+        return remoteRows;
+      });
+    };
+
+    const timerId = window.setInterval(sync, REMOTE_POLL_MS);
+    return () => {
+      active = false;
+      window.clearInterval(timerId);
+    };
   }, []);
 
   const selectedUnidadeInfo = useMemo(() => findUnidade(selectedUnidade), [selectedUnidade, unidades]);
@@ -740,7 +895,7 @@ const Mapa: React.FC = () => {
       }
 
       const payload = {
-        source: 'pgc-inpi-mapa',
+        source: MAPA_SOURCE,
         timestamp: new Date().toISOString(),
         rows,
       };
@@ -753,6 +908,11 @@ const Mapa: React.FC = () => {
 
       if (!resp.ok) {
         throw new Error(`Falha no endpoint (${resp.status})`);
+      }
+
+      const remoteRows = await fetchMapaRowsFromSheet();
+      if (remoteRows.length > 0) {
+        saveLocal(remoteRows);
       }
 
       setSaveMessage('Dados salvos na planilha com sucesso.');
