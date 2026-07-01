@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUsers, faChartColumn, faComments, faLightbulb } from '@fortawesome/free-solid-svg-icons';
 
 const AccordionItem = ({
   title,
@@ -47,7 +49,7 @@ const AccordionItem = ({
 );
 
 const MetodologiaGC: React.FC = () => {
-  const [openAccordion, setOpenAccordion] = useState<string | null>('troca');
+  const [openAccordion, setOpenAccordion] = useState<string | null>(null);
 
   const handleAccordionToggle = (id: string) => {
     setOpenAccordion(openAccordion === id ? null : id);
@@ -61,9 +63,7 @@ const MetodologiaGC: React.FC = () => {
           isOpen={openAccordion === 'troca'}
           onClick={() => handleAccordionToggle('troca')}
           icon={
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5V4h-5M2 20h5V4H2m15 8H7" />
-            </svg>
+            <FontAwesomeIcon icon={faUsers} className="h-5 w-5 text-orange-500" />
           }
         >
           <p>
@@ -81,9 +81,7 @@ const MetodologiaGC: React.FC = () => {
           isOpen={openAccordion === 'benchmarking'}
           onClick={() => handleAccordionToggle('benchmarking')}
           icon={
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 17v-6m4 6V7m4 10v-3M3 21h18" />
-            </svg>
+            <FontAwesomeIcon icon={faChartColumn} className="h-5 w-5 text-orange-500" />
           }
         >
           <p>
@@ -139,9 +137,7 @@ const MetodologiaGC: React.FC = () => {
           isOpen={openAccordion === 'workshop'}
           onClick={() => handleAccordionToggle('workshop')}
           icon={
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-4l-4 4v-4z" />
-            </svg>
+            <FontAwesomeIcon icon={faComments} className="h-5 w-5 text-orange-500" />
           }
         >
           <p>
@@ -159,10 +155,7 @@ const MetodologiaGC: React.FC = () => {
           isOpen={openAccordion === 'semana'}
           onClick={() => handleAccordionToggle('semana')}
           icon={
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 1.567-3 3.5 0 1.437.742 2.671 1.802 3.214L10 18h4l-.802-3.286A3.64 3.64 0 0015 11.5C15 9.567 13.657 8 12 8z" />
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v2m0 14v2m9-9h-2M5 12H3m14.364 6.364l-1.414-1.414M8.05 8.05 6.636 6.636m10.728 0L15.95 8.05M8.05 15.95l-1.414 1.414" />
-            </svg>
+            <FontAwesomeIcon icon={faLightbulb} className="h-5 w-5 text-orange-500" />
           }
         >
           <p>
