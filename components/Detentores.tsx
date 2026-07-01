@@ -46,26 +46,9 @@ const normalizeKey = (value: unknown): string =>
     .trim()
     .toUpperCase();
 
-const toTitlePt = (value: string): string => {
-  const smallWords = new Set(['a', 'as', 'o', 'os', 'de', 'da', 'das', 'do', 'dos', 'e', 'em', 'para', 'por', 'com']);
-  const normalized = value
-    .trim()
-    .replace(/\s+/g, ' ')
-    .toLocaleLowerCase('pt-BR');
-
-  if (!normalized) return '';
-
-  return normalized
-    .split(' ')
-    .map((word, index) => {
-      if (!word) return word;
-      if (index > 0 && smallWords.has(word)) return word;
-      return word[0].toLocaleUpperCase('pt-BR') + word.slice(1);
-    })
-    .join(' ');
-};
-
-const formatConhecimento = (value: unknown): string => toTitlePt(String(value ?? ''));
+const normalizeSpaces = (value: unknown): string => String(value ?? '').trim().replace(/\s+/g, ' ');
+const formatConhecimento = (value: unknown): string => normalizeSpaces(value);
+const formatUppercase = (value: unknown): string => normalizeSpaces(value).toLocaleUpperCase('pt-BR');
 
 const formatNatureza = (value: unknown): NaturezaConhecimento => {
   const key = normalizeKey(value);
@@ -128,7 +111,7 @@ const extractRowsFromPayload = (payload: any, source: string): Array<Record<stri
 };
 
 const toDetentorRow = (item: Record<string, unknown>, index: number): JoinedRow | null => {
-  const servidor = normalize(getRawValue(item, ['servidor', 'Servidor']));
+  const servidor = formatUppercase(getRawValue(item, ['servidor', 'Servidor']));
   const conhecimento = formatConhecimento(getRawValue(item, ['conhecimento', 'Conhecimento']));
 
   if (!servidor || !conhecimento) return null;
@@ -137,7 +120,7 @@ const toDetentorRow = (item: Record<string, unknown>, index: number): JoinedRow 
     id: normalize(getRawValue(item, ['id', 'ID'])) || `remote-${index + 1}`,
     servidor,
     conhecimento,
-    capacitacao: normalize(getRawValue(item, ['capacitacao', 'Capacitacao', 'capacitação', 'Capacitação'])),
+    capacitacao: formatUppercase(getRawValue(item, ['capacitacao', 'Capacitacao', 'capacitação', 'Capacitação'])),
     ano: normalize(getRawValue(item, ['ano', 'Ano'])) || '-',
     cargaHoraria: normalize(getRawValue(item, ['cargaHoraria', 'carga_horaria', 'CargaHoraria', 'Carga Horária'])) || '-',
     natureza: formatNatureza(getRawValue(item, ['natureza', 'Natureza'])),
@@ -277,9 +260,9 @@ const Detentores: React.FC = () => {
         const baseRows: JoinedRow[] = parsed.data
           .map((r, idx) => ({
             id: `csv-${idx + 1}`,
-            servidor: normalize(r.Servidor),
+            servidor: formatUppercase(r.Servidor),
             conhecimento: formatConhecimento(r.Conhecimento),
-            capacitacao: normalize(r.Capacitacao),
+            capacitacao: formatUppercase(r.Capacitacao),
             ano: normalize(r.Ano) || '-',
             cargaHoraria: normalize(r.CargaHoraria) || '-',
             natureza: formatNatureza(r.Natureza),
@@ -299,9 +282,9 @@ const Detentores: React.FC = () => {
             const sanitized = localRows
               .map((row, idx) => ({
                 id: normalize(row.id) || `local-${idx + 1}`,
-                servidor: normalize(row.servidor),
+                servidor: formatUppercase(row.servidor),
                 conhecimento: formatConhecimento(row.conhecimento),
-                capacitacao: normalize(row.capacitacao),
+                capacitacao: formatUppercase(row.capacitacao),
                 ano: normalize(row.ano) || '-',
                 cargaHoraria: normalize(row.cargaHoraria) || '-',
                 natureza: formatNatureza(row.natureza),
@@ -360,7 +343,14 @@ const Detentores: React.FC = () => {
     setErrorMessage('');
 
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(rows));
+      const normalizedRows = rows.map((row) => ({
+        ...row,
+        servidor: formatUppercase(row.servidor),
+        capacitacao: formatUppercase(row.capacitacao),
+        conhecimento: formatConhecimento(row.conhecimento),
+      }));
+
+      saveLocal(normalizedRows);
 
       if (!endpoint) {
         setSaveMessage('Dados salvos localmente. Defina VITE_GSHEET_DETENTORES_ENDPOINT para envio à planilha.');
@@ -370,7 +360,7 @@ const Detentores: React.FC = () => {
       const payload = {
         source: DETENTORES_SOURCE,
         timestamp: new Date().toISOString(),
-        rows,
+        rows: normalizedRows,
       };
 
       const resp = await fetch(endpoint, {
