@@ -583,7 +583,7 @@ const Detentores: React.FC = () => {
           <thead className="bg-slate-50 text-slate-700">
             <tr>
               <th className="text-left px-4 py-3">Servidor</th>
-              <th className="text-left px-4 py-3">Qtd. Registros</th>
+              <th className="text-left px-4 py-3">Registros</th>
               <th className="text-left px-4 py-3">Natureza</th>
               <th className="text-left px-4 py-3">Último Ano</th>
             </tr>
