@@ -2,8 +2,6 @@ import React, { useDeferredValue, useEffect, useMemo, useState } from 'react';
 import Papa from 'papaparse';
 import Select, { SingleValue } from 'react-select';
 import CreatableSelect from 'react-select/creatable';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import detentoresCsvUrl from '../src/files/docs/detentores.csv?url';
 
 type NaturezaConhecimento = 'Liderança' | 'Transversal' | 'Técnico';
@@ -600,23 +598,12 @@ const Detentores: React.FC = () => {
                 <React.Fragment key={group.servidor}>
                   <tr
                     onClick={() => toggleExpand(group.servidor)}
-                    className="border-t border-slate-100 cursor-pointer hover:bg-slate-50"
+                    className="group border-t border-slate-100 cursor-pointer hover:bg-slate-50"
                   >
                     <td className="px-4 py-3 font-semibold text-slate-800">
-                      <div className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            toggleExpand(group.servidor);
-                          }}
-                          className="inline-flex h-6 w-6 items-center justify-center text-blue-700 hover:text-blue-900"
-                          aria-label={expanded ? 'Recolher linha' : 'Expandir linha'}
-                        >
-                          <FontAwesomeIcon icon={expanded ? faChevronUp : faChevronDown} aria-hidden="true" />
-                        </button>
-                        <span>{group.servidor}</span>
-                      </div>
+                      <span className="inline-flex w-full items-center rounded-xl border border-blue-200 bg-white px-3 py-2 text-sm font-semibold text-blue-900 shadow-sm transition-colors duration-200 group-hover:border-blue-400 group-hover:bg-blue-50">
+                        <span className="truncate whitespace-nowrap">{group.servidor}</span>
+                      </span>
                     </td>
                     <td className="px-4 py-3 text-slate-700">{group.quantidade}</td>
                     <td className="px-4 py-3 text-slate-700">{group.naturezas || '-'}</td>
