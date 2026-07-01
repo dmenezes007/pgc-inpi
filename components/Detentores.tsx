@@ -42,6 +42,7 @@ const normalizeKey = (value: unknown): string =>
     .replace(/\p{Diacritic}/gu, '')
     .trim()
     .toUpperCase();
+  const displayUpper = (value: unknown): string => String(value ?? '').toLocaleUpperCase('pt-BR');
 
 const toOption = (value: string): SelectOption => ({ value, label: value });
 
@@ -326,11 +327,11 @@ const Detentores: React.FC = () => {
                         >
                           <FontAwesomeIcon icon={expanded ? faChevronUp : faChevronDown} aria-hidden="true" />
                         </button>
-                        <span>{group.servidor}</span>
+                        <span>{displayUpper(group.servidor)}</span>
                       </div>
                     </td>
                     <td className="px-4 py-3 text-slate-700">{group.quantidade}</td>
-                    <td className="px-4 py-3 text-slate-700">{group.naturezas || '-'}</td>
+                    <td className="px-4 py-3 text-slate-700">{displayUpper(group.naturezas || '-')}</td>
                     <td className="px-4 py-3 text-slate-700">{group.ultimoAno}</td>
                   </tr>
 
@@ -352,9 +353,9 @@ const Detentores: React.FC = () => {
                               {visibleItems.map((row, index) => (
                                 <tr key={`${group.servidor}-${index}`} className="border-t border-slate-100">
                                   <td className="px-3 py-2 text-slate-700">{row.ano || '-'}</td>
-                                  <td className="px-3 py-2 text-slate-700">{row.natureza}</td>
-                                  <td className="px-3 py-2 text-slate-700">{row.conhecimento || '-'}</td>
-                                  <td className="px-3 py-2 text-slate-700">{row.capacitacao || '-'}</td>
+                                  <td className="px-3 py-2 text-slate-700">{displayUpper(row.natureza)}</td>
+                                  <td className="px-3 py-2 text-slate-700">{displayUpper(row.conhecimento || '-')}</td>
+                                  <td className="px-3 py-2 text-slate-700">{displayUpper(row.capacitacao || '-')}</td>
                                   <td className="px-3 py-2 text-slate-700">{row.cargaHoraria || '-'}</td>
                                 </tr>
                               ))}
