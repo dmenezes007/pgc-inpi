@@ -36,6 +36,7 @@ const STORAGE_KEY = 'pgc_detentores_v1';
 const NATUREZA_OPTIONS: NaturezaConhecimento[] = ['Liderança', 'Transversal', 'Técnico'];
 const DETENTORES_SOURCE = 'pgc-inpi-detentores';
 const REMOTE_POLL_MS = 20000;
+const DEFAULT_GSHEET_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxnMmY_UO6uxdM8Uv3tjk3ZPjIJfU-jdstANTZ-wxI8UHApgtq6WqVX-gxMvSUI1IG0/exec';
 
 const normalize = (value: unknown): string => String(value ?? '').trim();
 const normalizeKey = (value: unknown): string =>
@@ -78,7 +79,8 @@ const getDetentoresSheetEndpoint = (): string => {
   const specific = env?.VITE_GSHEET_DETENTORES_ENDPOINT;
   if (typeof specific === 'string' && specific.trim() !== '') return specific;
   const fallback = env?.VITE_GSHEET_MAPA_ENDPOINT;
-  return typeof fallback === 'string' ? fallback : '';
+  if (typeof fallback === 'string' && fallback.trim() !== '') return fallback;
+  return DEFAULT_GSHEET_ENDPOINT;
 };
 
 const getDetentoresSheetReadEndpoint = (): string => {
@@ -90,7 +92,8 @@ const getDetentoresSheetReadEndpoint = (): string => {
   const mapaRead = env?.VITE_GSHEET_MAPA_READ_ENDPOINT;
   if (typeof mapaRead === 'string' && mapaRead.trim() !== '') return mapaRead;
   const mapaWrite = env?.VITE_GSHEET_MAPA_ENDPOINT;
-  return typeof mapaWrite === 'string' ? mapaWrite : '';
+  if (typeof mapaWrite === 'string' && mapaWrite.trim() !== '') return mapaWrite;
+  return DEFAULT_GSHEET_ENDPOINT;
 };
 
 const appendQuery = (url: string, params: Record<string, string>): string => {

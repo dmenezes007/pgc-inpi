@@ -81,6 +81,7 @@ const TRANSVERSAL_OPTIONS = [
 const DONUT_COLORS = ['#1351b4', '#0c326f', '#2670e8', '#00bde3', '#1d4ed8', '#3b82f6', '#60a5fa', '#93c5fd', '#a5f3fc', '#bfdbfe'];
 const MAPA_SOURCE = 'pgc-inpi-mapa';
 const REMOTE_POLL_MS = 20000;
+const DEFAULT_GSHEET_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxnMmY_UO6uxdM8Uv3tjk3ZPjIJfU-jdstANTZ-wxI8UHApgtq6WqVX-gxMvSUI1IG0/exec';
 
 const customStyles = {
   control: (provided: any, state: { isFocused: boolean; isDisabled: boolean }) => ({
@@ -137,7 +138,7 @@ const customStyles = {
 
 const getSheetEndpoint = (): string => {
   const value = (import.meta as any).env?.VITE_GSHEET_MAPA_ENDPOINT;
-  return typeof value === 'string' ? value : '';
+  return typeof value === 'string' && value.trim() !== '' ? value : DEFAULT_GSHEET_ENDPOINT;
 };
 
 const getSheetReadEndpoint = (): string => {
@@ -145,7 +146,8 @@ const getSheetReadEndpoint = (): string => {
   const readValue = env?.VITE_GSHEET_MAPA_READ_ENDPOINT;
   if (typeof readValue === 'string' && readValue.trim() !== '') return readValue;
   const writeValue = env?.VITE_GSHEET_MAPA_ENDPOINT;
-  return typeof writeValue === 'string' ? writeValue : '';
+  if (typeof writeValue === 'string' && writeValue.trim() !== '') return writeValue;
+  return DEFAULT_GSHEET_ENDPOINT;
 };
 
 const appendQuery = (url: string, params: Record<string, string>): string => {
