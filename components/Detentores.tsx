@@ -36,7 +36,7 @@ const STORAGE_KEY = 'pgc_detentores_v1';
 const NATUREZA_OPTIONS: NaturezaConhecimento[] = ['Liderança', 'Transversal', 'Técnico'];
 const DETENTORES_SOURCE = 'pgc-inpi-detentores';
 const REMOTE_POLL_MS = 20000;
-const DEFAULT_GSHEET_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxnMmY_UO6uxdM8Uv3tjk3ZPjIJfU-jdstANTZ-wxI8UHApgtq6WqVX-gxMvSUI1IG0/exec';
+const DEFAULT_GSHEET_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxXSylB3TI48-MLsXh-LGSA-7dhUwnnyCzZShmV9Ji1JeKBe14Uhg9jnzsz_uRKz79A/exec';
 
 const normalize = (value: unknown): string => String(value ?? '').trim();
 const normalizeKey = (value: unknown): string =>
