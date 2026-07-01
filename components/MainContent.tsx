@@ -145,7 +145,7 @@ const MainContent: React.FC<MainContentProps> = ({ activeModule, onModuleSelect 
                             </p>
                         </div>
                         <a
-                            href={`${import.meta.env.BASE_URL}files/docs/guia-metodologico-gestao-do-conhecimento-inpi.md`}
+                            href={`${import.meta.env.BASE_URL}docs/guia-metodologico-gestao-do-conhecimento-inpi.md`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-sm text-white bg-purple-600 hover:bg-purple-700 transition-colors duration-200 whitespace-nowrap"
