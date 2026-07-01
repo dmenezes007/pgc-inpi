@@ -432,7 +432,7 @@ const Detentores: React.FC = () => {
     return unique.sort((a, b) => a.localeCompare(b, 'pt-BR')).map(toOption);
   }, [rows]);
 
-  const naturezaOptions = useMemo(() => [{ value: 'Todos', label: 'Todos' }, ...NATUREZA_OPTIONS.map(toOption)], []);
+  const naturezaOptions = useMemo(() => NATUREZA_OPTIONS.map(toOption), []);
 
   const grouped = useMemo(() => {
     const groups = new Map<string, JoinedRow[]>();
@@ -509,11 +509,12 @@ const Detentores: React.FC = () => {
           <Select
             instanceId="detentores-natureza-filtro"
             classNamePrefix="tecnica-select"
-            value={naturezaOptions.find((option) => option.value === queryNatureza) || naturezaOptions[0]}
+            value={queryNatureza === 'Todos' ? null : toOption(queryNatureza)}
             onChange={(option: SingleValue<SelectOption>) => setQueryNatureza((option?.value as 'Todos' | NaturezaConhecimento) || 'Todos')}
             options={naturezaOptions}
             styles={selectStyles}
             placeholder="Busque por natureza"
+            isClearable
             isSearchable
             menuPortalTarget={document.body}
           />
