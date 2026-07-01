@@ -1,23 +1,19 @@
 import React, { useDeferredValue, useEffect, useMemo, useState } from 'react';
-import * as XLSX from 'xlsx';
 import Papa from 'papaparse';
 import CreatableSelect from 'react-select/creatable';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
-import baseCapacitacoesUrl from '../base-capacitacoes.xlsx?url';
-import tecnicaCsvUrl from '../src/files/docs/tecnica.csv?url';
+import detentoresCsvUrl from '../src/files/docs/detentores.csv?url';
 
 type NaturezaConhecimento = 'Liderança' | 'Transversal' | 'Técnico';
 
-interface CapacitacaoRow {
-  servidor: string;
-  conhecimento: string;
-  capacitacao: string;
-  ano: string;
-  cargaHoraria: string;
-  linhaCapacitacao: string;
-  programa: string;
-  uorg: string;
+interface CsvRow {
+  Servidor: string;
+  Natureza: NaturezaConhecimento;
+  Conhecimento: string;
+  Capacitacao: string;
+  Ano: string;
+  CargaHoraria: string;
 }
 
 interface JoinedRow {
@@ -39,76 +35,6 @@ interface SelectOption {
   label: string;
 }
 
-interface TecnicaRow {
-  Nivel1: string;
-  Nivel2: string;
-  Nivel3: string;
-}
-
-const LIDERANCA_OPTIONS = [
-  'Visão de Futuro',
-  'Inovação e Mudança',
-  'Comunicação Estratégica',
-  'Geração de Valor para o Usuário',
-  'Gestão para Resultados',
-  'Gestão de Crises',
-  'Autoconhecimento e Desenvolvimento Pessoal',
-  'Engajamento de Pessoas e Equipes',
-  'Coordenação e Colaboração em Rede',
-];
-
-const TRANSVERSAL_OPTIONS = [
-  'Resolução de Problemas com Base em Dados',
-  'Foco nos Resultados para os Cidadãos',
-  'Mentalidade Digital',
-  'Comunicação',
-  'Trabalho em Equipe',
-  'Orientação por Valores Éticos',
-  'Visão Sistêmica',
-];
-
-const LIDERANCA_KEYWORDS = [
-  'LIDERAN',
-  'GESTAO POR OBJETIVOS',
-  'GESTAO POR OBJETIVOS/RESULTADOS',
-  'GESTAO DE EQUIPES',
-  'MOTIVA',
-  'LIDERANCA E MOTIVACAO',
-  'DESENVOLVIMENTO DE EQUIPES',
-  'MELHORIA CONTINUA',
-  'QUALIDADE TOTAL',
-  'GESTAO',
-];
-
-const TRANSVERSAL_KEYWORDS = [
-  'COMUNICAC',
-  'TRABALHO EM EQUIPE',
-  'VISAO SISTEMICA',
-  'RESULTADOS PARA OS CIDADAOS',
-  'ORIENTACAO POR VALORES ETICOS',
-  'MENTALIDADE DIGITAL',
-  'RESOLUCAO DE PROBLEMAS',
-  'COLABORAC',
-  'INSTRU',
-  'FACILITA',
-];
-
-const TECNICA_KEYWORDS = [
-  'TECNICA',
-  'TECNOLOG',
-  'PROPRIEDADE INTELECTUAL',
-  'MARCAS',
-  'PATENTE',
-  'DESENHO INDUSTRIAL',
-  'NOME DE DOMINIO',
-  'ENGENHARIA',
-  'AVALIAC',
-  'PERIC',
-  'DIREITO AUTORAL',
-  'PUBLICAC',
-  'REVISTA',
-];
-
 const normalize = (value: unknown): string => String(value ?? '').trim();
 const normalizeKey = (value: unknown): string =>
   String(value ?? '')
@@ -116,104 +42,6 @@ const normalizeKey = (value: unknown): string =>
     .replace(/\p{Diacritic}/gu, '')
     .trim()
     .toUpperCase();
-
-const getCell = (obj: Record<string, any>, candidates: string[]): string => {
-  for (const key of Object.keys(obj)) {
-    const lower = key.toLowerCase();
-    if (candidates.some((c) => lower.includes(c))) {
-      return normalize(obj[key]);
-    }
-  }
-  return '';
-};
-
-const detectAno = (anoValue: string, cursoValue: string = ''): string => {
-  if (anoValue) return anoValue;
-  const match = cursoValue.match(/(19|20)\d{2}/);
-  return match ? match[0] : '-';
-};
-
-const normalizeText = (value: string): string =>
-  value
-    .normalize('NFD')
-    .replace(/\p{Diacritic}/gu, '')
-    .toUpperCase()
-    .trim();
-
-const tokenize = (value: string): string[] =>
-  normalizeText(value)
-    .split(/[^A-Z0-9]+/)
-    .filter((token) => token.length > 2);
-
-const STOP_WORDS = new Set([
-  'CURSO', 'EVENTO', 'CAPACITACAO', 'BATE', 'PAPO', 'SOBRE', 'PESSOAS', 'COM', 'PARA', 'DAS', 'DOS', 'DA', 'DE', 'DO', 'EM', 'NO', 'NA', 'E', 'A', 'O', 'AS', 'OS'
-]);
-
-const tokenizeMeaningful = (value: string): string[] =>
-  tokenize(value).filter((token) => !STOP_WORDS.has(token));
-
-const bestAreaMatchWithScore = (source: string, options: string[]): { match: string; score: number } => {
-  const sourceTokens = tokenizeMeaningful(source);
-  if (sourceTokens.length === 0) return { match: '', score: 0 };
-
-  let best = '';
-  let bestScore = 0;
-
-  options.forEach((option) => {
-    const optionTokens = tokenizeMeaningful(option);
-    const tokenHits = optionTokens.filter((token) => sourceTokens.includes(token)).length;
-    const directBoost = normalizeText(source).includes(normalizeText(option)) ? 3 : 0;
-    const partialBoost = sourceTokens.some((token) => normalizeText(option).includes(token)) ? 1 : 0;
-    const score = tokenHits + directBoost + partialBoost;
-
-    if (score > bestScore) {
-      best = option;
-      bestScore = score;
-    }
-  });
-
-  return { match: best, score: bestScore };
-};
-
-const bestAreaMatch = (source: string, options: string[]): string | '' => {
-  const sourceTokens = tokenize(source);
-  if (sourceTokens.length === 0) return '';
-
-  let best = '';
-  let bestScore = -1;
-
-  options.forEach((option) => {
-    const optionTokens = tokenize(option);
-    const tokenHits = optionTokens.filter((token) => sourceTokens.includes(token)).length;
-    const directBoost = normalizeText(source).includes(normalizeText(option)) ? 2 : 0;
-    const score = tokenHits + directBoost;
-
-    if (score > bestScore) {
-      best = option;
-      bestScore = score;
-    }
-  });
-
-  return bestScore > 1 ? best : '';
-};
-
-const pickTechnicalKnowledge = (competencia: string, options: string[]): string => {
-  const best = bestAreaMatchWithScore(competencia, options);
-  if (best.score >= 2) return best.match;
-  return options[0] || '';
-};
-
-const resolveKnowledgeByNature = (competencia: string, natureza: NaturezaConhecimento, options: string[]): string => {
-  const composed = bestAreaMatchWithScore(competencia, options);
-  if (composed.score >= 2) return composed.match;
-
-  if (natureza === 'Técnico') {
-    const technicalMatch = pickTechnicalKnowledge(competencia, options);
-    if (technicalMatch) return technicalMatch;
-  }
-
-  return options[0] || '';
-};
 
 const toOption = (value: string): SelectOption => ({ value, label: value });
 
@@ -270,25 +98,6 @@ const selectStyles = {
   menuPortal: (base: any) => ({ ...base, zIndex: 9999 }),
 };
 
-const classifyNatureza = (row: Record<string, any>): NaturezaConhecimento => {
-  const eventText = normalizeText(getCell(row, ['evento', 'curso', 'acao', 'capacita']));
-  const lineText = normalizeText(getCell(row, ['linha de capacitacao', 'programa', 'uorg']));
-
-  if (LIDERANCA_KEYWORDS.some((keyword) => eventText.includes(keyword) || lineText.includes(keyword))) {
-    return 'Liderança';
-  }
-
-  if (TRANSVERSAL_KEYWORDS.some((keyword) => eventText.includes(keyword) || lineText.includes(keyword))) {
-    return 'Transversal';
-  }
-
-  if (TECNICA_KEYWORDS.some((keyword) => eventText.includes(keyword) || lineText.includes(keyword))) {
-    return 'Técnico';
-  }
-
-  return 'Técnico';
-};
-
 const Detentores: React.FC = () => {
   const DETAIL_PAGE_SIZE = 8;
   const [rows, setRows] = useState<IndexedRow[]>([]);
@@ -307,92 +116,26 @@ const Detentores: React.FC = () => {
     const load = async () => {
       setIsLoading(true);
       try {
-        const [excelResp, tecnicaResp] = await Promise.all([
-          fetch(baseCapacitacoesUrl),
-          fetch(tecnicaCsvUrl),
-        ]);
-
-        const [buffer, tecnicaCsv] = await Promise.all([
-          excelResp.arrayBuffer(),
-          tecnicaResp.text(),
-        ]);
-
-        const tecnicaParsed = Papa.parse<TecnicaRow>(tecnicaCsv, {
+        const resp = await fetch(detentoresCsvUrl);
+        const csvText = await resp.text();
+        const parsed = Papa.parse<CsvRow>(csvText, {
           header: true,
           skipEmptyLines: true,
           delimiter: ';',
         });
 
-        const tecnicaSet = new Set<string>();
-        const tecnicaAreasSet = new Set<string>();
-        tecnicaParsed.data.forEach((row) => {
-          if (row.Nivel1) tecnicaSet.add(normalizeKey(row.Nivel1));
-          if (row.Nivel2) tecnicaSet.add(normalizeKey(row.Nivel2));
-          if (row.Nivel3) tecnicaSet.add(normalizeKey(row.Nivel3));
-          if (row.Nivel3) tecnicaAreasSet.add(normalize(row.Nivel3));
-        });
-
-        const tecnicaAreas = Array.from(tecnicaAreasSet).sort((a, b) => a.localeCompare(b, 'pt-BR'));
-
-        const liderancaSet = new Set(LIDERANCA_OPTIONS.map(normalizeKey));
-        const transversalSet = new Set(TRANSVERSAL_OPTIONS.map(normalizeKey));
-
-        const wb = XLSX.read(buffer, { type: 'array' });
-        const capacitacoesSheet = wb.Sheets['BASE CETEC'] || wb.Sheets[wb.SheetNames[0]];
-        const capRaw = XLSX.utils.sheet_to_json<Record<string, any>>(capacitacoesSheet, { defval: '' });
-
-        const capacitacoes: CapacitacaoRow[] = capRaw
-          .map((row) => ({
-            servidor: getCell(row, ['servidor', 'nome']),
-            conhecimento: getCell(row, ['conhecimento', 'tema', 'assunto', 'capacita']),
-            capacitacao: getCell(row, ['evento']),
-            ano: getCell(row, ['ano', 'year']),
-            cargaHoraria: getCell(row, ['carga horaria', 'carga']),
-            linhaCapacitacao: getCell(row, ['linha de capacitacao']),
-            programa: getCell(row, ['programa']),
-            uorg: getCell(row, ['uorg']),
+        const joined: IndexedRow[] = parsed.data
+          .map((r) => ({
+            servidor: normalize(r.Servidor),
+            conhecimento: normalize(r.Conhecimento),
+            capacitacao: normalize(r.Capacitacao),
+            ano: normalize(r.Ano) || '-',
+            cargaHoraria: normalize(r.CargaHoraria) || '-',
+            natureza: (normalize(r.Natureza) as NaturezaConhecimento) || 'Técnico',
+            servidorKey: normalizeKey(r.Servidor),
+            searchKey: normalizeKey(`${r.Conhecimento} ${r.Capacitacao}`),
           }))
           .filter((r) => r.servidor && (r.conhecimento || r.capacitacao));
-
-        const joined: IndexedRow[] = capacitacoes.map((c) => {
-          const knowledgeKey = normalizeKey(c.conhecimento);
-          const capacitacaoKey = normalizeKey(c.capacitacao);
-          const combinedText = normalizeText([c.conhecimento, c.capacitacao, c.linhaCapacitacao, c.programa, c.uorg].filter(Boolean).join(' '));
-          const sourceText = [c.capacitacao, c.conhecimento, c.linhaCapacitacao, c.programa, c.uorg].filter(Boolean).join(' ');
-          let natureza = classifyNatureza({
-            conhecimento: combinedText,
-            evento: capacitacaoKey,
-            'linha de capacitacao': c.linhaCapacitacao,
-            programa: c.programa,
-            uorg: c.uorg,
-          });
-
-          if (liderancaSet.has(knowledgeKey) || liderancaSet.has(capacitacaoKey)) {
-            natureza = 'Liderança';
-          } else if (transversalSet.has(knowledgeKey) || transversalSet.has(capacitacaoKey)) {
-            natureza = 'Transversal';
-          } else if (tecnicaSet.has(knowledgeKey) || tecnicaSet.has(capacitacaoKey)) {
-            natureza = 'Técnico';
-          }
-
-          const conhecimentoMapeado =
-            natureza === 'Liderança'
-              ? resolveKnowledgeByNature(sourceText, natureza, LIDERANCA_OPTIONS)
-              : natureza === 'Transversal'
-                ? resolveKnowledgeByNature(sourceText, natureza, TRANSVERSAL_OPTIONS)
-                : resolveKnowledgeByNature(sourceText, natureza, tecnicaAreas);
-
-          return {
-            servidor: c.servidor,
-            conhecimento: conhecimentoMapeado,
-            capacitacao: c.capacitacao.toUpperCase(),
-            ano: detectAno(c.ano, [c.capacitacao, c.conhecimento, c.programa].filter(Boolean).join(' ')),
-            cargaHoraria: c.cargaHoraria || '-',
-            natureza,
-            servidorKey: normalizeKey(c.servidor),
-            searchKey: normalizeKey(`${conhecimentoMapeado} ${c.capacitacao}`),
-          };
-        });
 
         setRows(joined);
       } catch (error) {
@@ -544,7 +287,7 @@ const Detentores: React.FC = () => {
       {isLoading && (
         <div className="flex items-center gap-3 rounded-xl border border-blue-200 bg-blue-50 px-4 py-4 text-blue-800">
           <span className="inline-flex h-10 w-10 items-center justify-center rounded-full border-2 border-blue-200 border-t-blue-700 animate-spin" aria-hidden="true" />
-          <p className="text-sm font-medium">Carregando a fonte de dados. Este processo pode levar alguns minutos.</p>
+          <p className="text-sm font-medium">Carregando a fonte única de detentores. Este processo pode levar alguns segundos.</p>
         </div>
       )}
 
@@ -554,7 +297,7 @@ const Detentores: React.FC = () => {
             <tr>
               <th className="text-left px-4 py-3">Servidor</th>
               <th className="text-left px-4 py-3">Qtd. Registros</th>
-              <th className="text-left px-4 py-3">Desenolvimento</th>
+              <th className="text-left px-4 py-3">Natureza</th>
               <th className="text-left px-4 py-3">Último Ano</th>
             </tr>
           </thead>
@@ -570,22 +313,22 @@ const Detentores: React.FC = () => {
                     onClick={() => toggleExpand(group.servidor)}
                     className="border-t border-slate-100 cursor-pointer hover:bg-slate-50"
                   >
-                        <td className="px-4 py-3 font-semibold text-slate-800">
-                          <div className="flex items-center gap-2">
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                toggleExpand(group.servidor);
-                              }}
-                              className="inline-flex h-6 w-6 items-center justify-center text-blue-700 hover:text-blue-900"
-                              aria-label={expanded ? 'Recolher linha' : 'Expandir linha'}
-                            >
-                              <FontAwesomeIcon icon={expanded ? faChevronUp : faChevronDown} aria-hidden="true" />
-                            </button>
-                            <span>{group.servidor}</span>
-                          </div>
-                        </td>
+                    <td className="px-4 py-3 font-semibold text-slate-800">
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleExpand(group.servidor);
+                          }}
+                          className="inline-flex h-6 w-6 items-center justify-center text-blue-700 hover:text-blue-900"
+                          aria-label={expanded ? 'Recolher linha' : 'Expandir linha'}
+                        >
+                          <FontAwesomeIcon icon={expanded ? faChevronUp : faChevronDown} aria-hidden="true" />
+                        </button>
+                        <span>{group.servidor}</span>
+                      </div>
+                    </td>
                     <td className="px-4 py-3 text-slate-700">{group.quantidade}</td>
                     <td className="px-4 py-3 text-slate-700">{group.naturezas || '-'}</td>
                     <td className="px-4 py-3 text-slate-700">{group.ultimoAno}</td>
