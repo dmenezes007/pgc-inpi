@@ -205,9 +205,10 @@ const selectStyles = {
 const Detentores: React.FC = () => {
   const DETAIL_PAGE_SIZE = 8;
   const [rows, setRows] = useState<JoinedRow[]>([]);
-  const [queryConhecimento, setQueryConhecimento] = useState('');
   const [queryServidor, setQueryServidor] = useState('');
   const [queryNatureza, setQueryNatureza] = useState<'Todos' | NaturezaConhecimento>('Todos');
+  const [queryConhecimento, setQueryConhecimento] = useState('');
+  const [queryCapacitacao, setQueryCapacitacao] = useState('');
   const [pageSize, setPageSize] = useState(10);
   const [page, setPage] = useState(1);
   const [expandedServidores, setExpandedServidores] = useState<Record<string, boolean>>({});
@@ -216,8 +217,9 @@ const Detentores: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const deferredQueryConhecimento = useDeferredValue(queryConhecimento);
   const deferredQueryServidor = useDeferredValue(queryServidor);
+  const deferredQueryConhecimento = useDeferredValue(queryConhecimento);
+  const deferredQueryCapacitacao = useDeferredValue(queryCapacitacao);
 
   const saveLocal = (next: JoinedRow[]) => {
     setRows(next);
@@ -387,12 +389,16 @@ const Detentores: React.FC = () => {
   };
 
   const conhecimentoOptions = useMemo(() => {
-    const unique = new Set<string>();
-    rows.forEach((r) => {
-      if (r.conhecimento) unique.add(r.conhecimento);
-      if (r.capacitacao) unique.add(r.capacitacao);
-    });
-    return Array.from(unique)
+    const unique = Array.from(new Set(rows.map((r) => r.conhecimento).filter(Boolean)));
+    return unique
+      .sort((a, b) => a.localeCompare(b, 'pt-BR'))
+      .slice(0, 1500)
+      .map(toOption);
+  }, [rows]);
+
+  const capacitacaoOptions = useMemo(() => {
+    const unique = Array.from(new Set(rows.map((r) => r.capacitacao).filter(Boolean)));
+    return unique
       .sort((a, b) => a.localeCompare(b, 'pt-BR'))
       .slice(0, 1500)
       .map(toOption);
@@ -407,25 +413,26 @@ const Detentores: React.FC = () => {
   }, [rows]);
 
   const filtered = useMemo(() => {
-    const conhecimentoKey = normalizeKey(deferredQueryConhecimento);
     const servidorKey = normalizeKey(deferredQueryServidor);
+    const conhecimentoKey = normalizeKey(deferredQueryConhecimento);
+    const capacitacaoKey = normalizeKey(deferredQueryCapacitacao);
     return rows
       .filter((r) => {
-        const searchKey = normalizeKey(`${r.conhecimento} ${r.capacitacao}`);
-        const byConhecimento = !conhecimentoKey || searchKey.includes(conhecimentoKey);
         const byServidor = !servidorKey || normalizeKey(r.servidor).includes(servidorKey);
         const byNatureza = queryNatureza === 'Todos' || r.natureza === queryNatureza;
-        return byConhecimento && byServidor && byNatureza;
+        const byConhecimento = !conhecimentoKey || normalizeKey(r.conhecimento).includes(conhecimentoKey);
+        const byCapacitacao = !capacitacaoKey || normalizeKey(r.capacitacao).includes(capacitacaoKey);
+        return byServidor && byNatureza && byConhecimento && byCapacitacao;
       })
       .sort((a, b) => a.servidor.localeCompare(b.servidor, 'pt-BR'));
-  }, [rows, deferredQueryConhecimento, deferredQueryServidor, queryNatureza]);
+  }, [rows, deferredQueryServidor, deferredQueryConhecimento, deferredQueryCapacitacao, queryNatureza]);
 
   const conhecimentoRelationOptions = useMemo(() => {
     const unique = Array.from(new Set(rows.map((row) => row.conhecimento).filter(Boolean)));
     return unique.sort((a, b) => a.localeCompare(b, 'pt-BR')).map(toOption);
   }, [rows]);
 
-  const naturezaOptions = useMemo(() => NATUREZA_OPTIONS.map(toOption), []);
+  const naturezaOptions = useMemo(() => [{ value: 'Todos', label: 'Todos' }, ...NATUREZA_OPTIONS.map(toOption)], []);
 
   const grouped = useMemo(() => {
     const groups = new Map<string, JoinedRow[]>();
@@ -479,25 +486,7 @@ const Detentores: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="detentores-filters-container rounded-xl border border-slate-200 bg-slate-50/70 p-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <CreatableSelect
-            instanceId="detentores-conhecimento"
-            classNamePrefix="tecnica-select"
-            value={queryConhecimento ? toOption(queryConhecimento) : null}
-            onChange={(option) => setQueryConhecimento(option?.value || '')}
-            onInputChange={(input, meta) => {
-              if (meta.action === 'input-change') {
-                setQueryConhecimento(input);
-              }
-            }}
-            options={conhecimentoOptions}
-            styles={selectStyles}
-            placeholder="Buscar por conhecimento/capacitação"
-            isClearable
-            isSearchable
-            menuPortalTarget={document.body}
-            formatCreateLabel={(input) => `Buscar por: ${input}`}
-          />
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
           <CreatableSelect
             instanceId="detentores-servidor"
             classNamePrefix="tecnica-select"
@@ -510,22 +499,62 @@ const Detentores: React.FC = () => {
             }}
             options={servidorOptions}
             styles={selectStyles}
-            placeholder="Buscar por servidor"
+            placeholder="Busque por servidor"
             isClearable
             isSearchable
             menuPortalTarget={document.body}
             formatCreateLabel={(input) => `Buscar por: ${input}`}
           />
-          <select
-            value={queryNatureza}
-            onChange={(e) => setQueryNatureza(e.target.value as 'Todos' | NaturezaConhecimento)}
-            className="px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-700"
-          >
-            <option value="Todos">Filtrar por natureza do conhecimento</option>
-            <option value="Liderança">Liderança</option>
-            <option value="Transversal">Transversal</option>
-            <option value="Técnico">Técnico</option>
-          </select>
+
+          <Select
+            instanceId="detentores-natureza-filtro"
+            classNamePrefix="tecnica-select"
+            value={naturezaOptions.find((option) => option.value === queryNatureza) || naturezaOptions[0]}
+            onChange={(option: SingleValue<SelectOption>) => setQueryNatureza((option?.value as 'Todos' | NaturezaConhecimento) || 'Todos')}
+            options={naturezaOptions}
+            styles={selectStyles}
+            placeholder="Busque por natureza"
+            isSearchable
+            menuPortalTarget={document.body}
+          />
+
+          <CreatableSelect
+            instanceId="detentores-conhecimento"
+            classNamePrefix="tecnica-select"
+            value={queryConhecimento ? toOption(queryConhecimento) : null}
+            onChange={(option) => setQueryConhecimento(option?.value || '')}
+            onInputChange={(input, meta) => {
+              if (meta.action === 'input-change') {
+                setQueryConhecimento(input);
+              }
+            }}
+            options={conhecimentoOptions}
+            styles={selectStyles}
+            placeholder="Busque por conhecimento"
+            isClearable
+            isSearchable
+            menuPortalTarget={document.body}
+            formatCreateLabel={(input) => `Buscar por: ${input}`}
+          />
+
+          <CreatableSelect
+            instanceId="detentores-capacitacao"
+            classNamePrefix="tecnica-select"
+            value={queryCapacitacao ? toOption(queryCapacitacao) : null}
+            onChange={(option) => setQueryCapacitacao(option?.value || '')}
+            onInputChange={(input, meta) => {
+              if (meta.action === 'input-change') {
+                setQueryCapacitacao(input);
+              }
+            }}
+            options={capacitacaoOptions}
+            styles={selectStyles}
+            placeholder="Busque por capacitação"
+            isClearable
+            isSearchable
+            menuPortalTarget={document.body}
+            formatCreateLabel={(input) => `Buscar por: ${input}`}
+          />
         </div>
 
         <div className="mt-4 flex justify-end">
