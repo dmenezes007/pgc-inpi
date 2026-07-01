@@ -601,8 +601,24 @@ const Detentores: React.FC = () => {
                     className="group border-t border-slate-100 cursor-pointer hover:bg-slate-50"
                   >
                     <td className="px-4 py-3 font-semibold text-slate-800">
-                      <span className="inline-flex w-full items-center rounded-xl border border-blue-200 bg-white px-3 py-2 text-sm font-semibold text-blue-900 shadow-sm transition-colors duration-200 group-hover:border-blue-400 group-hover:bg-blue-50">
+                      <span className="inline-flex w-full items-center justify-between gap-3 rounded-xl border border-blue-200 bg-white px-3 py-2 text-sm font-semibold text-blue-900 shadow-sm transition-colors duration-200 group-hover:border-blue-400 group-hover:bg-blue-50">
                         <span className="truncate whitespace-nowrap">{group.servidor}</span>
+                        <span
+                          className="inline-flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full border border-blue-200 bg-blue-100/70 text-blue-700 transition-colors duration-200 group-hover:border-blue-400 group-hover:bg-blue-200/70 group-hover:text-blue-900"
+                          aria-hidden="true"
+                        >
+                          {expanded ? (
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M8 8h8v8" />
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M9 15l7-7" />
+                            </svg>
+                          ) : (
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M16 16H8V8" />
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M15 9l-7 7" />
+                            </svg>
+                          )}
+                        </span>
                       </span>
                     </td>
                     <td className="px-4 py-3 text-slate-700">{group.quantidade}</td>
