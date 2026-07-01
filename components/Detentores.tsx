@@ -1,5 +1,6 @@
 import React, { useDeferredValue, useEffect, useMemo, useState } from 'react';
 import Papa from 'papaparse';
+import Select, { SingleValue } from 'react-select';
 import CreatableSelect from 'react-select/creatable';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
@@ -17,6 +18,7 @@ interface CsvRow {
 }
 
 interface JoinedRow {
+  id: string;
   servidor: string;
   conhecimento: string;
   capacitacao: string;
@@ -25,15 +27,13 @@ interface JoinedRow {
   natureza: NaturezaConhecimento;
 }
 
-interface IndexedRow extends JoinedRow {
-  servidorKey: string;
-  searchKey: string;
-}
-
 interface SelectOption {
   value: string;
   label: string;
 }
+
+const STORAGE_KEY = 'pgc_detentores_v1';
+const NATUREZA_OPTIONS: NaturezaConhecimento[] = ['Liderança', 'Transversal', 'Técnico'];
 
 const normalize = (value: unknown): string => String(value ?? '').trim();
 const normalizeKey = (value: unknown): string =>
@@ -42,7 +42,34 @@ const normalizeKey = (value: unknown): string =>
     .replace(/\p{Diacritic}/gu, '')
     .trim()
     .toUpperCase();
-  const displayUpper = (value: unknown): string => String(value ?? '').toLocaleUpperCase('pt-BR');
+
+const toTitlePt = (value: string): string => {
+  const smallWords = new Set(['a', 'as', 'o', 'os', 'de', 'da', 'das', 'do', 'dos', 'e', 'em', 'para', 'por', 'com']);
+  const normalized = value
+    .trim()
+    .replace(/\s+/g, ' ')
+    .toLocaleLowerCase('pt-BR');
+
+  if (!normalized) return '';
+
+  return normalized
+    .split(' ')
+    .map((word, index) => {
+      if (!word) return word;
+      if (index > 0 && smallWords.has(word)) return word;
+      return word[0].toLocaleUpperCase('pt-BR') + word.slice(1);
+    })
+    .join(' ');
+};
+
+const formatConhecimento = (value: unknown): string => toTitlePt(String(value ?? ''));
+
+const formatNatureza = (value: unknown): NaturezaConhecimento => {
+  const key = normalizeKey(value);
+  if (key === 'LIDERANCA') return 'Liderança';
+  if (key === 'TRANSVERSAL') return 'Transversal';
+  return 'Técnico';
+};
 
 const toOption = (value: string): SelectOption => ({ value, label: value });
 
@@ -101,7 +128,7 @@ const selectStyles = {
 
 const Detentores: React.FC = () => {
   const DETAIL_PAGE_SIZE = 8;
-  const [rows, setRows] = useState<IndexedRow[]>([]);
+  const [rows, setRows] = useState<JoinedRow[]>([]);
   const [queryConhecimento, setQueryConhecimento] = useState('');
   const [queryServidor, setQueryServidor] = useState('');
   const [queryNatureza, setQueryNatureza] = useState<'Todos' | NaturezaConhecimento>('Todos');
@@ -110,12 +137,40 @@ const Detentores: React.FC = () => {
   const [expandedServidores, setExpandedServidores] = useState<Record<string, boolean>>({});
   const [detailVisibleRows, setDetailVisibleRows] = useState<Record<string, number>>({});
   const [isLoading, setIsLoading] = useState(true);
+  const [saveMessage, setSaveMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
   const deferredQueryConhecimento = useDeferredValue(queryConhecimento);
   const deferredQueryServidor = useDeferredValue(queryServidor);
+
+  const saveLocal = (next: JoinedRow[]) => {
+    setRows(next);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+  };
+
+  const updateRow = (id: string, patch: Partial<Pick<JoinedRow, 'natureza' | 'conhecimento'>>) => {
+    const next = rows.map((row) => {
+      if (row.id !== id) return row;
+      return {
+        ...row,
+        natureza: patch.natureza ?? row.natureza,
+        conhecimento: patch.conhecimento !== undefined ? formatConhecimento(patch.conhecimento) : row.conhecimento,
+      };
+    });
+    saveLocal(next);
+  };
+
+  const handleAlterRow = (id: string) => {
+    const row = rows.find((item) => item.id === id);
+    if (!row) return;
+    setErrorMessage('');
+    setSaveMessage(`Registro de ${row.servidor} alterado com sucesso.`);
+  };
 
   useEffect(() => {
     const load = async () => {
       setIsLoading(true);
+      setSaveMessage('');
+      setErrorMessage('');
       try {
         const resp = await fetch(detentoresCsvUrl);
         const csvText = await resp.text();
@@ -125,23 +180,48 @@ const Detentores: React.FC = () => {
           delimiter: ';',
         });
 
-        const joined: IndexedRow[] = parsed.data
-          .map((r) => ({
+        const baseRows: JoinedRow[] = parsed.data
+          .map((r, idx) => ({
+            id: `csv-${idx + 1}`,
             servidor: normalize(r.Servidor),
-            conhecimento: normalize(r.Conhecimento),
+            conhecimento: formatConhecimento(r.Conhecimento),
             capacitacao: normalize(r.Capacitacao),
             ano: normalize(r.Ano) || '-',
             cargaHoraria: normalize(r.CargaHoraria) || '-',
-            natureza: (normalize(r.Natureza) as NaturezaConhecimento) || 'Técnico',
-            servidorKey: normalizeKey(r.Servidor),
-            searchKey: normalizeKey(`${r.Conhecimento} ${r.Capacitacao}`),
+            natureza: formatNatureza(r.Natureza),
           }))
           .filter((r) => r.servidor && (r.conhecimento || r.capacitacao));
 
-        setRows(joined);
+        const localRaw = localStorage.getItem(STORAGE_KEY);
+        if (localRaw) {
+          try {
+            const localRows = JSON.parse(localRaw) as Array<Partial<JoinedRow>>;
+            const sanitized = localRows
+              .map((row, idx) => ({
+                id: normalize(row.id) || `local-${idx + 1}`,
+                servidor: normalize(row.servidor),
+                conhecimento: formatConhecimento(row.conhecimento),
+                capacitacao: normalize(row.capacitacao),
+                ano: normalize(row.ano) || '-',
+                cargaHoraria: normalize(row.cargaHoraria) || '-',
+                natureza: formatNatureza(row.natureza),
+              }))
+              .filter((row) => row.servidor && (row.conhecimento || row.capacitacao));
+
+            if (sanitized.length > 0) {
+              setRows(sanitized);
+              return;
+            }
+          } catch {
+            // fallback to base rows
+          }
+        }
+
+        saveLocal(baseRows);
       } catch (error) {
         console.error('Falha ao carregar o módulo Detentores:', error);
         setRows([]);
+        setErrorMessage('Não foi possível carregar a tabela de detentores.');
       } finally {
         setIsLoading(false);
       }
@@ -175,13 +255,21 @@ const Detentores: React.FC = () => {
     const servidorKey = normalizeKey(deferredQueryServidor);
     return rows
       .filter((r) => {
-        const byConhecimento = !conhecimentoKey || r.searchKey.includes(conhecimentoKey);
-        const byServidor = !servidorKey || r.servidorKey.includes(servidorKey);
+        const searchKey = normalizeKey(`${r.conhecimento} ${r.capacitacao}`);
+        const byConhecimento = !conhecimentoKey || searchKey.includes(conhecimentoKey);
+        const byServidor = !servidorKey || normalizeKey(r.servidor).includes(servidorKey);
         const byNatureza = queryNatureza === 'Todos' || r.natureza === queryNatureza;
         return byConhecimento && byServidor && byNatureza;
       })
       .sort((a, b) => a.servidor.localeCompare(b.servidor, 'pt-BR'));
   }, [rows, deferredQueryConhecimento, deferredQueryServidor, queryNatureza]);
+
+  const conhecimentoRelationOptions = useMemo(() => {
+    const unique = Array.from(new Set(rows.map((row) => row.conhecimento).filter(Boolean)));
+    return unique.sort((a, b) => a.localeCompare(b, 'pt-BR')).map(toOption);
+  }, [rows]);
+
+  const naturezaOptions = useMemo(() => NATUREZA_OPTIONS.map(toOption), []);
 
   const grouped = useMemo(() => {
     const groups = new Map<string, JoinedRow[]>();
@@ -285,6 +373,9 @@ const Detentores: React.FC = () => {
         </div>
       </div>
 
+      {errorMessage && <p className="text-sm text-red-500">{errorMessage}</p>}
+      {saveMessage && <p className="text-sm text-slate-600">{saveMessage}</p>}
+
       {isLoading && (
         <div className="flex items-center gap-3 rounded-xl border border-blue-200 bg-blue-50 px-4 py-4 text-blue-800">
           <span className="inline-flex h-10 w-10 items-center justify-center rounded-full border-2 border-blue-200 border-t-blue-700 animate-spin" aria-hidden="true" />
@@ -327,11 +418,11 @@ const Detentores: React.FC = () => {
                         >
                           <FontAwesomeIcon icon={expanded ? faChevronUp : faChevronDown} aria-hidden="true" />
                         </button>
-                        <span>{displayUpper(group.servidor)}</span>
+                        <span>{group.servidor}</span>
                       </div>
                     </td>
                     <td className="px-4 py-3 text-slate-700">{group.quantidade}</td>
-                    <td className="px-4 py-3 text-slate-700">{displayUpper(group.naturezas || '-')}</td>
+                    <td className="px-4 py-3 text-slate-700">{group.naturezas || '-'}</td>
                     <td className="px-4 py-3 text-slate-700">{group.ultimoAno}</td>
                   </tr>
 
@@ -347,16 +438,61 @@ const Detentores: React.FC = () => {
                                 <th className="text-left px-3 py-2">Conhecimento</th>
                                 <th className="text-left px-3 py-2">Capacitação</th>
                                 <th className="text-left px-3 py-2">Carga Horária</th>
+                                <th className="text-left px-3 py-2">Ações</th>
                               </tr>
                             </thead>
                             <tbody>
-                              {visibleItems.map((row, index) => (
-                                <tr key={`${group.servidor}-${index}`} className="border-t border-slate-100">
+                              {visibleItems.map((row) => (
+                                <tr key={row.id} className="border-t border-slate-100">
                                   <td className="px-3 py-2 text-slate-700">{row.ano || '-'}</td>
-                                  <td className="px-3 py-2 text-slate-700">{displayUpper(row.natureza)}</td>
-                                  <td className="px-3 py-2 text-slate-700">{displayUpper(row.conhecimento || '-')}</td>
-                                  <td className="px-3 py-2 text-slate-700">{displayUpper(row.capacitacao || '-')}</td>
+                                  <td className="px-3 py-2 text-slate-700 min-w-[13rem]">
+                                    <Select
+                                      instanceId={`detentores-natureza-${row.id}`}
+                                      classNamePrefix="tecnica-select"
+                                      value={toOption(row.natureza)}
+                                      onChange={(option: SingleValue<SelectOption>) => {
+                                        const selected = NATUREZA_OPTIONS.find((item) => item === option?.value);
+                                        if (selected) {
+                                          updateRow(row.id, { natureza: selected });
+                                        }
+                                      }}
+                                      options={naturezaOptions}
+                                      styles={selectStyles}
+                                      menuPortalTarget={document.body}
+                                      isSearchable
+                                    />
+                                  </td>
+                                  <td className="px-3 py-2 text-slate-700 min-w-[18rem]">
+                                    <CreatableSelect
+                                      instanceId={`detentores-conhecimento-${row.id}`}
+                                      classNamePrefix="tecnica-select"
+                                      value={row.conhecimento ? toOption(row.conhecimento) : null}
+                                      onChange={(option) => {
+                                        updateRow(row.id, { conhecimento: option?.value || '' });
+                                      }}
+                                      options={conhecimentoRelationOptions}
+                                      styles={selectStyles}
+                                      placeholder="Busque ou selecione"
+                                      isClearable
+                                      isSearchable
+                                      menuPortalTarget={document.body}
+                                      formatCreateLabel={(input) => `Usar: ${input}`}
+                                    />
+                                  </td>
+                                  <td className="px-3 py-2 text-slate-700">{row.capacitacao || '-'}</td>
                                   <td className="px-3 py-2 text-slate-700">{row.cargaHoraria || '-'}</td>
+                                  <td className="px-3 py-2 text-slate-700">
+                                    <button
+                                      type="button"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleAlterRow(row.id);
+                                      }}
+                                      className="px-3 py-1 rounded-md text-xs font-medium text-white bg-green-600 hover:bg-green-700"
+                                    >
+                                      Alterar
+                                    </button>
+                                  </td>
                                 </tr>
                               ))}
                             </tbody>

@@ -408,6 +408,34 @@ const Mapa: React.FC = () => {
     return [] as SelectOption[];
   }, [selectedNatureza, nivel3Options]);
 
+  const tableKnowledgeOptionsByNature = useMemo(() => {
+    const byRows = {
+      Liderança: new Set<string>(),
+      Transversal: new Set<string>(),
+      Técnico: new Set<string>(),
+    } as Record<NaturezaConhecimento, Set<string>>;
+
+    rows.forEach((row) => {
+      if (row.conhecimento) {
+        byRows[row.natureza].add(row.conhecimento.trim());
+      }
+    });
+
+    LIDERANCA_OPTIONS.forEach((item) => byRows.Liderança.add(item));
+    TRANSVERSAL_OPTIONS.forEach((item) => byRows.Transversal.add(item));
+    tecnicaData.forEach((item) => {
+      if (item.Nivel3) {
+        byRows.Técnico.add(item.Nivel3.trim());
+      }
+    });
+
+    return {
+      Liderança: Array.from(byRows.Liderança).sort((a, b) => a.localeCompare(b, 'pt-BR')).map(toOption),
+      Transversal: Array.from(byRows.Transversal).sort((a, b) => a.localeCompare(b, 'pt-BR')).map(toOption),
+      Técnico: Array.from(byRows.Técnico).sort((a, b) => a.localeCompare(b, 'pt-BR')).map(toOption),
+    } as Record<NaturezaConhecimento, SelectOption[]>;
+  }, [rows, tecnicaData]);
+
   const finalConhecimento = selectedNatureza === 'Técnico' && customNivel3.trim() !== '' ? customNivel3.trim() : selectedConhecimento;
 
   const resetKnowledgeStep = () => {
@@ -1049,10 +1077,18 @@ const Mapa: React.FC = () => {
                 <td className="px-4 py-3 align-top text-slate-800">{`${row.unidadeSigla} - ${row.unidadeNome}`}</td>
                 <td className="px-4 py-3 align-top text-slate-700">{row.natureza}</td>
                 <td className="px-4 py-3 align-top text-slate-700">
-                  <input
-                    value={row.conhecimento}
-                    onChange={(e) => updateRow(row.id, { conhecimento: e.target.value })}
-                    className="w-72 px-2 py-1 rounded border border-slate-300"
+                  <CreatableSelect
+                    instanceId={`mapa-row-conhecimento-${row.id}`}
+                    classNamePrefix="tecnica-select"
+                    value={row.conhecimento ? toOption(row.conhecimento) : null}
+                    onChange={(option) => updateRow(row.id, { conhecimento: (option?.value || '').trim() })}
+                    options={tableKnowledgeOptionsByNature[row.natureza]}
+                    styles={customStyles}
+                    placeholder="Busque ou selecione"
+                    isClearable
+                    isSearchable
+                    menuPortalTarget={document.body}
+                    formatCreateLabel={(input) => `Usar: ${input}`}
                   />
                 </td>
                 <td className="px-4 py-3 align-top text-slate-700">
