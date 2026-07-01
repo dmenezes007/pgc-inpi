@@ -136,17 +136,16 @@ const MainContent: React.FC<MainContentProps> = ({ activeModule, onModuleSelect 
                         <div className="flex-1">
                             <p className="text-sm font-semibold text-orange-800 mb-1">Guia Metodológico de Implementação</p>
                             <p className="text-sm text-orange-700 leading-relaxed">
-                                Documento de referência para a Gestão do Conhecimento no INPI que estabelece diretrizes,
-                                conceitos, papéis, critérios e procedimentos para orientar, com unidade conceitual,
-                                todo o ciclo de inovação e aprendizagem organizacional, da captação de ideias à
-                                priorização, implementação, monitoramento e ampliação em escala. Sua aplicação
-                                estrutura responsabilidades, reduz assimetrias entre áreas e fortalece decisões
-                                baseadas em evidências, assegurando rastreabilidade das ações e geração de valor
-                                público mensurável ao longo do tempo.
+                                Documento de referência para a Gestão do Conhecimento no INPI, com diretrizes,
+                                conceitos, papéis, critérios e procedimentos para padronizar o inventário de
+                                conhecimentos individuais, estruturar a matriz institucional de conhecimentos e
+                                orientar ciclos contínuos de identificação de lacunas, desenvolvimento de competências,
+                                retenção e monitoramento de resultados. Sua aplicação harmoniza a linguagem entre
+                                áreas, fortalece a rastreabilidade e amplia decisões baseadas em evidências.
                             </p>
                         </div>
                         <a
-                            href="https://dmenezes007.github.io/pgi-inpi/files/docs/guia-motodologico.md"
+                            href={`${import.meta.env.BASE_URL}files/docs/guia-metodologico-gestao-do-conhecimento-inpi.md`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-sm text-white bg-purple-600 hover:bg-purple-700 transition-colors duration-200 whitespace-nowrap"
@@ -154,7 +153,7 @@ const MainContent: React.FC<MainContentProps> = ({ activeModule, onModuleSelect 
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                             </svg>
-                            Acessar o Guia Metodológico
+                            Acessar o Guia Metodológico do INPI
                         </a>
                     </div>
                 )}
